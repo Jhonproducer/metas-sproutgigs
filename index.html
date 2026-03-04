@@ -8,31 +8,32 @@
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
         .card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #30363d; text-align: center; width: 380px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
         
-        /* Cabecera con Hora Arreglada */
         .header { border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 15px; }
         .day-name { color: var(--blue); font-weight: 800; text-transform: uppercase; font-size: 1.1rem; display: block; }
         .date-time { color: #8b949e; font-size: 0.85rem; }
 
-        /* Ganancia de Hoy (Grande) */
         h2 { color: #8b949e; font-size: 0.7rem; text-transform: uppercase; margin-top: 10px; }
         .total-hoy { font-size: 4.5rem; font-weight: 900; margin: 5px 0; }
         
-        /* Barra de Semáforo */
         .progress-bar { background: #30363d; border-radius: 10px; height: 12px; margin: 15px 0; overflow: hidden; }
         #fill { height: 100%; width: 0%; transition: width 1s ease, background-color 0.5s ease; }
 
-        /* SALDOS REALES (Lo que te devolví) */
         .real-stats { background: #0d1117; padding: 15px; border-radius: 12px; border: 1px solid #30363d; margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .stat-item { text-align: center; }
         .stat-label { font-size: 0.65rem; color: #8b949e; text-transform: uppercase; display: block; }
         .stat-val { font-size: 1rem; font-weight: bold; color: white; }
         .stat-total { grid-column: span 2; border-top: 1px solid #1f242b; padding-top: 8px; margin-top: 5px; color: var(--green); font-size: 1.2rem; }
 
-        /* Meta e Historial */
-        .meta-box { margin-top: 15px; font-size: 0.9rem; }
+        /* NUEVA CAJA DE RETIRO */
+        .withdrawal-box { margin-top: 15px; padding: 15px; background: #1c2128; border-radius: 12px; border: 1px solid #30363d; border-left: 4px solid var(--blue); text-align: left; }
+        .withdrawal-title { font-size: 0.7rem; color: var(--blue); font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .withdrawal-msg { font-size: 0.9rem; font-weight: bold; display: block; margin-top: 5px; color: #f0f6fc; }
+
+        .meta-box { margin-top: 15px; font-size: 0.9rem; color: #8b949e; }
         input { background: transparent; border: none; border-bottom: 2px solid var(--green); color: white; padding: 2px; width: 60px; text-align: center; font-size: 1.1rem; font-weight: bold; outline: none; }
+        #withdrawTarget { border-bottom-color: var(--blue); width: 50px; }
+
         .history { margin-top: 15px; text-align: left; background: #0d1117; padding: 10px; border-radius: 8px; font-size: 0.75rem; border: 1px solid #30363d; }
-        
         #soundToggle { font-size: 0.65rem; color: #484f58; cursor: pointer; text-decoration: underline; margin-top: 15px; display: block; }
     </style>
 </head>
@@ -43,34 +44,30 @@
             <span id="txtDateTime" class="date-time">--/--/---- | --:-- --</span>
         </div>
 
-        <h2>Llevas ganado hoy:</h2>
+        <h2>Ganado hoy:</h2>
         <div class="total-hoy" id="gananciaHoy">$0.00</div>
-        
         <div id="message" style="font-weight:bold; font-size:0.9rem;">Faltan $--</div>
         <div class="progress-bar"><div id="fill"></div></div>
 
         <div class="meta-box">
-            Meta de hoy: $ <input type="number" id="goal" value="1.00" step="0.10">
+            Meta del día: $ <input type="number" id="goal" value="1.00" step="0.10">
         </div>
 
         <div class="real-stats">
-            <div class="stat-item">
-                <span class="stat-label">Ganado</span>
-                <span id="valEarned" class="stat-val">$0.0000</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Pendiente</span>
-                <span id="valPending" class="stat-val">$0.0000</span>
-            </div>
-            <div class="stat-item stat-total">
-                <span class="stat-label">Saldo Total Real</span>
-                <span id="valTotalReal">$0.0000</span>
-            </div>
+            <div class="stat-item"><span class="stat-label">Ganado</span><span id="valEarned" class="stat-val">$0.0000</span></div>
+            <div class="stat-item"><span class="stat-label">Pendiente</span><span id="valPending" class="stat-val">$0.0000</span></div>
+            <div class="stat-item stat-total"><span class="stat-label">Saldo Total Real</span><span id="valTotalReal">$0.0000</span></div>
         </div>
 
-        <div class="history">
-            <div id="historyList" style="color:#8b949e; text-align:center;">Historial Vzla (Vacío)</div>
+        <div class="withdrawal-box">
+            <span class="withdrawal-title">Calculadora de Retiro</span>
+            <div style="font-size: 0.8rem; color: #8b949e;">
+                Quiero retirar: $ <input type="number" id="withdrawTarget" value="13.00" step="1">
+            </div>
+            <span id="withdrawRemaining" class="withdrawal-msg">Cargando cálculo...</span>
         </div>
+
+        <div class="history"><div id="historyList" style="color:#8b949e; text-align:center;">Historial Vzla (Vacío)</div></div>
 
         <span id="soundToggle" onclick="testSound()">🔊 Activar Sonido Ka-ching</span>
     </div>
@@ -86,12 +83,7 @@
             const ampm = h >= 12 ? 'PM' : 'AM';
             h = h % 12 || 12;
             const m = vzla.getMinutes().toString().padStart(2, '0');
-            return { 
-                id: vzla.toISOString().split('T')[0], 
-                dia: dias[vzla.getDay()], 
-                fecha: vzla.toLocaleDateString('es-VE'),
-                hora: `${h}:${m} ${ampm}`
-            };
+            return { id: vzla.toISOString().split('T')[0], dia: dias[vzla.getDay()], fecha: vzla.toLocaleDateString('es-VE'), hora: `${h}:${m} ${ampm}` };
         }
 
         const info = getVzlaData();
@@ -107,7 +99,6 @@
         let ultimaFecha = localStorage.getItem('fechaJhon');
         let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
 
-        // Lógica de reset diario
         if (ultimaFecha && ultimaFecha !== info.id) {
             const ganadoAyer = Math.max(0, totalActual - base);
             historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2) });
@@ -121,49 +112,59 @@
         localStorage.setItem('fechaJhon', info.id);
 
         function calcular() {
+            // Lógica Meta Diaria
             const meta = parseFloat(document.getElementById('goal').value) || 1.00;
             localStorage.setItem('metaJhon', meta);
 
-            const ganadoPuro = Math.max(0, totalActual - base);
-            const redondeoHoy = Math.round(ganadoPuro * 100) / 100;
+            // Lógica Retiro
+            const retiroTarget = parseFloat(document.getElementById('withdrawTarget').value) || 13.00;
+            localStorage.setItem('retiroJhon', retiroTarget);
+
+            const ganadoHoy = Math.max(0, totalActual - base);
+            const redondeoHoy = Math.round(ganadoHoy * 100) / 100;
             
-            // Sonido $$$
+            // Sonido
             const ant = parseFloat(localStorage.getItem('antJhon')) || 0;
             if (redondeoHoy > ant) { document.getElementById('cashSound').play().catch(e=>{}); }
             localStorage.setItem('antJhon', redondeoHoy);
 
-            // ACTUALIZAR VISTA
+            // Actualizar Textos
             document.getElementById('gananciaHoy').innerText = '$' + redondeoHoy.toFixed(2);
             document.getElementById('valEarned').innerText = '$' + earned.toFixed(4);
             document.getElementById('valPending').innerText = '$' + pending.toFixed(4);
             document.getElementById('valTotalReal').innerText = '$' + totalActual.toFixed(4);
 
-            const pct = Math.min((ganadoPuro / meta) * 100, 100);
+            // Cálculo Retiro
+            const faltaRetiro = Math.max(0, retiroTarget - totalActual);
+            document.getElementById('withdrawRemaining').innerText = faltaRetiro > 0 
+                ? `Faltan $${faltaRetiro.toFixed(2)} para tu retiro.` 
+                : "¡YA PUEDES RETIRAR! 🔥";
+
+            // Barra e Interfaz
+            const pct = Math.min((ganadoHoy / meta) * 100, 100);
             const fill = document.getElementById('fill');
             const bigNum = document.getElementById('gananciaHoy');
             fill.style.width = pct + '%';
 
-            // Semáforo
             if(pct < 35) { fill.style.backgroundColor = "#da3633"; bigNum.style.color = "#da3633"; }
             else if(pct < 75) { fill.style.backgroundColor = "#d29922"; bigNum.style.color = "#d29922"; }
             else { fill.style.backgroundColor = "#238636"; bigNum.style.color = "#238636"; }
 
-            document.getElementById('message').innerText = ganadoPuro >= meta ? "¡META LOGRADA! 🚀" : `Faltan $${(meta - ganadoPuro).toFixed(2)}`;
-            document.getElementById('message').style.color = ganadoPuro >= meta ? "#238636" : "#d29922";
+            document.getElementById('message').innerText = ganadoHoy >= meta ? "¡META LOGRADA! 🚀" : `Faltan $${(meta - ganadoHoy).toFixed(2)}`;
+            document.getElementById('message').style.color = ganadoHoy >= meta ? "#238636" : "#d29922";
 
             if(historial.length > 0) {
-                document.getElementById('historyList').innerHTML = historial.map(h => `
-                    <div style="display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid #1f242b">
-                        <span>${h.f}</span> <b>$${h.m}</b>
-                    </div>
-                `).join('');
+                document.getElementById('historyList').innerHTML = historial.map(h => `<div style="display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid #1f242b"><span>${h.f}</span> <b>$${h.m}</b></div>`).join('');
             }
         }
 
         function testSound() { document.getElementById('cashSound').play(); document.getElementById('soundToggle').innerText = "✅ Sonido Activo"; }
 
         document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
+        document.getElementById('withdrawTarget').value = localStorage.getItem('retiroJhon') || 13.00;
+        
         document.getElementById('goal').addEventListener('input', calcular);
+        document.getElementById('withdrawTarget').addEventListener('input', calcular);
         calcular();
     </script>
 </body>
