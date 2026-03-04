@@ -118,8 +118,16 @@
         document.body.setAttribute('data-theme', localStorage.getItem('jhonTheme') || 'dark');
 
         const params = new URLSearchParams(window.location.search);
-        const earned = parseFloat(params.get('earned')) || 0;
-        const pending = parseFloat(params.get('pending')) || 0;
+        let earned = parseFloat(params.get('earned'));
+        let pending = parseFloat(params.get('pending'));
+
+        // PROTECCIÓN: Si abres el link sin datos, usa lo último que guardamos
+        if (isNaN(earned)) earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
+        if (isNaN(pending)) pending = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
+        
+        localStorage.setItem('lastEarnedJhon', earned);
+        localStorage.setItem('lastPendingJhon', pending);
+        
         const totalActual = earned + pending;
 
         let base = parseFloat(localStorage.getItem('baseJhon'));
@@ -182,9 +190,9 @@
             document.getElementById('historyList').innerHTML = htmlHist || '<div style="text-align:center;padding:10px;color:#666">SIN REGISTROS</div>';
         }
 
-        // ESCUCHA SILENCIOSA: Si otra pestaña actualiza los datos, esta se refresca sola
+        // ESCUCHA SILENCIOSA: Importante para el mensajero invisible
         window.addEventListener('storage', (e) => {
-            if (e.key === 'antJhon' || e.key === 'baseJhon' || e.key === 'fechaJhon') {
+            if (e.key === 'lastEarnedJhon' || e.key === 'lastPendingJhon') {
                 location.reload();
             }
         });
