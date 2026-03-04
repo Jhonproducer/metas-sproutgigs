@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Jhonproducer - Master Dashboard 2026</title>
+    <title>Jhonproducer - Silent Master Dashboard</title>
     <style>
         :root {
             --bg: #000000; --card: #161b22; --text: #ffffff;
@@ -12,49 +12,31 @@
             --bg: #ffffff; --card: #f6f8fa; --text: #000000;
             --green: #1a7f37; --red: #cf222e; --yellow: #9a6700; --blue: #0969da; --border: #d0d7de;
         }
-        
         body { 
             background: var(--bg); color: var(--text); 
             font-family: 'Arial Black', Gadget, sans-serif; 
-            display: flex; justify-content: center; 
-            align-items: flex-start; /* Permite que el contenido empiece desde arriba si hay scroll */
-            min-height: 100vh; margin: 0; 
-            overflow-y: auto; /* ¡AQUÍ ESTÁ TU SCROLL, JHON! */
-            padding: 40px 10px; /* Espacio arriba y abajo para que no choque al scrollear */
+            display: flex; justify-content: center; align-items: flex-start; 
+            min-height: 100vh; margin: 0; overflow-y: auto; padding: 20px 10px;
             font-weight: 900;
         }
-
-        /* Personalización de la barra de scroll para que se vea chimba */
-        ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--blue); }
-
         .card { 
             background: var(--card); border: 4px solid var(--border);
-            border-radius: 20px; padding: 25px; width: 460px;
+            border-radius: 20px; padding: 20px; width: 460px;
             box-shadow: 0 0 40px rgba(0,0,0,0.5);
-            margin-bottom: 20px; /* Margen extra al final */
         }
-
         .top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
         .big-money { font-size: 5rem; line-height: 1; margin: 10px 0; text-align: center; }
-        
         details { background: var(--bg); border: 2px solid var(--border); border-radius: 10px; margin-top: 10px; }
         summary { padding: 12px; cursor: pointer; color: var(--blue); font-size: 1rem; outline: none; text-transform: uppercase; }
         .content { padding: 10px; border-top: 2px solid var(--border); }
-
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
         .box { border: 2px solid var(--border); padding: 12px; border-radius: 10px; text-align: center; }
         .label { font-size: 0.75rem; color: #8b949e; display: block; text-transform: uppercase; }
-        
-        input { background: var(--card); border: 3px solid var(--blue); color: var(--text); width: 90px; text-align: center; font-size: 1.6rem; font-weight: 900; border-radius: 8px; outline: none; }
-        .btn-theme { background: var(--blue); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 900; font-size: 0.85rem; }
-        
+        input { background: var(--card); border: 3px solid var(--blue); color: var(--text); width: 90px; text-align: center; font-size: 1.6rem; font-weight: 900; border-radius: 8px; }
+        .btn-theme { background: var(--blue); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 900; }
         .progress-bar { background: #333; border-radius: 12px; height: 22px; margin: 15px 0; overflow: hidden; border: 1px solid #555; }
         #fill { height: 100%; width: 0%; transition: width 1s ease; }
-
-        .month-header { background: var(--border); color: var(--text); padding: 8px; font-size: 0.85rem; margin-top: 12px; border-radius: 4px; text-align: center; letter-spacing: 1px; }
+        .month-header { background: var(--border); color: var(--text); padding: 8px; font-size: 0.85rem; margin-top: 12px; border-radius: 4px; text-align: center; }
         .hist-item { display:flex; justify-content:space-between; padding:8px 5px; border-bottom:1px solid var(--border); font-size: 1rem; }
     </style>
 </head>
@@ -69,8 +51,8 @@
         </div>
 
         <div style="text-align: center; margin-top: 15px;">
-            <span id="labelHoy" style="font-size: 1rem; letter-spacing: 1px;">GANADO HOY:</span>
-            <div class="big-money" id="gananciaHoy" style="text-shadow: 2px 2px 10px rgba(0,0,0,0.5);">$0.00</div>
+            <span id="labelHoy" style="font-size: 1rem;">GANADO HOY:</span>
+            <div class="big-money" id="gananciaHoy">$0.00</div>
             <div id="message" style="font-size: 1.3rem; margin-bottom: 8px;">---</div>
             <div class="progress-bar"><div id="fill"></div></div>
         </div>
@@ -88,14 +70,14 @@
             <summary>📊 HISTORIAL Y ACUMULADO</summary>
             <div class="content">
                 <div style="display:flex; justify-content:space-between; margin-bottom: 10px; padding: 10px; background: var(--green); color: white; border-radius: 8px; font-size: 1.1rem;">
-                    <span>TOTAL MES:</span> <b id="valMes">$0.00</b>
+                    <span>TOTAL MES ACTUAL:</span> <b id="valMes">$0.00</b>
                 </div>
                 <div id="historyList"></div>
             </div>
         </details>
 
         <details>
-            <summary>💰 CALCULADORA DE RETIRO</summary>
+            <summary>💰 META DE RETIRO</summary>
             <div class="content">
                 M META DE RETIRO: $ <input type="number" id="withdrawTarget" value="13.00">
                 <div id="withdrawRemaining" style="margin-top: 15px; color: var(--yellow); font-size: 1.3rem; text-align: center;">---</div>
@@ -127,15 +109,7 @@
             let h = vzla.getHours();
             const am = h >= 12 ? 'PM' : 'AM';
             h = h % 12 || 12;
-            const m = vzla.getMinutes().toString().padStart(2, '0');
-            return { 
-                id: vzla.toISOString().split('T')[0], 
-                mesIdx: vzla.getMonth(),
-                anio: vzla.getFullYear(),
-                diaNom: dias[vzla.getDay()], 
-                fecha: vzla.toLocaleDateString('es-VE'), 
-                hora: `${h}:${m} ${am}` 
-            };
+            return { id: vzla.toISOString().split('T')[0], mesIdx: vzla.getMonth(), anio: vzla.getFullYear(), diaNom: dias[vzla.getDay()], fecha: vzla.toLocaleDateString('es-VE'), hora: `${h}:${vzla.getMinutes().toString().padStart(2, '0')} ${am}` };
         }
 
         const info = getVzlaData();
@@ -155,13 +129,7 @@
         if (ultimaFecha && ultimaFecha !== info.id) {
             const ganadoAyer = Math.max(0, totalActual - base);
             const d = new Date(ultimaFecha + "T12:00:00");
-            historial.unshift({ 
-                f: ultimaFecha, 
-                m: ganadoAyer.toFixed(2), 
-                mes: d.getMonth(), 
-                anio: d.getFullYear() 
-            });
-            if(historial.length > 90) historial.pop();
+            historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), mes: d.getMonth(), anio: d.getFullYear() });
             localStorage.setItem('histJhon', JSON.stringify(historial));
             base = totalActual;
             localStorage.setItem('baseJhon', base);
@@ -187,10 +155,7 @@
             document.getElementById('valPending').innerText = '$' + pending.toFixed(4);
             document.getElementById('valTotalReal').innerText = '$' + totalActual.toFixed(4);
 
-            const sumMesActual = historial
-                .filter(h => h.mes === info.mesIdx && h.anio === info.anio)
-                .reduce((acc, h) => acc + parseFloat(h.m), 0) + hoyRedondeo;
-            
+            const sumMesActual = historial.filter(h => h.mes === info.mesIdx && h.anio === info.anio).reduce((acc, h) => acc + parseFloat(h.m), 0) + hoyRedondeo;
             document.getElementById('valMes').innerText = '$' + sumMesActual.toFixed(2);
             document.getElementById('labelHoy').innerText = `GANADO HOY (${MESES[info.mesIdx]}):`;
 
@@ -209,20 +174,20 @@
             
             let htmlHist = "";
             let ultimoMesAnio = "";
-            
             historial.forEach(h => {
-                let nombreMes = (h.mes !== undefined) ? MESES[h.mes] : "ANTERIORES";
-                let numeroAnio = (h.anio !== undefined) ? h.anio : "";
-                let mesAnio = `${nombreMes} ${numeroAnio}`.trim();
-
-                if (mesAnio !== ultimoMesAnio) {
-                    htmlHist += `<div class="month-header">${mesAnio}</div>`;
-                    ultimoMesAnio = mesAnio;
-                }
+                let mesAnio = `${MESES[h.mes] || 'ANTERIORES'} ${h.anio || ''}`.trim();
+                if (mesAnio !== ultimoMesAnio) { htmlHist += `<div class="month-header">${mesAnio}</div>`; ultimoMesAnio = mesAnio; }
                 htmlHist += `<div class="hist-item"><span>${h.f}</span> <b>$${h.m}</b></div>`;
             });
             document.getElementById('historyList').innerHTML = htmlHist || '<div style="text-align:center;padding:10px;color:#666">SIN REGISTROS</div>';
         }
+
+        // ESCUCHA SILENCIOSA: Si otra pestaña actualiza los datos, esta se refresca sola
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'antJhon' || e.key === 'baseJhon' || e.key === 'fechaJhon') {
+                location.reload();
+            }
+        });
 
         function testSound() { document.getElementById('cashSound').play(); }
         document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
