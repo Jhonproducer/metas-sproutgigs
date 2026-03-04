@@ -2,147 +2,283 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Jhonproducer Pro</title>
+    <title>Dashboard SproutGigs - Jhonproducer</title>
     <style>
-        body { background-color: #0d1117; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .card { background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #30363d; text-align: center; width: 360px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .header-info { color: #8b949e; font-size: 0.85rem; margin-bottom: 15px; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
-        .day-name { color: #58a6ff; font-weight: bold; text-transform: uppercase; display: block; font-size: 1.1rem; }
-        h2 { color: #8b949e; font-size: 0.8rem; text-transform: uppercase; margin-top: 15px; letter-spacing: 1px; }
-        .total-hoy { font-size: 4rem; color: #238636; font-weight: bold; margin: 5px 0; }
-        .meta-container { background: #0d1117; padding: 15px; border-radius: 10px; margin: 15px 0; border: 1px solid #30363d; }
-        input { background: transparent; border: none; border-bottom: 2px solid #238636; color: white; padding: 5px; width: 80px; text-align: center; font-size: 1.2rem; font-weight: bold; outline: none; }
-        .progress-bar { background: #30363d; border-radius: 20px; height: 12px; width: 100%; margin: 12px 0; overflow: hidden; }
-        #fill { background: linear-gradient(90deg, #238636, #2ea043); height: 100%; width: 0%; transition: width 1s ease-in-out; }
-        .msg { font-weight: bold; margin-top: 10px; font-size: 1rem; }
-        
-        /* Estilos del Historial */
-        .history { margin-top: 20px; text-align: left; background: #0d1117; padding: 10px; border-radius: 8px; font-size: 0.75rem; border: 1px solid #30363d; }
-        .history-title { color: #8b949e; font-weight: bold; margin-bottom: 8px; display: block; text-align: center; border-bottom: 1px solid #30363d; padding-bottom: 4px; }
-        .history-item { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #1f242b; }
-        .status-ok { color: #238636; }
-        .status-fail { color: #da3633; }
+        :root {
+            --primary: #238636;
+            --primary-glow: rgba(35, 134, 54, 0.3);
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --text-gray: #8b949e;
+        }
+
+        body { 
+            background-color: var(--bg); 
+            color: white; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px;
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 20px; 
+            border: 1px solid #30363d; 
+            text-align: center; 
+            width: 380px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        .header-info { 
+            margin-bottom: 20px; 
+            border-bottom: 1px solid #30363d; 
+            padding-bottom: 15px; 
+        }
+
+        .day-name { 
+            color: #58a6ff; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            display: block; 
+            font-size: 1.2rem; 
+            letter-spacing: 2px;
+        }
+
+        .date-time {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: block;
+        }
+
+        h2 { color: var(--text-gray); font-size: 0.75rem; text-transform: uppercase; margin-top: 20px; letter-spacing: 1.5px; }
+
+        .total-hoy { 
+            font-size: 4.5rem; 
+            color: var(--primary); 
+            font-weight: 900; 
+            margin: 10px 0; 
+            text-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .meta-container { 
+            background: #0d1117; 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin: 20px 0; 
+            border: 1px solid #30363d; 
+        }
+
+        .meta-input-wrap {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        input { 
+            background: transparent; 
+            border: none; 
+            border-bottom: 2px solid var(--primary); 
+            color: white; 
+            padding: 5px; 
+            width: 70px; 
+            text-align: center; 
+            font-size: 1.3rem; 
+            font-weight: bold; 
+            outline: none; 
+        }
+
+        .progress-bar { 
+            background: #30363d; 
+            border-radius: 10px; 
+            height: 10px; 
+            width: 100%; 
+            margin: 15px 0; 
+            overflow: hidden; 
+        }
+
+        #fill { 
+            background: linear-gradient(90deg, #238636, #44d664); 
+            height: 100%; 
+            width: 0%; 
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .msg { font-weight: bold; font-size: 1rem; margin-top: 5px; }
+
+        /* Estilos del Historial - Lo que pediste parce */
+        .history { 
+            margin-top: 25px; 
+            text-align: left; 
+            background: #0d1117; 
+            padding: 15px; 
+            border-radius: 12px; 
+            border: 1px solid #30363d; 
+        }
+
+        .history-title { 
+            color: var(--text-gray); 
+            font-weight: bold; 
+            font-size: 0.7rem;
+            margin-bottom: 10px; 
+            display: block; 
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .history-item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 6px 0; 
+            border-bottom: 1px solid #1f242b;
+            font-size: 0.85rem;
+        }
+
+        .history-item:last-child { border: none; }
+        .status-ok { color: #238636; font-weight: bold; }
+        .status-fail { color: #da3633; font-weight: bold; }
+
+        .btn-reset {
+            margin-top: 25px; 
+            background: transparent; 
+            border: 1px solid #30363d; 
+            color: #484f58; 
+            cursor: pointer; 
+            font-size: 0.7rem; 
+            padding: 8px; 
+            border-radius: 6px; 
+            width: 100%;
+            transition: 0.3s;
+        }
+
+        .btn-reset:hover { border-color: #da3633; color: #da3633; }
     </style>
 </head>
 <body>
     <div class="card">
         <div class="header-info">
             <span id="txtDia" class="day-name">---</span>
-            <span id="txtFecha">--/--/----</span> | <span id="txtHora">--:-- --</span>
+            <span id="txtDateTime" class="date-time">--/--/---- | --:-- --</span>
         </div>
 
         <h2>Ganancia hoy:</h2>
         <div class="total-hoy" id="gananciaHoy">$0.00</div>
         
         <div class="meta-container">
-            <span>Meta: $</span>
-            <input type="number" id="goal" value="1.00" step="0.10">
+            <div class="meta-input-wrap">Meta: $ <input type="number" id="goal" value="1.00" step="0.10"></div>
             <div class="progress-bar"><div id="fill"></div></div>
             <div id="message" class="msg">Sincronizando...</div>
         </div>
 
         <div class="history">
-            <span class="history-title">ÚLTIMOS DÍAS</span>
+            <span class="history-title">Historial de Esfuerzo (Vzla)</span>
             <div id="historyList">
-                <div style="text-align:center; color:#484f58;">No hay registros aún</div>
+                <div style="text-align:center; color:#484f58; font-size: 0.7rem;">Sin registros previos</div>
             </div>
         </div>
         
-        <button onclick="forzarReset()" style="margin-top: 20px; background: transparent; border: 1px solid #30363d; color: #8b949e; cursor: pointer; font-size: 0.65rem; padding: 5px; border-radius: 4px; width: 100%;">Reiniciar día (Usar solo si hay error)</button>
+        <button onclick="forzarReset()" class="btn-reset">Reiniciar día (Solo en caso de error)</button>
     </div>
 
     <script>
+        // --- FUNCIÓN DE TIEMPO VZLA CORREGIDA ---
         function getVzlaData() {
             const ahora = new Date();
-            const vzlaTime = new Date(ahora.getTime() + (ahora.getTimezoneOffset() * 60000) - (4 * 3600000));
+            // GMT-4 Venezuela
+            const vzla = new Date(ahora.getTime() + (ahora.getTimezoneOffset() * 60000) - (4 * 3600000));
+            
             const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-            return { 
-                idFecha: vzlaTime.toISOString().split('T')[0], 
-                dia: dias[vzlaTime.getDay()], 
-                fecha: vzlaTime.toLocaleDateString('es-VE'), 
-                hora: vzlaTime.getHours() % 12 || 12 + ":" + vzlaTime.getMinutes().toString().padStart(2, '0') + " " + (vzlaTime.getHours() >= 12 ? 'PM' : 'AM')
-            };
+            const diaNombre = dias[vzla.getDay()];
+            const fecha = vzla.toLocaleDateString('es-VE');
+            
+            // Formato 12h corregido
+            let h = vzla.getHours();
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            const m = vzla.getMinutes().toString().padStart(2, '0');
+            const horaString = `${h}:${m} ${ampm}`;
+
+            return { id: vzla.toISOString().split('T')[0], diaNombre, fecha, horaString };
         }
 
         const info = getVzlaData();
-        document.getElementById('txtDia').innerText = info.dia;
-        document.getElementById('txtFecha').innerText = info.fecha;
-        document.getElementById('txtHora').innerText = info.hora;
+        document.getElementById('txtDia').innerText = info.diaNombre;
+        document.getElementById('txtDateTime').innerText = `${info.fecha} | ${info.horaString}`;
 
         const params = new URLSearchParams(window.location.search);
-        const earned = parseFloat(params.get('earned')) || 0;
-        const pending = parseFloat(params.get('pending')) || 0;
-        const saldoActualTotal = earned + pending;
+        const e = parseFloat(params.get('earned')) || 0;
+        const p = parseFloat(params.get('pending')) || 0;
+        const totalActual = e + p;
 
-        // Cargar datos
-        let saldoInicial = parseFloat(localStorage.getItem('saldoInicialJhon'));
-        let ultimaFecha = localStorage.getItem('ultimaFechaJhon');
-        let historial = JSON.parse(localStorage.getItem('historialJhon')) || [];
+        let base = parseFloat(localStorage.getItem('baseJhon'));
+        let ultimaFecha = localStorage.getItem('fechaJhon');
+        let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
 
-        // --- LÓGICA DE AUTO-RESET Y GUARDADO EN HISTORIAL ---
-        if (ultimaFecha && ultimaFecha !== info.idFecha) {
-            // Antes de resetear, guardamos lo que se hizo ayer
-            const ganadoAyer = Math.max(0, saldoActualTotal - saldoInicial);
-            const metaAyer = parseFloat(localStorage.getItem('metaDiariaJhon')) || 1.00;
+        // --- LÓGICA DE DÍA SIGUIENTE ---
+        if (ultimaFecha && ultimaFecha !== info.id) {
+            const ganadoAyer = Math.max(0, totalActual - base);
+            const metaAyer = parseFloat(localStorage.getItem('metaJhon')) || 1.00;
             
-            // Agregar al historial (máximo 3 días)
             historial.unshift({ 
-                fecha: ultimaFecha, 
-                monto: ganadoAyer.toFixed(2), 
-                cumplido: ganadoAyer >= metaAyer 
+                f: ultimaFecha, 
+                m: ganadoAyer.toFixed(2), 
+                ok: ganadoAyer >= metaAyer 
             });
-            if(historial.length > 3) historial.pop();
+            if(historial.length > 5) historial.pop();
+            localStorage.setItem('histJhon', JSON.stringify(historial));
             
-            localStorage.setItem('historialJhon', JSON.stringify(historial));
-            
-            // Ahora sí, reseteamos para el nuevo día
-            saldoInicial = saldoActualTotal;
-            localStorage.setItem('saldoInicialJhon', saldoInicial);
+            base = totalActual;
+            localStorage.setItem('baseJhon', base);
         }
 
-        if (!saldoInicial) {
-            saldoInicial = saldoActualTotal;
-            localStorage.setItem('saldoInicialJhon', saldoInicial);
+        if (!base) {
+            base = totalActual;
+            localStorage.setItem('baseJhon', base);
         }
-        localStorage.setItem('ultimaFechaJhon', info.idFecha);
+        localStorage.setItem('fechaJhon', info.id);
 
         function calcular() {
             const meta = parseFloat(document.getElementById('goal').value) || 1.00;
-            localStorage.setItem('metaDiariaJhon', meta);
+            localStorage.setItem('metaJhon', meta);
 
-            const ganadoPuro = Math.max(0, saldoActualTotal - saldoInicial);
-            const ganadoRedondeado = Math.round(ganadoPuro * 100) / 100;
+            const ganado = Math.max(0, totalActual - base);
+            const redondeo = Math.round(ganado * 100) / 100;
 
-            document.getElementById('gananciaHoy').innerText = '$' + ganadoRedondeado.toFixed(2);
-            document.getElementById('fill').style.width = Math.min((ganadoPuro / meta) * 100, 100) + '%';
+            document.getElementById('gananciaHoy').innerText = '$' + redondeo.toFixed(2);
+            document.getElementById('fill').style.width = Math.min((ganado / meta) * 100, 100) + '%';
 
             const msg = document.getElementById('message');
-            if (ganadoPuro >= meta) {
+            if (ganado >= meta) {
                 msg.innerText = "¡META CUMPLIDA! 🚀"; msg.style.color = "#238636";
             } else {
-                msg.innerText = "Faltan $" + (meta - ganadoPuro).toFixed(2); msg.style.color = "#d29922";
+                msg.innerText = "Faltan $" + (meta - ganado).toFixed(2); msg.style.color = "#d29922";
             }
 
-            // Dibujar Historial
             const list = document.getElementById('historyList');
             if(historial.length > 0) {
                 list.innerHTML = historial.map(h => `
                     <div class="history-item">
-                        <span>${h.fecha}</span>
-                        <b class="${h.cumplido ? 'status-ok' : 'status-fail'}">$${h.monto} ${h.cumplido ? '✓' : '✗'}</b>
+                        <span>${h.f}</span>
+                        <span class="${h.ok ? 'status-ok' : 'status-fail'}">$${h.m} ${h.ok ? '✓' : '✗'}</span>
                     </div>
                 `).join('');
             }
         }
 
         function forzarReset() {
-            if(confirm("¿Reiniciar base de hoy?")) {
-                localStorage.setItem('saldoInicialJhon', saldoActualTotal);
+            if(confirm("¿Reiniciar saldo base?")) {
+                localStorage.setItem('baseJhon', totalActual);
                 location.reload();
             }
         }
 
-        document.getElementById('goal').value = localStorage.getItem('metaDiariaJhon') || 1.00;
+        document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
         document.getElementById('goal').addEventListener('input', calcular);
         calcular();
     </script>
