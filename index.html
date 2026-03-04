@@ -2,106 +2,148 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Meta Diaria Automática - Jhonproducer</title>
+    <title>Dashboard Jhonproducer Pro</title>
     <style>
-        body { background-color: #0d1117; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        body { background-color: #0d1117; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
         .card { background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #30363d; text-align: center; width: 360px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h2 { color: #8b949e; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
+        .header-info { color: #8b949e; font-size: 0.85rem; margin-bottom: 15px; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+        .day-name { color: #58a6ff; font-weight: bold; text-transform: uppercase; display: block; font-size: 1.1rem; }
+        h2 { color: #8b949e; font-size: 0.8rem; text-transform: uppercase; margin-top: 15px; letter-spacing: 1px; }
         .total-hoy { font-size: 4rem; color: #238636; font-weight: bold; margin: 5px 0; }
-        .meta-container { background: #0d1117; padding: 15px; border-radius: 10px; margin: 20px 0; border: 1px solid #30363d; }
+        .meta-container { background: #0d1117; padding: 15px; border-radius: 10px; margin: 15px 0; border: 1px solid #30363d; }
         input { background: transparent; border: none; border-bottom: 2px solid #238636; color: white; padding: 5px; width: 80px; text-align: center; font-size: 1.2rem; font-weight: bold; outline: none; }
-        .progress-bar { background: #30363d; border-radius: 20px; height: 12px; width: 100%; margin: 15px 0; overflow: hidden; }
+        .progress-bar { background: #30363d; border-radius: 20px; height: 12px; width: 100%; margin: 12px 0; overflow: hidden; }
         #fill { background: linear-gradient(90deg, #238636, #2ea043); height: 100%; width: 0%; transition: width 1s ease-in-out; }
-        .stats { display: flex; justify-content: space-between; font-size: 0.8rem; color: #8b949e; margin-top: 15px; }
         .msg { font-weight: bold; margin-top: 10px; font-size: 1rem; }
-        .automatic-tag { font-size: 0.6rem; background: #238636; color: white; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 5px; }
+        
+        /* Estilos del Historial */
+        .history { margin-top: 20px; text-align: left; background: #0d1117; padding: 10px; border-radius: 8px; font-size: 0.75rem; border: 1px solid #30363d; }
+        .history-title { color: #8b949e; font-weight: bold; margin-bottom: 8px; display: block; text-align: center; border-bottom: 1px solid #30363d; padding-bottom: 4px; }
+        .history-item { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #1f242b; }
+        .status-ok { color: #238636; }
+        .status-fail { color: #da3633; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>Llevas hoy (Vzla Time) <span class="automatic-tag">AUTO-RESET</span></h2>
+        <div class="header-info">
+            <span id="txtDia" class="day-name">---</span>
+            <span id="txtFecha">--/--/----</span> | <span id="txtHora">--:-- --</span>
+        </div>
+
+        <h2>Ganancia hoy:</h2>
         <div class="total-hoy" id="gananciaHoy">$0.00</div>
         
         <div class="meta-container">
-            <span>Mi meta de hoy: $</span>
+            <span>Meta: $</span>
             <input type="number" id="goal" value="1.00" step="0.10">
             <div class="progress-bar"><div id="fill"></div></div>
             <div id="message" class="msg">Sincronizando...</div>
         </div>
 
-        <div class="stats" style="border-top: 1px solid #30363d; padding-top: 15px;">
-            <div>INICIO DÍA:<br><b id="base" style="color:white">$0.00</b></div>
-            <div>SALDO REAL:<br><b id="actual" style="color:white">$0.00</b></div>
+        <div class="history">
+            <span class="history-title">ÚLTIMOS DÍAS</span>
+            <div id="historyList">
+                <div style="text-align:center; color:#484f58;">No hay registros aún</div>
+            </div>
         </div>
         
-        <button onclick="forzarReset()" style="margin-top: 20px; background: transparent; border: 1px solid #30363d; color: #8b949e; cursor: pointer; font-size: 0.7rem; padding: 5px; border-radius: 4px;">Forzar Reset Manual</button>
+        <button onclick="forzarReset()" style="margin-top: 20px; background: transparent; border: 1px solid #30363d; color: #8b949e; cursor: pointer; font-size: 0.65rem; padding: 5px; border-radius: 4px; width: 100%;">Reiniciar día (Usar solo si hay error)</button>
     </div>
 
     <script>
-        // --- LÓGICA DE TIEMPO (VENEZUELA GMT-4) ---
-        function getFechaVzla() {
+        function getVzlaData() {
             const ahora = new Date();
-            // Calculamos la hora de Vzla sin importar la hora de la PC
-            const vzla = new Date(ahora.getTime() + (ahora.getTimezoneOffset() * 60000) - (4 * 3600000));
-            return vzla.toISOString().split('T')[0]; // Devuelve solo AAAA-MM-DD
+            const vzlaTime = new Date(ahora.getTime() + (ahora.getTimezoneOffset() * 60000) - (4 * 3600000));
+            const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+            return { 
+                idFecha: vzlaTime.toISOString().split('T')[0], 
+                dia: dias[vzlaTime.getDay()], 
+                fecha: vzlaTime.toLocaleDateString('es-VE'), 
+                hora: vzlaTime.getHours() % 12 || 12 + ":" + vzlaTime.getMinutes().toString().padStart(2, '0') + " " + (vzlaTime.getHours() >= 12 ? 'PM' : 'AM')
+            };
         }
 
-        // --- LÓGICA DE DINERO ---
+        const info = getVzlaData();
+        document.getElementById('txtDia').innerText = info.dia;
+        document.getElementById('txtFecha').innerText = info.fecha;
+        document.getElementById('txtHora').innerText = info.hora;
+
         const params = new URLSearchParams(window.location.search);
         const earned = parseFloat(params.get('earned')) || 0;
         const pending = parseFloat(params.get('pending')) || 0;
         const saldoActualTotal = earned + pending;
 
-        const hoy = getFechaVzla();
-        const ultimaFecha = localStorage.getItem('ultimaFechaJhon');
+        // Cargar datos
         let saldoInicial = parseFloat(localStorage.getItem('saldoInicialJhon'));
+        let ultimaFecha = localStorage.getItem('ultimaFechaJhon');
+        let historial = JSON.parse(localStorage.getItem('historialJhon')) || [];
 
-        // --- EL AUTO-RESET ---
-        // Si no hay saldo guardado O si la fecha de hoy es distinta a la última guardada
-        if (!saldoInicial || ultimaFecha !== hoy) {
+        // --- LÓGICA DE AUTO-RESET Y GUARDADO EN HISTORIAL ---
+        if (ultimaFecha && ultimaFecha !== info.idFecha) {
+            // Antes de resetear, guardamos lo que se hizo ayer
+            const ganadoAyer = Math.max(0, saldoActualTotal - saldoInicial);
+            const metaAyer = parseFloat(localStorage.getItem('metaDiariaJhon')) || 1.00;
+            
+            // Agregar al historial (máximo 3 días)
+            historial.unshift({ 
+                fecha: ultimaFecha, 
+                monto: ganadoAyer.toFixed(2), 
+                cumplido: ganadoAyer >= metaAyer 
+            });
+            if(historial.length > 3) historial.pop();
+            
+            localStorage.setItem('historialJhon', JSON.stringify(historial));
+            
+            // Ahora sí, reseteamos para el nuevo día
             saldoInicial = saldoActualTotal;
             localStorage.setItem('saldoInicialJhon', saldoInicial);
-            localStorage.setItem('ultimaFechaJhon', hoy);
         }
 
-        const inputMeta = document.getElementById('goal');
-        inputMeta.value = localStorage.getItem('metaDiariaJhon') || 1.00;
+        if (!saldoInicial) {
+            saldoInicial = saldoActualTotal;
+            localStorage.setItem('saldoInicialJhon', saldoInicial);
+        }
+        localStorage.setItem('ultimaFechaJhon', info.idFecha);
 
         function calcular() {
-            const meta = parseFloat(inputMeta.value) || 1.00;
+            const meta = parseFloat(document.getElementById('goal').value) || 1.00;
             localStorage.setItem('metaDiariaJhon', meta);
 
             const ganadoPuro = Math.max(0, saldoActualTotal - saldoInicial);
-            
-            // Redondeo inteligente (2 decimales, aproxima si >= 5)
             const ganadoRedondeado = Math.round(ganadoPuro * 100) / 100;
 
-            // Actualizar Interfaz
             document.getElementById('gananciaHoy').innerText = '$' + ganadoRedondeado.toFixed(2);
-            document.getElementById('base').innerText = '$' + saldoInicial.toFixed(4);
-            document.getElementById('actual').innerText = '$' + saldoActualTotal.toFixed(4);
-
-            const pct = Math.min((ganadoPuro / meta) * 100, 100);
-            document.getElementById('fill').style.width = pct + '%';
+            document.getElementById('fill').style.width = Math.min((ganadoPuro / meta) * 100, 100) + '%';
 
             const msg = document.getElementById('message');
             if (ganadoPuro >= meta) {
-                msg.innerText = "¡META CUMPLIDA! 🚀";
-                msg.style.color = "#238636";
+                msg.innerText = "¡META CUMPLIDA! 🚀"; msg.style.color = "#238636";
             } else {
-                msg.innerText = "Faltan $" + (meta - ganadoPuro).toFixed(2);
-                msg.style.color = "#d29922";
+                msg.innerText = "Faltan $" + (meta - ganadoPuro).toFixed(2); msg.style.color = "#d29922";
+            }
+
+            // Dibujar Historial
+            const list = document.getElementById('historyList');
+            if(historial.length > 0) {
+                list.innerHTML = historial.map(h => `
+                    <div class="history-item">
+                        <span>${h.fecha}</span>
+                        <b class="${h.cumplido ? 'status-ok' : 'status-fail'}">$${h.monto} ${h.cumplido ? '✓' : '✗'}</b>
+                    </div>
+                `).join('');
             }
         }
 
         function forzarReset() {
-            if(confirm("¿Quieres reiniciar el inicio de día manualmente?")) {
+            if(confirm("¿Reiniciar base de hoy?")) {
                 localStorage.setItem('saldoInicialJhon', saldoActualTotal);
                 location.reload();
             }
         }
 
-        inputMeta.addEventListener('input', calcular);
+        document.getElementById('goal').value = localStorage.getItem('metaDiariaJhon') || 1.00;
+        document.getElementById('goal').addEventListener('input', calcular);
         calcular();
     </script>
 </body>
