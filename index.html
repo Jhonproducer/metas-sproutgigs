@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Control de Metas</title>
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #22c55e; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 20px; }
+        .container { background: var(--card); padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 100%; max-width: 400px; text-align: center; }
+        .meta-box { margin-bottom: 20px; }
+        input { background: #334155; border: none; color: white; padding: 8px; border-radius: 5px; width: 80px; text-align: center; font-size: 1.1rem; }
+        .progress-container { background: #334155; border-radius: 20px; height: 25px; margin: 20px 0; overflow: hidden; }
+        #bar { background: var(--accent); height: 100%; width: 0%; transition: width 0.5s ease-in-out; }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; font-size: 0.9rem; }
+        .highlight { color: var(--accent); font-weight: bold; font-size: 1.5rem; display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Mi Meta Diaria</h2>
+        <div class="meta-box">
+            Meta: $ <input type="number" id="dailyGoal" value="1.00" step="0.10">
+        </div>
+
+        <div class="progress-container">
+            <div id="bar"></div>
+        </div>
+
+        <div>
+            <span id="statusText">Cargando datos...</span>
+            <span id="totalDisplay" class="highlight">$0.00</span>
+        </div>
+
+        <div class="stats">
+            <div>Ganado: <br> <span id="earnedDisp">$0.00</span></div>
+            <div>Pendiente: <br> <span id="pendingDisp">$0.00</span></div>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const earned = parseFloat(urlParams.get('earned')) || 0;
+        const pending = parseFloat(urlParams.get('pending')) || 0;
+        const total = earned + pending;
+
+        // Cargar meta de localStorage
+        const goalInput = document.getElementById('dailyGoal');
+        const savedGoal = localStorage.getItem('miMetaDiaria') || 1.00;
+        goalInput.value = savedGoal;
+
+        function updateUI() {
+            const goal = parseFloat(goalInput.value);
+            localStorage.setItem('miMetaDiaria', goal);
+            
+            const percent = Math.min((total / goal) * 100, 100);
+            document.getElementById('bar').style.width = percent + '%';
+            document.getElementById('totalDisplay').innerText = '$' + total.toFixed(4);
+            document.getElementById('earnedDisp').innerText = '$' + earned.toFixed(4);
+            document.getElementById('pendingDisp').innerText = '$' + pending.toFixed(4);
+
+            if (total >= goal) {
+                document.getElementById('statusText').innerText = "¡META CUMPLIDA! 🚀";
+                document.getElementById('statusText').style.color = "#22c55e";
+            } else {
+                const faltan = goal - total;
+                document.getElementById('statusText').innerText = `Te faltan $${faltan.toFixed(4)}`;
+            }
+        }
+
+        goalInput.addEventListener('input', updateUI);
+        updateUI();
+    </script>
+</body>
+</html>
