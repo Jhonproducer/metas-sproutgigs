@@ -122,15 +122,19 @@
         let earned = parseFloat(params.get('earned'));
         let pending = parseFloat(params.get('pending'));
 
-        // Protección de memoria: Cargar últimos valores si el link viene vacío
-        if (isNaN(earned)) earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
-        if (isNaN(pending)) pending = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
-        
-        localStorage.setItem('lastEarnedJhon', earned);
-        localStorage.setItem('lastPendingJhon', pending);
+        // PROTECCIÓN Y BROADCAST: Si vienen datos nuevos en la URL, los guardamos y avisamos a las otras pestañas
+        if (!isNaN(earned) && !isNaN(pending)) {
+            localStorage.setItem('lastEarnedJhon', earned);
+            localStorage.setItem('lastPendingJhon', pending);
+            // Esto dispara el evento 'storage' en la pestaña principal
+            localStorage.setItem('syncTrigger', Date.now()); 
+        } else {
+            // Si no hay datos en la URL, leemos los últimos guardados
+            earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
+            pending = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
+        }
         
         const totalActual = earned + pending;
-
         let base = parseFloat(localStorage.getItem('baseJhon'));
         let ultimaFecha = localStorage.getItem('fechaJhon');
         let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
@@ -188,19 +192,15 @@
                 let nombreMes = (h.mes !== undefined) ? MESES[h.mes] : "ANTERIORES";
                 let numeroAnio = (h.anio !== undefined) ? h.anio : "";
                 let mesAnio = `${nombreMes} ${numeroAnio}`.trim();
-
-                if (mesAnio !== ultimoMesAnio) {
-                    htmlHist += `<div class="month-header">${mesAnio}</div>`;
-                    ultimoMesAnio = mesAnio;
-                }
+                if (mesAnio !== ultimoMesAnio) { htmlHist += `<div class="month-header">${mesAnio}</div>`; ultimoMesAnio = mesAnio; }
                 htmlHist += `<div class="hist-item"><span>${h.f}</span> <b>$${h.m}</b></div>`;
             });
             document.getElementById('historyList').innerHTML = htmlHist || '<div style="text-align:center;padding:10px;color:#666">SIN REGISTROS</div>';
         }
 
-        // Listener silencioso para actualizaciones desde el mensajero fantasma
+        // ESCUCHA ACTIVA: Recarga la pestaña principal cuando el mensajero avisa
         window.addEventListener('storage', (e) => {
-            if (e.key === 'lastEarnedJhon' || e.key === 'lastPendingJhon') {
+            if (e.key === 'syncTrigger') {
                 location.reload();
             }
         });
