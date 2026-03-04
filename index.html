@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Jhonproducer - Master Dashboard PRO</title>
+    <title>Jhonproducer - Monthly Master Dashboard</title>
     <style>
         :root {
             --bg: #000000; --card: #161b22; --text: #ffffff;
@@ -21,28 +21,28 @@
         }
         .card { 
             background: var(--card); border: 4px solid var(--border);
-            border-radius: 20px; padding: 20px; width: 450px;
+            border-radius: 20px; padding: 20px; width: 460px;
             box-shadow: 0 0 40px rgba(0,0,0,0.5);
         }
         .top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
         .big-money { font-size: 5rem; line-height: 1; margin: 10px 0; text-align: center; }
         
-        /* Secciones Desplegables para no ensuciar */
         details { background: var(--bg); border: 2px solid var(--border); border-radius: 10px; margin-top: 8px; }
-        summary { padding: 10px; cursor: pointer; color: var(--blue); font-size: 1rem; outline: none; text-transform: uppercase; }
-        .content { padding: 10px; border-top: 2px solid var(--border); }
+        summary { padding: 10px; cursor: pointer; color: var(--blue); font-size: 0.9rem; outline: none; text-transform: uppercase; }
+        .content { padding: 10px; border-top: 2px solid var(--border); max-height: 250px; overflow-y: auto; }
 
-        /* Cuadrícula de Saldos REALES */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
         .box { border: 2px solid var(--border); padding: 10px; border-radius: 8px; text-align: center; }
         .label { font-size: 0.7rem; color: #8b949e; display: block; text-transform: uppercase; }
         
-        /* Botones e Inputs Grandes */
         input { background: var(--card); border: 2px solid var(--blue); color: var(--text); width: 80px; text-align: center; font-size: 1.4rem; font-weight: 900; border-radius: 8px; }
         .btn-theme { background: var(--blue); color: white; border: none; padding: 5px 15px; border-radius: 8px; cursor: pointer; font-weight: 900; font-size: 0.8rem; }
         
         .progress-bar { background: #333; border-radius: 10px; height: 18px; margin: 10px 0; overflow: hidden; border: 1px solid #555; }
         #fill { height: 100%; width: 0%; transition: width 1s ease; }
+
+        .month-header { background: var(--border); color: var(--text); padding: 5px; font-size: 0.75rem; margin-top: 10px; border-radius: 4px; text-align: center; }
+        .hist-item { display:flex; justify-content:space-between; padding:4px 5px; border-bottom:1px solid var(--border); font-size: 0.8rem; }
     </style>
 </head>
 <body data-theme="dark">
@@ -56,7 +56,7 @@
         </div>
 
         <div style="text-align: center; margin-top: 10px;">
-            <span style="font-size: 0.8rem;">GANADO HOY:</span>
+            <span id="labelHoy" style="font-size: 0.8rem;">GANADO HOY:</span>
             <div class="big-money" id="gananciaHoy">$0.00</div>
             <div id="message" style="font-size: 1.1rem;">FALTAN $1.00</div>
             <div class="progress-bar"><div id="fill"></div></div>
@@ -72,20 +72,20 @@
         </div>
 
         <details>
-            <summary>💰 CALCULAR RETIRO</summary>
+            <summary>📊 HISTORIAL POR MESES</summary>
             <div class="content">
-                QUIERO RETIRAR: $ <input type="number" id="withdrawTarget" value="13.00">
-                <div id="withdrawRemaining" style="margin-top: 10px; color: var(--yellow); font-size: 1.1rem;">---</div>
+                <div style="display:flex; justify-content:space-between; margin-bottom: 5px; padding: 5px; background: rgba(46, 176, 67, 0.1); border-radius: 5px;">
+                    <span>TOTAL MES ACTUAL:</span> <b id="valMes" style="color: var(--green);">$0.00</b>
+                </div>
+                <div id="historyList"></div>
             </div>
         </details>
 
         <details>
-            <summary>📊 HISTORIAL Y MES (30D)</summary>
+            <summary>💰 META DE RETIRO</summary>
             <div class="content">
-                <div style="display:flex; justify-content:space-between; margin-bottom: 10px; border-bottom: 2px solid var(--border); padding-bottom: 5px;">
-                    <span>TOTAL MES:</span> <b id="valMes" style="color: var(--green);">$0.00</b>
-                </div>
-                <div id="historyList" style="font-size: 0.85rem;"></div>
+                QUIERO RETIRAR: $ <input type="number" id="withdrawTarget" value="13.00">
+                <div id="withdrawRemaining" style="margin-top: 10px; color: var(--yellow); font-size: 1.1rem;">---</div>
             </div>
         </details>
 
@@ -105,6 +105,8 @@
             localStorage.setItem('jhonTheme', t);
         }
 
+        const MESES = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+
         function getVzlaData() {
             const ahora = new Date();
             const vzla = new Date(ahora.getTime() + (ahora.getTimezoneOffset() * 60000) - (4 * 3600000));
@@ -112,11 +114,18 @@
             let h = vzla.getHours();
             const am = h >= 12 ? 'PM' : 'AM';
             h = h % 12 || 12;
-            return { id: vzla.toISOString().split('T')[0], dia: dias[vzla.getDay()], fecha: vzla.toLocaleDateString('es-VE'), hora: `${h}:${vzla.getMinutes().toString().padStart(2, '0')} ${am}` };
+            return { 
+                id: vzla.toISOString().split('T')[0], 
+                mesIdx: vzla.getMonth(),
+                anio: vzla.getFullYear(),
+                diaNom: dias[vzla.getDay()], 
+                fecha: vzla.toLocaleDateString('es-VE'), 
+                hora: `${h}:${vzla.getMinutes().toString().padStart(2, '0')} ${am}` 
+            };
         }
 
         const info = getVzlaData();
-        document.getElementById('txtDia').innerText = info.dia;
+        document.getElementById('txtDia').innerText = info.diaNom;
         document.getElementById('txtDateTime').innerText = `${info.fecha} | ${info.hora}`;
         document.body.setAttribute('data-theme', localStorage.getItem('jhonTheme') || 'dark');
 
@@ -131,8 +140,10 @@
 
         if (ultimaFecha && ultimaFecha !== info.id) {
             const ganadoAyer = Math.max(0, totalActual - base);
-            historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2) });
-            if(historial.length > 31) historial.pop();
+            // Guardamos el registro con mes y año para agrupar fácil
+            const d = new Date(ultimaFecha + "T12:00:00");
+            historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), mes: d.getMonth(), anio: d.getFullYear() });
+            if(historial.length > 90) historial.pop(); // Guardar 90 días
             localStorage.setItem('histJhon', JSON.stringify(historial));
             base = totalActual;
             localStorage.setItem('baseJhon', base);
@@ -149,27 +160,29 @@
             const ganadoHoy = Math.max(0, totalActual - base);
             const hoyRedondeo = Math.round(ganadoHoy * 100) / 100;
 
-            // Sonido
             const ant = parseFloat(localStorage.getItem('antJhon')) || 0;
             if (hoyRedondeo > ant) { document.getElementById('cashSound').play().catch(e=>{}); }
             localStorage.setItem('antJhon', hoyRedondeo);
 
-            // UI
-            const bigNum = document.getElementById('gananciaHoy');
-            bigNum.innerText = '$' + hoyRedondeo.toFixed(2);
+            document.getElementById('gananciaHoy').innerText = '$' + hoyRedondeo.toFixed(2);
             document.getElementById('valEarned').innerText = '$' + earned.toFixed(4);
             document.getElementById('valPending').innerText = '$' + pending.toFixed(4);
             document.getElementById('valTotalReal').innerText = '$' + totalActual.toFixed(4);
 
-            // Mes y Retiro
-            const sumMes = historial.reduce((acc, h) => acc + parseFloat(h.m), 0) + hoyRedondeo;
-            document.getElementById('valMes').innerText = '$' + sumMes.toFixed(2);
+            // Suma del MES ACTUAL (Hoy + lo guardado que sea de este mes y año)
+            const sumMesActual = historial
+                .filter(h => h.mes === info.mesIdx && h.anio === info.anio)
+                .reduce((acc, h) => acc + parseFloat(h.m), 0) + hoyRedondeo;
+            
+            document.getElementById('valMes').innerText = '$' + sumMesActual.toFixed(2);
+            document.getElementById('labelHoy').innerText = `GANADO HOY (${MESES[info.mesIdx]}):`;
+
             const faltaW = Math.max(0, wTarget - totalActual);
             document.getElementById('withdrawRemaining').innerText = faltaW > 0 ? `FALTAN $${faltaW.toFixed(2)}` : "¡RETIRA YA! 🔥";
 
-            // Barra
             const pct = Math.min((ganadoHoy / goal) * 100, 100);
             const fill = document.getElementById('fill');
+            const bigNum = document.getElementById('gananciaHoy');
             fill.style.width = pct + '%';
             if(pct < 35) { fill.style.backgroundColor = "#ff4444"; bigNum.style.color = "#ff4444"; }
             else if(pct < 75) { fill.style.backgroundColor = "#ffcc00"; bigNum.style.color = "#ffcc00"; }
@@ -177,11 +190,19 @@
 
             document.getElementById('message').innerText = ganadoHoy >= goal ? "META LOGRADA! 🏆" : `FALTAN $${(goal - ganadoHoy).toFixed(2)}`;
             
-            document.getElementById('historyList').innerHTML = historial.slice(0,5).map(h => `
-                <div style="display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid var(--border)">
-                    <span>${h.f}</span> <b>$${h.m}</b>
-                </div>
-            `).join('');
+            // RENDER HISTORIAL AGRUPADO
+            let htmlHist = "";
+            let ultimoMesAnio = "";
+            
+            historial.forEach(h => {
+                let mesAnio = `${MESES[h.mes]} ${h.anio}`;
+                if (mesAnio !== ultimoMesAnio) {
+                    htmlHist += `<div class="month-header">${mesAnio}</div>`;
+                    ultimoMesAnio = mesAnio;
+                }
+                htmlHist += `<div class="hist-item"><span>${h.f}</span> <b>$${h.m}</b></div>`;
+            });
+            document.getElementById('historyList').innerHTML = htmlHist || '<div style="text-align:center;padding:10px;color:#666">SIN DATOS PREVIOS</div>';
         }
 
         function testSound() { document.getElementById('cashSound').play(); }
