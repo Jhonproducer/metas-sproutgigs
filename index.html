@@ -2,74 +2,107 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Control de Metas</title>
+    <title>Meta Diaria Automática - Jhonproducer</title>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #22c55e; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 20px; }
-        .container { background: var(--card); padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 100%; max-width: 400px; text-align: center; }
-        .meta-box { margin-bottom: 20px; }
-        input { background: #334155; border: none; color: white; padding: 8px; border-radius: 5px; width: 80px; text-align: center; font-size: 1.1rem; }
-        .progress-container { background: #334155; border-radius: 20px; height: 25px; margin: 20px 0; overflow: hidden; }
-        #bar { background: var(--accent); height: 100%; width: 0%; transition: width 0.5s ease-in-out; }
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; font-size: 0.9rem; }
-        .highlight { color: var(--accent); font-weight: bold; font-size: 1.5rem; display: block; }
+        body { background-color: #0d1117; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #30363d; text-align: center; width: 360px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { color: #8b949e; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
+        .total-hoy { font-size: 4rem; color: #238636; font-weight: bold; margin: 5px 0; }
+        .meta-container { background: #0d1117; padding: 15px; border-radius: 10px; margin: 20px 0; border: 1px solid #30363d; }
+        input { background: transparent; border: none; border-bottom: 2px solid #238636; color: white; padding: 5px; width: 80px; text-align: center; font-size: 1.2rem; font-weight: bold; outline: none; }
+        .progress-bar { background: #30363d; border-radius: 20px; height: 12px; width: 100%; margin: 15px 0; overflow: hidden; }
+        #fill { background: linear-gradient(90deg, #238636, #2ea043); height: 100%; width: 0%; transition: width 1s ease-in-out; }
+        .stats { display: flex; justify-content: space-between; font-size: 0.8rem; color: #8b949e; margin-top: 15px; }
+        .msg { font-weight: bold; margin-top: 10px; font-size: 1rem; }
+        .automatic-tag { font-size: 0.6rem; background: #238636; color: white; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 5px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Mi Meta Diaria</h2>
-        <div class="meta-box">
-            Meta: $ <input type="number" id="dailyGoal" value="1.00" step="0.10">
+    <div class="card">
+        <h2>Llevas hoy (Vzla Time) <span class="automatic-tag">AUTO-RESET</span></h2>
+        <div class="total-hoy" id="gananciaHoy">$0.00</div>
+        
+        <div class="meta-container">
+            <span>Mi meta de hoy: $</span>
+            <input type="number" id="goal" value="1.00" step="0.10">
+            <div class="progress-bar"><div id="fill"></div></div>
+            <div id="message" class="msg">Sincronizando...</div>
         </div>
 
-        <div class="progress-container">
-            <div id="bar"></div>
+        <div class="stats" style="border-top: 1px solid #30363d; padding-top: 15px;">
+            <div>INICIO DÍA:<br><b id="base" style="color:white">$0.00</b></div>
+            <div>SALDO REAL:<br><b id="actual" style="color:white">$0.00</b></div>
         </div>
-
-        <div>
-            <span id="statusText">Cargando datos...</span>
-            <span id="totalDisplay" class="highlight">$0.00</span>
-        </div>
-
-        <div class="stats">
-            <div>Ganado: <br> <span id="earnedDisp">$0.00</span></div>
-            <div>Pendiente: <br> <span id="pendingDisp">$0.00</span></div>
-        </div>
+        
+        <button onclick="forzarReset()" style="margin-top: 20px; background: transparent; border: 1px solid #30363d; color: #8b949e; cursor: pointer; font-size: 0.7rem; padding: 5px; border-radius: 4px;">Forzar Reset Manual</button>
     </div>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const earned = parseFloat(urlParams.get('earned')) || 0;
-        const pending = parseFloat(urlParams.get('pending')) || 0;
-        const total = earned + pending;
+        // --- LÓGICA DE TIEMPO (VENEZUELA GMT-4) ---
+        function getFechaVzla() {
+            const ahora = new Date();
+            // Calculamos la hora de Vzla sin importar la hora de la PC
+            const vzla = new Date(ahora.getTime() + (ahora.getTimezoneOffset() * 60000) - (4 * 3600000));
+            return vzla.toISOString().split('T')[0]; // Devuelve solo AAAA-MM-DD
+        }
 
-        // Cargar meta de localStorage
-        const goalInput = document.getElementById('dailyGoal');
-        const savedGoal = localStorage.getItem('miMetaDiaria') || 1.00;
-        goalInput.value = savedGoal;
+        // --- LÓGICA DE DINERO ---
+        const params = new URLSearchParams(window.location.search);
+        const earned = parseFloat(params.get('earned')) || 0;
+        const pending = parseFloat(params.get('pending')) || 0;
+        const saldoActualTotal = earned + pending;
 
-        function updateUI() {
-            const goal = parseFloat(goalInput.value);
-            localStorage.setItem('miMetaDiaria', goal);
+        const hoy = getFechaVzla();
+        const ultimaFecha = localStorage.getItem('ultimaFechaJhon');
+        let saldoInicial = parseFloat(localStorage.getItem('saldoInicialJhon'));
+
+        // --- EL AUTO-RESET ---
+        // Si no hay saldo guardado O si la fecha de hoy es distinta a la última guardada
+        if (!saldoInicial || ultimaFecha !== hoy) {
+            saldoInicial = saldoActualTotal;
+            localStorage.setItem('saldoInicialJhon', saldoInicial);
+            localStorage.setItem('ultimaFechaJhon', hoy);
+        }
+
+        const inputMeta = document.getElementById('goal');
+        inputMeta.value = localStorage.getItem('metaDiariaJhon') || 1.00;
+
+        function calcular() {
+            const meta = parseFloat(inputMeta.value) || 1.00;
+            localStorage.setItem('metaDiariaJhon', meta);
+
+            const ganadoPuro = Math.max(0, saldoActualTotal - saldoInicial);
             
-            const percent = Math.min((total / goal) * 100, 100);
-            document.getElementById('bar').style.width = percent + '%';
-            document.getElementById('totalDisplay').innerText = '$' + total.toFixed(4);
-            document.getElementById('earnedDisp').innerText = '$' + earned.toFixed(4);
-            document.getElementById('pendingDisp').innerText = '$' + pending.toFixed(4);
+            // Redondeo inteligente (2 decimales, aproxima si >= 5)
+            const ganadoRedondeado = Math.round(ganadoPuro * 100) / 100;
 
-            if (total >= goal) {
-                document.getElementById('statusText').innerText = "¡META CUMPLIDA! 🚀";
-                document.getElementById('statusText').style.color = "#22c55e";
+            // Actualizar Interfaz
+            document.getElementById('gananciaHoy').innerText = '$' + ganadoRedondeado.toFixed(2);
+            document.getElementById('base').innerText = '$' + saldoInicial.toFixed(4);
+            document.getElementById('actual').innerText = '$' + saldoActualTotal.toFixed(4);
+
+            const pct = Math.min((ganadoPuro / meta) * 100, 100);
+            document.getElementById('fill').style.width = pct + '%';
+
+            const msg = document.getElementById('message');
+            if (ganadoPuro >= meta) {
+                msg.innerText = "¡META CUMPLIDA! 🚀";
+                msg.style.color = "#238636";
             } else {
-                const faltan = goal - total;
-                document.getElementById('statusText').innerText = `Te faltan $${faltan.toFixed(4)}`;
+                msg.innerText = "Faltan $" + (meta - ganadoPuro).toFixed(2);
+                msg.style.color = "#d29922";
             }
         }
 
-        goalInput.addEventListener('input', updateUI);
-        updateUI();
+        function forzarReset() {
+            if(confirm("¿Quieres reiniciar el inicio de día manualmente?")) {
+                localStorage.setItem('saldoInicialJhon', saldoActualTotal);
+                location.reload();
+            }
+        }
+
+        inputMeta.addEventListener('input', calcular);
+        calcular();
     </script>
 </body>
 </html>
