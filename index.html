@@ -2,38 +2,54 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Jhonproducer - Money Tracker</title>
+    <title>Jhonproducer - Money Tracker Pro</title>
     <style>
-        :root { --primary: #238636; --bg: #0d1117; --card: #161b22; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        :root { 
+            --bg: #0d1117; 
+            --card: #161b22; 
+            --red: #da3633;
+            --yellow: #d29922;
+            --green: #238636;
+        }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
         .card { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid #30363d; text-align: center; width: 380px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
-        .day-name { color: #58a6ff; font-weight: 800; text-transform: uppercase; font-size: 1.2rem; }
-        .total-hoy { font-size: 5rem; color: var(--primary); font-weight: 900; margin: 10px 0; text-shadow: 0 0 20px rgba(35,134,54,0.4); }
-        .progress-bar { background: #30363d; border-radius: 10px; height: 12px; margin: 20px 0; overflow: hidden; }
-        #fill { background: linear-gradient(90deg, #238636, #44d664); height: 100%; width: 0%; transition: width 1s ease; }
+        .day-name { color: #58a6ff; font-weight: 800; text-transform: uppercase; font-size: 1.2rem; letter-spacing: 1px; }
+        .total-hoy { font-size: 5rem; font-weight: 900; margin: 10px 0; transition: color 0.5s ease; }
+        
+        /* Contenedor de Meta */
+        .meta-container { background: #0d1117; padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid #30363d; }
+        input { background: transparent; border: none; border-bottom: 2px solid var(--green); color: white; padding: 5px; width: 70px; text-align: center; font-size: 1.3rem; font-weight: bold; outline: none; }
+        
+        /* Barra de Progreso Dinámica */
+        .progress-bar { background: #30363d; border-radius: 10px; height: 14px; margin: 15px 0; overflow: hidden; }
+        #fill { height: 100%; width: 0%; transition: width 1s ease, background-color 0.5s ease; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        
         .history { margin-top: 20px; background: #0d1117; padding: 15px; border-radius: 12px; border: 1px solid #30363d; text-align: left; font-size: 0.8rem; }
-        .status-ok { color: #238636; font-weight: bold; }
-        .status-fail { color: #da3633; font-weight: bold; }
-        #soundToggle { font-size: 0.7rem; color: #8b949e; cursor: pointer; text-decoration: underline; margin-top: 10px; display: block; }
+        .status-ok { color: var(--green); font-weight: bold; }
+        .status-fail { color: var(--red); font-weight: bold; }
+        #soundToggle { font-size: 0.7rem; color: #8b949e; cursor: pointer; text-decoration: underline; margin-top: 15px; display: block; }
     </style>
 </head>
 <body>
     <div class="card">
         <div id="txtDia" class="day-name">---</div>
-        <div style="color:#8b949e; font-size:0.9rem" id="txtFecha">--/--/--</div>
+        <div style="color:#8b949e; font-size:0.9rem; margin-top:5px;" id="txtFecha">--/--/----</div>
 
-        <h2>GANADO HOY:</h2>
-        <div class="total-hoy" id="gananciaHoy">$0.00</div>
+        <h2 style="color:#8b949e; font-size:0.7rem; text-transform:uppercase; margin-top:20px;">Ganado hoy:</h2>
+        <div class="total-hoy" id="gananciaHoy" style="color: var(--red);">$0.00</div>
         
-        <div style="font-weight:bold; color:#d29922" id="message">Faltan $--</div>
-        <div class="progress-bar"><div id="fill"></div></div>
+        <div class="meta-container">
+            <div style="margin-bottom:10px;">Meta Manual: $ <input type="number" id="goal" value="1.00" step="0.10"></div>
+            <div class="progress-bar"><div id="fill"></div></div>
+            <div id="message" style="font-weight:bold; font-size:1rem;">Calculando...</div>
+        </div>
 
         <div class="history">
-            <div style="text-align:center; color:#8b949e; margin-bottom:10px">HISTORIAL RECIENTE</div>
+            <div style="text-align:center; color:#8b949e; margin-bottom:10px; font-size:0.7rem; font-weight:bold;">HISTORIAL VENEZUELA</div>
             <div id="historyList"></div>
         </div>
 
-        <span id="soundToggle" onclick="testSound()">🔊 Haz clic aquí para activar sonido</span>
+        <span id="soundToggle" onclick="testSound()">🔊 Activar Sonido Ka-ching</span>
     </div>
 
     <audio id="cashSound" src="https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3"></audio>
@@ -58,38 +74,58 @@
         let base = parseFloat(localStorage.getItem('baseJhon'));
         let ultimaFecha = localStorage.getItem('fechaJhon');
         let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
-        let meta = 1.00; // Puedes cambiarla aquí
 
-        // AUTO-RESET DIARIO
         if (ultimaFecha && ultimaFecha !== info.id) {
             const ganadoAyer = Math.max(0, totalActual - base);
-            historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), ok: ganadoAyer >= meta });
+            const metaAyer = parseFloat(localStorage.getItem('metaJhon')) || 1.00;
+            historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), ok: ganadoAyer >= metaAyer });
             if(historial.length > 3) historial.pop();
             localStorage.setItem('histJhon', JSON.stringify(historial));
             base = totalActual;
             localStorage.setItem('baseJhon', base);
         }
 
-        if (!base) {
-            base = totalActual;
-            localStorage.setItem('baseJhon', base);
-        }
+        if (!base) { base = totalActual; localStorage.setItem('baseJhon', base); }
         localStorage.setItem('fechaJhon', info.id);
 
         function calcular() {
+            const meta = parseFloat(document.getElementById('goal').value) || 1.00;
+            localStorage.setItem('metaJhon', meta);
+
             const ganadoPuro = Math.max(0, totalActual - base);
             const redondeo = Math.round(ganadoPuro * 100) / 100;
             
-            // LÓGICA DEL SONIDO $$$
+            // Sonido
             const anteriorGanado = parseFloat(localStorage.getItem('ultimoGanadoJhon')) || 0;
-            if (redondeo > anteriorGanado) {
-                document.getElementById('cashSound').play().catch(e => console.log("Clic para activar audio"));
-            }
+            if (redondeo > anteriorGanado) { document.getElementById('cashSound').play().catch(e => {}); }
             localStorage.setItem('ultimoGanadoJhon', redondeo);
 
-            document.getElementById('gananciaHoy').innerText = '$' + redondeo.toFixed(2);
-            document.getElementById('fill').style.width = Math.min((ganadoPuro / meta) * 100, 100) + '%';
-            document.getElementById('message').innerText = ganadoPuro >= meta ? "¡META CUMPLIDA! 🚀" : `Faltan $${(meta - ganadoPuro).toFixed(2)}`;
+            // Interfaz
+            const displayGanado = document.getElementById('gananciaHoy');
+            displayGanado.innerText = '$' + redondeo.toFixed(2);
+            
+            const pct = Math.min((ganadoPuro / meta) * 100, 100);
+            const bar = document.getElementById('fill');
+            bar.style.width = pct + '%';
+
+            // Lógica de Colores (Semáforo)
+            if (pct < 35) {
+                bar.style.backgroundColor = "#da3633"; // Rojo
+                displayGanado.style.color = "#da3633";
+            } else if (pct < 75) {
+                bar.style.backgroundColor = "#d29922"; // Amarillo
+                displayGanado.style.color = "#d29922";
+            } else {
+                bar.style.backgroundColor = "#238636"; // Verde
+                displayGanado.style.color = "#238636";
+            }
+
+            const msg = document.getElementById('message');
+            if (ganadoPuro >= meta) {
+                msg.innerText = "¡META CUMPLIDA! 🚀"; msg.style.color = "#238636";
+            } else {
+                msg.innerText = `Faltan $${(meta - ganadoPuro).toFixed(2)}`; msg.style.color = "#8b949e";
+            }
 
             document.getElementById('historyList').innerHTML = historial.map(h => `
                 <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #1f242b">
@@ -100,9 +136,11 @@
 
         function testSound() {
             document.getElementById('cashSound').play();
-            document.getElementById('soundToggle').innerText = "✅ Sonido Activado";
+            document.getElementById('soundToggle').innerText = "✅ Sonido Ka-ching Listo";
         }
 
+        document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
+        document.getElementById('goal').addEventListener('input', calcular);
         calcular();
     </script>
 </body>
