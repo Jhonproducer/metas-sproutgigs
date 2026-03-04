@@ -2,237 +2,70 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard SproutGigs - Jhonproducer</title>
+    <title>Jhonproducer - Money Tracker</title>
     <style>
-        :root {
-            --primary: #238636;
-            --primary-glow: rgba(35, 134, 54, 0.3);
-            --bg: #0d1117;
-            --card-bg: #161b22;
-            --text-gray: #8b949e;
-        }
-
-        body { 
-            background-color: var(--bg); 
-            color: white; 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            padding: 20px;
-        }
-
-        .card { 
-            background: var(--card-bg); 
-            padding: 30px; 
-            border-radius: 20px; 
-            border: 1px solid #30363d; 
-            text-align: center; 
-            width: 380px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            position: relative;
-        }
-
-        .header-info { 
-            margin-bottom: 20px; 
-            border-bottom: 1px solid #30363d; 
-            padding-bottom: 15px; 
-        }
-
-        .day-name { 
-            color: #58a6ff; 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            display: block; 
-            font-size: 1.2rem; 
-            letter-spacing: 2px;
-        }
-
-        .date-time {
-            color: var(--text-gray);
-            font-size: 0.9rem;
-            margin-top: 5px;
-            display: block;
-        }
-
-        h2 { color: var(--text-gray); font-size: 0.75rem; text-transform: uppercase; margin-top: 20px; letter-spacing: 1.5px; }
-
-        .total-hoy { 
-            font-size: 4.5rem; 
-            color: var(--primary); 
-            font-weight: 900; 
-            margin: 10px 0; 
-            text-shadow: 0 0 20px var(--primary-glow);
-        }
-
-        .meta-container { 
-            background: #0d1117; 
-            padding: 20px; 
-            border-radius: 15px; 
-            margin: 20px 0; 
-            border: 1px solid #30363d; 
-        }
-
-        .meta-input-wrap {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
-
-        input { 
-            background: transparent; 
-            border: none; 
-            border-bottom: 2px solid var(--primary); 
-            color: white; 
-            padding: 5px; 
-            width: 70px; 
-            text-align: center; 
-            font-size: 1.3rem; 
-            font-weight: bold; 
-            outline: none; 
-        }
-
-        .progress-bar { 
-            background: #30363d; 
-            border-radius: 10px; 
-            height: 10px; 
-            width: 100%; 
-            margin: 15px 0; 
-            overflow: hidden; 
-        }
-
-        #fill { 
-            background: linear-gradient(90deg, #238636, #44d664); 
-            height: 100%; 
-            width: 0%; 
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); 
-            box-shadow: 0 0 10px var(--primary-glow);
-        }
-
-        .msg { font-weight: bold; font-size: 1rem; margin-top: 5px; }
-
-        /* Estilos del Historial - Lo que pediste parce */
-        .history { 
-            margin-top: 25px; 
-            text-align: left; 
-            background: #0d1117; 
-            padding: 15px; 
-            border-radius: 12px; 
-            border: 1px solid #30363d; 
-        }
-
-        .history-title { 
-            color: var(--text-gray); 
-            font-weight: bold; 
-            font-size: 0.7rem;
-            margin-bottom: 10px; 
-            display: block; 
-            text-transform: uppercase;
-            text-align: center;
-        }
-
-        .history-item { 
-            display: flex; 
-            justify-content: space-between; 
-            padding: 6px 0; 
-            border-bottom: 1px solid #1f242b;
-            font-size: 0.85rem;
-        }
-
-        .history-item:last-child { border: none; }
+        :root { --primary: #238636; --bg: #0d1117; --card: #161b22; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid #30363d; text-align: center; width: 380px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        .day-name { color: #58a6ff; font-weight: 800; text-transform: uppercase; font-size: 1.2rem; }
+        .total-hoy { font-size: 5rem; color: var(--primary); font-weight: 900; margin: 10px 0; text-shadow: 0 0 20px rgba(35,134,54,0.4); }
+        .progress-bar { background: #30363d; border-radius: 10px; height: 12px; margin: 20px 0; overflow: hidden; }
+        #fill { background: linear-gradient(90deg, #238636, #44d664); height: 100%; width: 0%; transition: width 1s ease; }
+        .history { margin-top: 20px; background: #0d1117; padding: 15px; border-radius: 12px; border: 1px solid #30363d; text-align: left; font-size: 0.8rem; }
         .status-ok { color: #238636; font-weight: bold; }
         .status-fail { color: #da3633; font-weight: bold; }
-
-        .btn-reset {
-            margin-top: 25px; 
-            background: transparent; 
-            border: 1px solid #30363d; 
-            color: #484f58; 
-            cursor: pointer; 
-            font-size: 0.7rem; 
-            padding: 8px; 
-            border-radius: 6px; 
-            width: 100%;
-            transition: 0.3s;
-        }
-
-        .btn-reset:hover { border-color: #da3633; color: #da3633; }
+        #soundToggle { font-size: 0.7rem; color: #8b949e; cursor: pointer; text-decoration: underline; margin-top: 10px; display: block; }
     </style>
 </head>
 <body>
     <div class="card">
-        <div class="header-info">
-            <span id="txtDia" class="day-name">---</span>
-            <span id="txtDateTime" class="date-time">--/--/---- | --:-- --</span>
-        </div>
+        <div id="txtDia" class="day-name">---</div>
+        <div style="color:#8b949e; font-size:0.9rem" id="txtFecha">--/--/--</div>
 
-        <h2>Ganancia hoy:</h2>
+        <h2>GANADO HOY:</h2>
         <div class="total-hoy" id="gananciaHoy">$0.00</div>
         
-        <div class="meta-container">
-            <div class="meta-input-wrap">Meta: $ <input type="number" id="goal" value="1.00" step="0.10"></div>
-            <div class="progress-bar"><div id="fill"></div></div>
-            <div id="message" class="msg">Sincronizando...</div>
-        </div>
+        <div style="font-weight:bold; color:#d29922" id="message">Faltan $--</div>
+        <div class="progress-bar"><div id="fill"></div></div>
 
         <div class="history">
-            <span class="history-title">Historial de Esfuerzo (Vzla)</span>
-            <div id="historyList">
-                <div style="text-align:center; color:#484f58; font-size: 0.7rem;">Sin registros previos</div>
-            </div>
+            <div style="text-align:center; color:#8b949e; margin-bottom:10px">HISTORIAL RECIENTE</div>
+            <div id="historyList"></div>
         </div>
-        
-        <button onclick="forzarReset()" class="btn-reset">Reiniciar día (Solo en caso de error)</button>
+
+        <span id="soundToggle" onclick="testSound()">🔊 Haz clic aquí para activar sonido</span>
     </div>
 
+    <audio id="cashSound" src="https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3"></audio>
+
     <script>
-        // --- FUNCIÓN DE TIEMPO VZLA CORREGIDA ---
         function getVzlaData() {
             const ahora = new Date();
-            // GMT-4 Venezuela
             const vzla = new Date(ahora.getTime() + (ahora.getTimezoneOffset() * 60000) - (4 * 3600000));
-            
             const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-            const diaNombre = dias[vzla.getDay()];
-            const fecha = vzla.toLocaleDateString('es-VE');
-            
-            // Formato 12h corregido
-            let h = vzla.getHours();
-            const ampm = h >= 12 ? 'PM' : 'AM';
-            h = h % 12 || 12;
-            const m = vzla.getMinutes().toString().padStart(2, '0');
-            const horaString = `${h}:${m} ${ampm}`;
-
-            return { id: vzla.toISOString().split('T')[0], diaNombre, fecha, horaString };
+            return { id: vzla.toISOString().split('T')[0], dia: dias[vzla.getDay()], fecha: vzla.toLocaleDateString('es-VE') };
         }
 
         const info = getVzlaData();
-        document.getElementById('txtDia').innerText = info.diaNombre;
-        document.getElementById('txtDateTime').innerText = `${info.fecha} | ${info.horaString}`;
+        document.getElementById('txtDia').innerText = info.dia;
+        document.getElementById('txtFecha').innerText = info.fecha;
 
         const params = new URLSearchParams(window.location.search);
-        const e = parseFloat(params.get('earned')) || 0;
-        const p = parseFloat(params.get('pending')) || 0;
-        const totalActual = e + p;
+        const earned = parseFloat(params.get('earned')) || 0;
+        const pending = parseFloat(params.get('pending')) || 0;
+        const totalActual = earned + pending;
 
         let base = parseFloat(localStorage.getItem('baseJhon'));
         let ultimaFecha = localStorage.getItem('fechaJhon');
         let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
+        let meta = 1.00; // Puedes cambiarla aquí
 
-        // --- LÓGICA DE DÍA SIGUIENTE ---
+        // AUTO-RESET DIARIO
         if (ultimaFecha && ultimaFecha !== info.id) {
             const ganadoAyer = Math.max(0, totalActual - base);
-            const metaAyer = parseFloat(localStorage.getItem('metaJhon')) || 1.00;
-            
-            historial.unshift({ 
-                f: ultimaFecha, 
-                m: ganadoAyer.toFixed(2), 
-                ok: ganadoAyer >= metaAyer 
-            });
-            if(historial.length > 5) historial.pop();
+            historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), ok: ganadoAyer >= meta });
+            if(historial.length > 3) historial.pop();
             localStorage.setItem('histJhon', JSON.stringify(historial));
-            
             base = totalActual;
             localStorage.setItem('baseJhon', base);
         }
@@ -244,42 +77,32 @@
         localStorage.setItem('fechaJhon', info.id);
 
         function calcular() {
-            const meta = parseFloat(document.getElementById('goal').value) || 1.00;
-            localStorage.setItem('metaJhon', meta);
-
-            const ganado = Math.max(0, totalActual - base);
-            const redondeo = Math.round(ganado * 100) / 100;
+            const ganadoPuro = Math.max(0, totalActual - base);
+            const redondeo = Math.round(ganadoPuro * 100) / 100;
+            
+            // LÓGICA DEL SONIDO $$$
+            const anteriorGanado = parseFloat(localStorage.getItem('ultimoGanadoJhon')) || 0;
+            if (redondeo > anteriorGanado) {
+                document.getElementById('cashSound').play().catch(e => console.log("Clic para activar audio"));
+            }
+            localStorage.setItem('ultimoGanadoJhon', redondeo);
 
             document.getElementById('gananciaHoy').innerText = '$' + redondeo.toFixed(2);
-            document.getElementById('fill').style.width = Math.min((ganado / meta) * 100, 100) + '%';
+            document.getElementById('fill').style.width = Math.min((ganadoPuro / meta) * 100, 100) + '%';
+            document.getElementById('message').innerText = ganadoPuro >= meta ? "¡META CUMPLIDA! 🚀" : `Faltan $${(meta - ganadoPuro).toFixed(2)}`;
 
-            const msg = document.getElementById('message');
-            if (ganado >= meta) {
-                msg.innerText = "¡META CUMPLIDA! 🚀"; msg.style.color = "#238636";
-            } else {
-                msg.innerText = "Faltan $" + (meta - ganado).toFixed(2); msg.style.color = "#d29922";
-            }
-
-            const list = document.getElementById('historyList');
-            if(historial.length > 0) {
-                list.innerHTML = historial.map(h => `
-                    <div class="history-item">
-                        <span>${h.f}</span>
-                        <span class="${h.ok ? 'status-ok' : 'status-fail'}">$${h.m} ${h.ok ? '✓' : '✗'}</span>
-                    </div>
-                `).join('');
-            }
+            document.getElementById('historyList').innerHTML = historial.map(h => `
+                <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #1f242b">
+                    <span>${h.f}</span> <span class="${h.ok ? 'status-ok' : 'status-fail'}">$${h.m} ${h.ok ? '✓' : '✗'}</span>
+                </div>
+            `).join('');
         }
 
-        function forzarReset() {
-            if(confirm("¿Reiniciar saldo base?")) {
-                localStorage.setItem('baseJhon', totalActual);
-                location.reload();
-            }
+        function testSound() {
+            document.getElementById('cashSound').play();
+            document.getElementById('soundToggle').innerText = "✅ Sonido Activado";
         }
 
-        document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
-        document.getElementById('goal').addEventListener('input', calcular);
         calcular();
     </script>
 </body>
