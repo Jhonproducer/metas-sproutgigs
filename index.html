@@ -2,111 +2,95 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Jhonproducer - HP 17-Inch Control</title>
+    <title>Jhonproducer - High Contrast Dashboard</title>
     <style>
         :root {
-            --bg: #0d1117; --card: #161b22; --text: #ffffff;
-            --accent: #2ea043; --blue: #58a6ff; --border: #30363d;
-        }
-        [data-theme="light"] {
-            --bg: #f6f8fa; --card: #ffffff; --text: #1f2328;
-            --accent: #1a7f37; --blue: #0969da; --border: #d0d7de;
+            --bg: #000000; --card: #161b22; --text: #ffffff;
+            --green: #2eb043; --red: #ff4444; --yellow: #ffcc00; --blue: #58a6ff;
         }
         body { 
             background: var(--bg); color: var(--text); 
-            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-family: 'Arial Black', Gadget, sans-serif; /* Fuente gruesa por defecto */
             display: flex; justify-content: center; align-items: center; 
-            height: 100vh; margin: 0; overflow: hidden; /* Evita scroll */
+            height: 100vh; margin: 0; overflow: hidden;
+            font-weight: 900; /* TODO EN NEGRITAS MÁXIMAS */
         }
         .card { 
-            background: var(--card); border: 2px solid var(--border);
-            border-radius: 16px; padding: 20px; width: 420px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            background: var(--card); border: 3px solid #30363d;
+            border-radius: 20px; padding: 25px; width: 440px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
         }
-        /* Controles Superiores */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .btn-theme { background: var(--border); border: none; color: var(--text); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
-
-        .header-main { text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .big-money { font-size: 4.5rem; font-weight: 900; margin: 5px 0; letter-spacing: -2px; }
+        /* Cabecera */
+        .header { border-bottom: 2px solid #30363d; padding-bottom: 10px; margin-bottom: 15px; }
+        .day-label { color: var(--blue); font-size: 1.3rem; letter-spacing: 1px; display: block; }
         
-        /* Secciones Plegables */
-        details { background: rgba(0,0,0,0.05); border-radius: 8px; margin-top: 8px; border: 1px solid var(--border); }
-        summary { padding: 8px; cursor: pointer; font-weight: bold; font-size: 0.8rem; color: var(--blue); outline: none; }
-        .details-content { padding: 10px; font-size: 0.85rem; border-top: 1px solid var(--border); }
+        /* Dinero Grande */
+        .big-money { font-size: 5.5rem; margin: 10px 0; line-height: 1; }
+        .info-msg { font-size: 1.2rem; margin-bottom: 10px; }
 
-        /* Stats y Calculadora */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
-        .stat-box { background: var(--bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border); }
-        .stat-label { font-size: 0.6rem; text-transform: uppercase; color: #8b949e; display: block; }
-        .stat-val { font-size: 1.1rem; font-weight: bold; }
+        /* Barra de Progreso Gruesa */
+        .progress-bar { background: #333; border-radius: 15px; height: 20px; margin: 15px 0; border: 2px solid #555; }
+        #fill { height: 100%; width: 0%; transition: width 1s ease; }
 
-        input { background: transparent; border: none; border-bottom: 2px solid var(--accent); color: var(--text); width: 60px; text-align: center; font-size: 1.1rem; font-weight: bold; }
-        .progress-bar { background: var(--border); border-radius: 10px; height: 10px; margin: 10px 0; overflow: hidden; }
-        #fill { height: 100%; width: 0%; transition: width 1s ease; background: var(--accent); }
+        /* Cuadrícula de Saldos */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .box { background: #000; padding: 12px; border-radius: 10px; border: 2px solid #444; }
+        .label { font-size: 0.75rem; color: #aaa; text-transform: uppercase; display: block; }
+        .val { font-size: 1.2rem; display: block; }
+
+        /* HISTORIAL SIEMPRE VISIBLE */
+        .history-box { 
+            background: #000; border: 2px solid #30363d; 
+            border-radius: 12px; padding: 12px; margin-top: 15px;
+            max-height: 120px; overflow-y: auto;
+        }
+        .hist-item { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 5px 0; border-bottom: 1px solid #222; }
+
+        input { background: #222; border: 2px solid var(--blue); color: #fff; width: 80px; text-align: center; font-size: 1.3rem; font-weight: 900; border-radius: 5px; }
     </style>
 </head>
-<body data-theme="dark">
+<body>
     <div class="card">
-        <div class="top-bar">
-            <span id="txtDateTime" style="font-size: 0.75rem; font-weight: bold;">--/--/--</span>
-            <button class="btn-theme" onclick="toggleTheme()">CAMBIAR TEMA 🌓</button>
+        <div class="header">
+            <span id="txtDia" class="day-label">CARGANDO...</span>
+            <span id="txtDateTime" style="font-size: 1rem; color: #8b949e;">--/--/-- | --:--</span>
         </div>
 
-        <div class="header-main">
-            <span id="txtDia" style="color: var(--blue); font-weight: 900; text-transform: uppercase;">MARTES</span>
-            <div class="big-money" id="gananciaHoy">$0.00</div>
-            <div id="message" style="font-weight: bold;">Cargando...</div>
-            <div class="progress-bar"><div id="fill"></div></div>
+        <div style="text-align: center;">
+            <span style="font-size: 0.9rem; color: #aaa;">GANADO HOY:</span>
+            <div class="big-money" id="gananciaHoy" style="color: var(--red);">$0.00</div>
+            <div id="message" class="info-msg" style="color: var(--yellow);">Faltan $1.00</div>
         </div>
+
+        <div class="progress-bar"><div id="fill"></div></div>
 
         <div class="stats-grid">
-            <div class="stat-box"><span class="stat-label">Ganado</span><span class="stat-val" id="valEarned">$0.00</span></div>
-            <div class="stat-box"><span class="stat-label">Pendiente</span><span class="stat-val" id="valPending">$0.00</span></div>
-            <div class="stat-box" style="grid-column: span 2; border-color: var(--accent);">
-                <span class="stat-label">Total Real</span><span class="stat-val" id="valTotalReal" style="color: var(--accent); font-size: 1.3rem;">$0.00</span>
+            <div class="box"><span class="label">EN GANADO</span><span class="val" id="valEarned">$0.00</span></div>
+            <div class="box"><span class="label">PENDIENTE</span><span class="val" id="valPending">$0.00</span></div>
+            <div class="box" style="grid-column: span 2; border-color: var(--green);">
+                <span class="label" style="color: var(--green);">SALDO TOTAL REAL</span>
+                <span class="val" id="valTotalReal" style="font-size: 1.6rem; color: var(--green);">$0.00</span>
             </div>
         </div>
 
-        <details>
-            <summary>📊 ACUMULADO 30 DÍAS</summary>
-            <div class="details-content">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>Total Mes:</span>
-                    <b id="valMes" style="font-size: 1.2rem; color: var(--accent);">$0.00</b>
-                </div>
-            </div>
-        </details>
+        <div class="history-box">
+            <div style="text-align: center; font-size: 0.7rem; color: #58a6ff; margin-bottom: 5px;">HISTORIAL ÚLTIMOS DÍAS</div>
+            <div id="historyList"></div>
+        </div>
 
-        <details>
-            <summary>💰 META DE RETIRO</summary>
-            <div class="details-content">
-                Quiero retirar: $ <input type="number" id="withdrawTarget" value="13.00">
-                <div id="withdrawRemaining" style="margin-top:5px; font-weight:bold;">---</div>
-            </div>
-        </details>
-
-        <div style="margin-top: 10px; font-size: 0.8rem; text-align: center;">
-            Meta Diaria: $ <input type="number" id="goal" value="1.00">
-            <span id="soundToggle" onclick="testSound()" style="cursor:pointer; text-decoration:underline; display:block; margin-top:5px; font-size:0.6rem;">🔊 Activar Sonido</span>
+        <div style="margin-top: 15px; font-size: 0.9rem; text-align: center;">
+            META: $ <input type="number" id="goal" value="1.00" step="0.10">
+            <span onclick="document.getElementById('cashSound').play()" style="cursor:pointer; display:block; font-size:0.7rem; margin-top:5px; color:#58a6ff;">🔊 PROBAR SONIDO</span>
         </div>
     </div>
 
     <audio id="cashSound" src="https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3"></audio>
 
     <script>
-        function toggleTheme() {
-            const body = document.body;
-            const current = body.getAttribute('data-theme');
-            const next = current === 'dark' ? 'light' : 'dark';
-            body.setAttribute('data-theme', next);
-            localStorage.setItem('jhonTheme', next);
-        }
-
         function getVzlaData() {
             const ahora = new Date();
             const vzla = new Date(ahora.getTime() + (ahora.getTimezoneOffset() * 60000) - (4 * 3600000));
-            const dias = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
+            const dias = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
             let h = vzla.getHours();
             const ampm = h >= 12 ? 'PM' : 'AM';
             h = h % 12 || 12;
@@ -117,7 +101,6 @@
         const info = getVzlaData();
         document.getElementById('txtDia').innerText = info.dia;
         document.getElementById('txtDateTime').innerText = `${info.fecha} | ${info.hora}`;
-        document.body.setAttribute('data-theme', localStorage.getItem('jhonTheme') || 'dark');
 
         const params = new URLSearchParams(window.location.search);
         const earned = parseFloat(params.get('earned')) || 0;
@@ -128,12 +111,16 @@
         let ultimaFecha = localStorage.getItem('fechaJhon');
         let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
 
-        // Reset Diario e Historial
+        // Lógica de Historia: Si hoy es un día nuevo, guarda lo de ayer
         if (ultimaFecha && ultimaFecha !== info.id) {
             const ganadoAyer = Math.max(0, totalActual - base);
-            historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2) });
-            if(historial.length > 31) historial.pop(); // Guardamos 31 días
+            const metaAyer = parseFloat(localStorage.getItem('metaJhon')) || 1.00;
+            const cumplido = ganadoAyer >= metaAyer;
+            
+            historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), ok: cumplido });
+            if(historial.length > 5) historial.pop();
             localStorage.setItem('histJhon', JSON.stringify(historial));
+            
             base = totalActual;
             localStorage.setItem('baseJhon', base);
         }
@@ -142,43 +129,51 @@
 
         function calcular() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
-            const wTarget = parseFloat(document.getElementById('withdrawTarget').value) || 13.00;
             localStorage.setItem('metaJhon', goal);
-            localStorage.setItem('retiroJhon', wTarget);
 
             const ganadoHoy = Math.max(0, totalActual - base);
             const hoyRedondeo = Math.round(ganadoHoy * 100) / 100;
 
-            // Sonido $$$
+            // Sonido
             const ant = parseFloat(localStorage.getItem('antJhon')) || 0;
             if (hoyRedondeo > ant) { document.getElementById('cashSound').play().catch(e=>{}); }
             localStorage.setItem('antJhon', hoyRedondeo);
 
-            // Vista
-            document.getElementById('gananciaHoy').innerText = '$' + hoyRedondeo.toFixed(2);
+            // UI
+            const bigNum = document.getElementById('gananciaHoy');
+            bigNum.innerText = '$' + hoyRedondeo.toFixed(2);
             document.getElementById('valEarned').innerText = '$' + earned.toFixed(4);
             document.getElementById('valPending').innerText = '$' + pending.toFixed(4);
             document.getElementById('valTotalReal').innerText = '$' + totalActual.toFixed(4);
 
-            // Cálculo Mensual (Últimos 30 días)
-            const sumMes = historial.reduce((acc, h) => acc + parseFloat(h.m), 0) + hoyRedondeo;
-            document.getElementById('valMes').innerText = '$' + sumMes.toFixed(2);
-
-            // Cálculo Retiro
-            const faltaW = Math.max(0, wTarget - totalActual);
-            document.getElementById('withdrawRemaining').innerText = faltaW > 0 ? `Faltan $${faltaW.toFixed(2)}` : "¡RETIRA YA! 🔥";
-
-            // Barra y Meta
             const pct = Math.min((ganadoHoy / goal) * 100, 100);
-            document.getElementById('fill').style.width = pct + '%';
-            document.getElementById('message').innerText = ganadoHoy >= goal ? "META LOGRADA! 🏆" : `Faltan $${(goal - ganadoHoy).toFixed(2)}`;
+            const fill = document.getElementById('fill');
+            fill.style.width = pct + '%';
+
+            // Colores
+            if(pct < 35) { fill.style.backgroundColor = "#da3633"; bigNum.style.color = "#da3633"; }
+            else if(pct < 75) { fill.style.backgroundColor = "#ffcc00"; bigNum.style.color = "#ffcc00"; }
+            else { fill.style.backgroundColor = "#2eb043"; bigNum.style.color = "#2eb043"; }
+
+            document.getElementById('message').innerText = ganadoHoy >= goal ? "META LOGRADA! 🏆" : `FALTAN $${(goal - ganadoHoy).toFixed(2)}`;
+            document.getElementById('message').style.color = ganadoHoy >= goal ? "#2eb043" : "#ffcc00";
+
+            // Mostrar Historial
+            const list = document.getElementById('historyList');
+            if(historial.length > 0) {
+                list.innerHTML = historial.map(h => `
+                    <div class="hist-item">
+                        <span>${h.f}</span>
+                        <b style="color:${h.ok ? '#2eb043' : '#ff4444'}">$${h.m} ${h.ok ? '✓' : '✗'}</b>
+                    </div>
+                `).join('');
+            } else {
+                list.innerHTML = '<div style="text-align:center;color:#444">SIN REGISTROS</div>';
+            }
         }
 
-        function testSound() { document.getElementById('cashSound').play(); }
         document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
-        document.getElementById('withdrawTarget').value = localStorage.getItem('retiroJhon') || 13.00;
         document.getElementById('goal').addEventListener('input', calcular);
-        document.getElementById('withdrawTarget').addEventListener('input', calcular);
         calcular();
     </script>
 </body>
