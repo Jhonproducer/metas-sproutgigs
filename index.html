@@ -41,7 +41,6 @@
             align-items: start; transition: all 0.4s ease; box-sizing: border-box;
         }
         
-        /* CABECERA Y BOTONES SUPERIORES */
         .top-bar { 
             grid-column: span 2; display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 2px solid var(--border-color); padding-bottom: 15px; margin-bottom: -5px; 
@@ -54,24 +53,26 @@
         .col-left { display: flex; flex-direction: column; gap: 15px; } 
         .col-right { display: flex; flex-direction: column; gap: 15px; } 
         
+        /* EFECTO DE REBOTE PARA EL NÚMERO AL ACTUALIZAR */
         .big-money { 
             font-size: 4.8rem; font-weight: 800; line-height: 1; margin: 5px 0; 
             text-align: center; background: linear-gradient(135deg, var(--accent-yellow), #f59e0b);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             filter: drop-shadow(0px 3px 6px rgba(251, 191, 36, 0.2));
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            display: inline-block; width: 100%;
         }
         
-        /* GRID DE 3 CAJAS (Saldo Real ocupa 2 columnas) */
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } 
         .box { 
             background: var(--bg-panel); border: 1px solid var(--border-color); 
             padding: 12px; border-radius: 14px; text-align: center; 
             box-shadow: var(--shadow-box); transition: transform 0.2s;
         }
-        .box-full { grid-column: span 2; } /* Clase para que ocupe todo el ancho */
+        .box-full { grid-column: span 2; } 
         .box:hover { transform: translateY(-2px); }
         .label { font-size: 0.85rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; display: block; }
-        .box-val { font-size: 1.4rem; font-weight: 800; display: block; }
+        .box-val { font-size: 1.4rem; font-weight: 800; display: block; transition: color 0.3s; }
         
         input { 
             background: var(--bg-panel); border: 2px solid var(--border-color); 
@@ -81,7 +82,6 @@
         }
         input:focus { border-color: var(--accent-blue); box-shadow: 0 0 8px rgba(59, 130, 246, 0.3); }
         
-        /* BOTONES */
         .btn-theme { 
             background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color); 
             padding: 10px 18px; border-radius: 50px; cursor: pointer; font-weight: 700; 
@@ -205,18 +205,17 @@
         document.getElementById('txtDateTime').innerText = `${info.fecha} | ${info.hora}`;
         document.body.setAttribute('data-theme', localStorage.getItem('jhonTheme') || 'dark');
 
+        // 1. EL MENSAJERO FANTASMA (Lee la URL si el script de SproutGigs abre el iframe)
         const params = new URLSearchParams(window.location.search);
-        let earned = parseFloat(params.get('earned')); let pending = parseFloat(params.get('pending'));
+        let eParam = parseFloat(params.get('earned')); let pParam = parseFloat(params.get('pending'));
 
-        if (!isNaN(earned) && !isNaN(pending)) {
-            localStorage.setItem('lastEarnedJhon', earned); localStorage.setItem('lastPendingJhon', pending);
+        if (!isNaN(eParam) && !isNaN(pParam)) {
+            localStorage.setItem('lastEarnedJhon', eParam); 
+            localStorage.setItem('lastPendingJhon', pParam);
             localStorage.setItem('syncTrigger', Date.now()); 
-        } else {
-            earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
-            pending = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
         }
         
-        const totalActual = earned + pending;
+        // 2. CONFIGURACIÓN BASE
         let base = parseFloat(localStorage.getItem('baseJhon'));
         let ultimaFecha = localStorage.getItem('fechaJhon');
         let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
@@ -229,31 +228,51 @@
         });
         if(guardoCambios) localStorage.setItem('histJhon', JSON.stringify(historial));
 
-        if (ultimaFecha && ultimaFecha !== info.id) {
-            const ganadoAyer = Math.max(0, totalActual - base);
-            const d = new Date(ultimaFecha + "T12:00:00");
-            historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), mes: d.getMonth(), anio: d.getFullYear() });
-            if(historial.length > 90) historial.pop(); 
-            localStorage.setItem('histJhon', JSON.stringify(historial));
-            base = totalActual; localStorage.setItem('baseJhon', base);
+        function revisarCambioDeDia() {
+            let totalA = (parseFloat(localStorage.getItem('lastEarnedJhon')) || 0) + (parseFloat(localStorage.getItem('lastPendingJhon')) || 0);
+            if (ultimaFecha && ultimaFecha !== info.id) {
+                const ganadoAyer = Math.max(0, totalA - base);
+                const d = new Date(ultimaFecha + "T12:00:00");
+                historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), mes: d.getMonth(), anio: d.getFullYear() });
+                if(historial.length > 90) historial.pop(); 
+                localStorage.setItem('histJhon', JSON.stringify(historial));
+                base = totalA; localStorage.setItem('baseJhon', base);
+                ultimaFecha = info.id; localStorage.setItem('fechaJhon', info.id);
+            }
+            if (!base && base !== 0) { base = totalA; localStorage.setItem('baseJhon', base); }
+            if (!ultimaFecha) { localStorage.setItem('fechaJhon', info.id); }
         }
-        if (!base) { base = totalActual; localStorage.setItem('baseJhon', base); }
-        localStorage.setItem('fechaJhon', info.id);
+        revisarCambioDeDia();
 
         let miGrafico; 
 
+        // 3. FUNCIÓN MAESTRA (AHORA ES REACTIVA)
         function calcular() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
             const wTarget = parseFloat(document.getElementById('withdrawTarget').value) || 13.00;
             localStorage.setItem('metaJhon', goal); localStorage.setItem('retiroJhon', wTarget);
 
+            // Leer datos FRESCOS directo de la memoria
+            let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
+            let pending = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
+            let totalActual = earned + pending;
+
             const ganadoHoy = Math.max(0, totalActual - base);
             const hoyRedondeo = Math.round(ganadoHoy * 100) / 100;
 
+            // DETECTOR DE DINERO NUEVO (Sonido y Animación)
             const ant = parseFloat(localStorage.getItem('antJhon')) || 0;
-            if (hoyRedondeo > ant) { document.getElementById('cashSound').play().catch(e=>{}); }
+            if (hoyRedondeo > ant) { 
+                document.getElementById('cashSound').play().catch(e=>{}); 
+                
+                // Efecto POP visual en el número
+                const bigNumber = document.getElementById('gananciaHoy');
+                bigNumber.style.transform = "scale(1.15)";
+                setTimeout(() => { bigNumber.style.transform = "scale(1)"; }, 300);
+            }
             localStorage.setItem('antJhon', hoyRedondeo);
 
+            // Actualizar Textos dinámicamente
             document.getElementById('gananciaHoy').innerText = '$' + hoyRedondeo.toFixed(2);
             document.getElementById('valEarned').innerText = '$' + earned.toFixed(4);
             document.getElementById('valPending').innerText = '$' + pending.toFixed(4);
@@ -265,8 +284,6 @@
             let proyeccion = (sumMesActual / info.diaNumero) * info.totalDiasMes;
             document.getElementById('valProyeccion').innerText = '$' + proyeccion.toFixed(2);
             document.getElementById('labelHoy').innerText = `HOY (${MESES[info.mesIdx]}):`; 
-
-            // SE ELIMINÓ EL CÓDIGO DE CÁLCULO DE RACHA
 
             const faltaW = Math.max(0, wTarget - totalActual);
             document.getElementById('withdrawRemaining').innerText = faltaW > 0 ? `FALTAN $${faltaW.toFixed(2)}` : "¡YA PUEDES RETIRAR! 🔥";
@@ -297,7 +314,6 @@
             let valores = datosGrafico.map(h => parseFloat(h.m));
             
             const isLight = document.body.getAttribute('data-theme') === 'light';
-            const colorExito = '#10b981'; const colorFallo = '#fbbf24'; 
             const gridColor = isLight ? '#e2e8f0' : '#334155';
             const textColor = isLight ? '#64748b' : '#94a3b8';
 
@@ -313,6 +329,7 @@
                 type: 'bar',
                 data: { labels: etiquetas, datasets: [{ label: 'Ganancia Diaria ($)', data: valores, backgroundColor: bgColorsGradient, borderRadius: 6, borderWidth: 0, hoverBackgroundColor: '#3b82f6' }] },
                 options: {
+                    animation: { duration: 0 }, /* Apaga la animación para que la auto-actualización sea limpia */
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false }, tooltip: { backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(15,23,42,0.95)', titleColor: isLight ? '#0f172a' : '#f8fafc', bodyColor: isLight ? '#0f172a' : '#f8fafc', borderColor: gridColor, borderWidth: 1, titleFont: { size: 12, family: 'Poppins' }, bodyFont: { size: 16, weight: 'bold', family: 'Poppins' }, displayColors: false, padding: 8, cornerRadius: 6, callbacks: { label: function(context) { return '$' + context.parsed.y.toFixed(2); } } } },
                     scales: { y: { beginAtZero: true, grid: { color: gridColor, drawBorder: false }, ticks: { color: textColor, font: { family: 'Poppins', weight: '600', size: 11 }, callback: function(value) { return '$' + value; } } }, x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Poppins', weight: '600', size: 11 } } } }
@@ -320,7 +337,16 @@
             });
         }
 
-        window.addEventListener('storage', (e) => { if (e.key === 'syncTrigger') location.reload(); });
+        // 4. EL RADAR (AUTO-ACTUALIZACIÓN SILENCIOSA)
+        let ultimoSync = localStorage.getItem('syncTrigger');
+        setInterval(() => {
+            let syncActual = localStorage.getItem('syncTrigger');
+            if (syncActual !== ultimoSync) {
+                ultimoSync = syncActual;
+                calcular(); // ¡Magia! Se actualiza la pantalla sin recargar
+            }
+        }, 1500); // Escanea cada 1.5 segundos
+
         function testSound() { document.getElementById('cashSound').play(); }
         
         function exportarExcelPro() {
@@ -337,10 +363,13 @@
             XLSX.writeFile(wb, `SproutGigs_Master_${info.id}.xlsx`);
         }
 
-        document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
-        document.getElementById('withdrawTarget').value = localStorage.getItem('retiroJhon') || 13.00;
         document.getElementById('goal').addEventListener('input', calcular);
         document.getElementById('withdrawTarget').addEventListener('input', calcular);
+        
+        document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
+        document.getElementById('withdrawTarget').value = localStorage.getItem('retiroJhon') || 13.00;
+        
+        // Ejecución inicial
         calcular();
     </script>
 </body>
