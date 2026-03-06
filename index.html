@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Jhonproducer - Master Dashboard PRO</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         /* VARIABLES DE TEMA Y COLORES GLOBALES */
         :root {
@@ -15,7 +16,6 @@
             --green: #1a7f37; --red: #cb2431; --yellow: #b08800; --blue: #0366d6; --border: #d1d5da;
         }
         
-        /* DISEÑO BASE PANORÁMICO */
         body { 
             background: var(--bg); color: var(--text); 
             font-family: 'Arial Black', Gadget, sans-serif; 
@@ -31,29 +31,24 @@
             transition: all 0.3s ease;
         }
         
-        /* CABECERA */
         .top-bar { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
         .col-left { display: flex; flex-direction: column; gap: 15px; }
         .col-right { display: flex; flex-direction: column; gap: 15px; }
         
-        /* TIPOGRAFÍAS Y PANELES */
         .big-money { font-size: 5.5rem; line-height: 1; margin: 10px 0; text-align: center; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
         .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
         .box { border: 2px solid var(--border); padding: 10px; border-radius: 10px; text-align: center; background: rgba(0,0,0,0.05); }
         .label { font-size: 0.75rem; color: #8b949e; display: block; text-transform: uppercase; margin-bottom: 5px; }
         
-        /* CONTROLES E INPUTS */
         input { background: var(--card); border: 2px solid var(--blue); color: var(--text); width: 85px; text-align: center; font-size: 1.4rem; font-weight: 900; border-radius: 6px; outline: none; transition: border 0.3s; }
         input:focus { border-color: var(--green); }
         
-        /* BOTONES PRO */
         .btn-theme { background: var(--border); color: var(--text); border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 900; text-transform: uppercase; transition: filter 0.2s; }
         .btn-theme:hover { filter: brightness(1.2); }
         
         .btn-excel { background: var(--green); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 900; width: 100%; text-transform: uppercase; font-size: 1rem; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 10px rgba(46, 176, 67, 0.3); }
         .btn-excel:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(46, 176, 67, 0.5); }
         
-        /* BARRA DE PROGRESO Y GRÁFICO */
         .progress-bar { background: var(--border); border-radius: 10px; height: 25px; overflow: hidden; border: 1px solid var(--border); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
         #fill { height: 100%; width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease; }
         
@@ -107,25 +102,23 @@
                 <canvas id="historialChart"></canvas>
             </div>
 
-            <button class="btn-excel" onclick="exportarCSV()">💾 DESCARGAR HISTORIAL EN EXCEL (.CSV)</button>
+            <button class="btn-excel" onclick="exportarExcelPro()">💾 DESCARGAR REPORTE EXCEL PRO (.XLSX)</button>
         </div>
     </div>
 
     <audio id="cashSound" src="https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3"></audio>
 
     <script>
-        // --- 1. CONFIGURACIÓN VISUAL ---
         function toggleTheme() {
             const b = document.body;
             const t = b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
             b.setAttribute('data-theme', t);
             localStorage.setItem('jhonTheme', t);
-            calcular(); // Recarga el gráfico para pintar líneas correctas
+            calcular(); 
         }
 
         const MESES = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
 
-        // --- 2. RELOJ VENEZOLANO (HORA EXACTA PARA TUS CORTES) ---
         function getVzlaData() {
             const ahora = new Date();
             const vzla = new Date(ahora.getTime() + (ahora.getTimezoneOffset() * 60000) - (4 * 3600000));
@@ -145,7 +138,6 @@
         document.getElementById('txtDateTime').innerText = `${info.fecha} | ${info.hora}`;
         document.body.setAttribute('data-theme', localStorage.getItem('jhonTheme') || 'dark');
 
-        // --- 3. SINCRONIZACIÓN DE DATOS (URL -> LocalStorage) ---
         const params = new URLSearchParams(window.location.search);
         let earned = parseFloat(params.get('earned')); let pending = parseFloat(params.get('pending'));
 
@@ -162,7 +154,6 @@
         let ultimaFecha = localStorage.getItem('fechaJhon');
         let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
 
-        // Parche de seguridad: Agrega mes y año a datos antiguos si no lo tienen
         let guardoCambios = false;
         historial.forEach(h => {
             if (h.mes === undefined || h.anio === undefined) {
@@ -171,21 +162,19 @@
         });
         if(guardoCambios) localStorage.setItem('histJhon', JSON.stringify(historial));
 
-        // Cierre de día automático
         if (ultimaFecha && ultimaFecha !== info.id) {
             const ganadoAyer = Math.max(0, totalActual - base);
             const d = new Date(ultimaFecha + "T12:00:00");
             historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), mes: d.getMonth(), anio: d.getFullYear() });
-            if(historial.length > 90) historial.pop(); // Guarda hasta 3 meses de memoria
+            if(historial.length > 90) historial.pop(); 
             localStorage.setItem('histJhon', JSON.stringify(historial));
             base = totalActual; localStorage.setItem('baseJhon', base);
         }
         if (!base) { base = totalActual; localStorage.setItem('baseJhon', base); }
         localStorage.setItem('fechaJhon', info.id);
 
-        let miGrafico; // Instancia global del gráfico
+        let miGrafico; 
 
-        // --- 4. CEREBRO MATEMÁTICO ---
         function calcular() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
             const wTarget = parseFloat(document.getElementById('withdrawTarget').value) || 13.00;
@@ -194,27 +183,22 @@
             const ganadoHoy = Math.max(0, totalActual - base);
             const hoyRedondeo = Math.round(ganadoHoy * 100) / 100;
 
-            // Sonido de cobro al detectar incremento
             const ant = parseFloat(localStorage.getItem('antJhon')) || 0;
             if (hoyRedondeo > ant) { document.getElementById('cashSound').play().catch(e=>{}); }
             localStorage.setItem('antJhon', hoyRedondeo);
 
-            // Actualizar Textos
             document.getElementById('gananciaHoy').innerText = '$' + hoyRedondeo.toFixed(2);
             document.getElementById('valEarned').innerText = '$' + earned.toFixed(4);
             document.getElementById('valPending').innerText = '$' + pending.toFixed(4);
             document.getElementById('valTotalReal').innerText = '$' + totalActual.toFixed(4);
 
-            // Matemáticas del Mes (Suma historial del mes + lo de hoy)
             const sumMesActual = historial.filter(h => h.mes === info.mesIdx && h.anio === info.anio).reduce((acc, h) => acc + parseFloat(h.m), 0) + hoyRedondeo;
             document.getElementById('valMes').innerText = '$' + sumMesActual.toFixed(2);
             
-            // Proyección al finalizar el mes
             let proyeccion = (sumMesActual / info.diaNumero) * info.totalDiasMes;
             document.getElementById('valProyeccion').innerText = '$' + proyeccion.toFixed(2);
             document.getElementById('labelHoy').innerText = `GANADO HOY (${MESES[info.mesIdx]}):`;
 
-            // Cálculo de Racha (Días seguidos cumpliendo la meta)
             let rachaDias = 0;
             for(let i=0; i < historial.length; i++) {
                 if(parseFloat(historial[i].m) >= goal) rachaDias++; else break;
@@ -222,11 +206,9 @@
             if(hoyRedondeo >= goal) rachaDias++;
             document.getElementById('valRacha').innerText = rachaDias + (rachaDias === 1 ? " DÍA" : " DÍAS");
 
-            // Meta de Retiro
             const faltaW = Math.max(0, wTarget - totalActual);
             document.getElementById('withdrawRemaining').innerText = faltaW > 0 ? `FALTAN $${faltaW.toFixed(2)}` : "¡YA PUEDES RETIRAR! 🔥";
 
-            // Barra de Progreso y Mensaje Central
             const pct = Math.min((ganadoHoy / goal) * 100, 100);
             const fill = document.getElementById('fill');
             const bigNum = document.getElementById('gananciaHoy');
@@ -235,7 +217,6 @@
             else if(pct < 99) { fill.style.backgroundColor = "var(--yellow)"; bigNum.style.color = "var(--yellow)"; }
             else { fill.style.backgroundColor = "var(--green)"; bigNum.style.color = "var(--green)"; }
 
-            // Mensaje Dinámico Corregido
             document.getElementById('message').innerText = ganadoHoy >= goal ? "¡META LOGRADA! 🏆" : `FALTAN $${(goal - ganadoHoy).toFixed(2)}`;
             if(ganadoHoy >= goal) document.getElementById('message').style.color = "var(--green)";
             else document.getElementById('message').style.color = "var(--text)";
@@ -243,12 +224,10 @@
             actualizarGrafico(goal);
         }
 
-        // --- 5. RENDERIZADO DEL GRÁFICO (Chart.js) ---
         function actualizarGrafico(goal) {
             const ctx = document.getElementById('historialChart').getContext('2d');
-            if (miGrafico) { miGrafico.destroy(); } // Limpiar gráfico anterior
+            if (miGrafico) { miGrafico.destroy(); } 
 
-            // Tomar máximo 30 días y ordenarlos cronológicamente (izq a der)
             let datosGrafico = historial.slice(0, 30).reverse();
             let etiquetas = datosGrafico.map(h => {
                 let partes = h.f.split('-'); return `${partes[2]}/${partes[1]}`;
@@ -297,32 +276,71 @@
             });
         }
 
-        // Auto-recarga si otra pestaña envía datos
         window.addEventListener('storage', (e) => { if (e.key === 'syncTrigger') location.reload(); });
         function testSound() { document.getElementById('cashSound').play(); }
         
-        // --- 6. EL EXCEL PERFECTO (Con BOM para la Ñ y ; para las columnas) ---
-        function exportarCSV() {
-            // \uFEFF asegura que Excel reconozca que es un archivo en Español (UTF-8)
-            let csv = "\uFEFFFECHA;GANANCIA;MES;AÑO\n";
-            historial.forEach(h => { 
-                // Se usa punto y coma (;) para que separe perfectamente las columnas
-                csv += `${h.f};$${h.m};${MESES[h.mes]};${h.anio}\n`; 
+        // --- MOTOR DE EXCEL PRO (SheetJS) ---
+        function exportarExcelPro() {
+            const goal = parseFloat(document.getElementById('goal').value) || 1.00;
+            let wb = XLSX.utils.book_new(); // Crear nuevo libro de Excel
+
+            // 1. Calcular estadísticas globales
+            let totalGanado = 0;
+            let diasExito = 0;
+            historial.forEach(h => {
+                let m = parseFloat(h.m);
+                totalGanado += m;
+                if(m >= goal) diasExito++;
             });
-            let blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
-            let link = document.createElement("a");
-            if (link.download !== undefined) {
-                let url = URL.createObjectURL(blob); 
-                link.setAttribute("href", url);
-                link.setAttribute("download", `SproutGigs_Historial_${info.id}.csv`); 
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link); 
-                link.click(); 
-                document.body.removeChild(link);
+
+            // 2. Crear HOJA 1: RESUMEN GENERAL
+            let wsResumenData = [
+                ["REPORTE MAESTRO - SPROUTGIGS"],
+                [],
+                ["MÉTRICA", "RESULTADO"],
+                ["Total de Días Trabajados", historial.length],
+                ["Días con Meta Cumplida", diasExito],
+                ["Días con Meta Fallida", historial.length - diasExito],
+                ["Ganancia Histórica Total", totalGanado], // Lo dejamos como número para poder sumar en Excel
+                ["Meta Diaria Configurada", goal]
+            ];
+            let wsResumen = XLSX.utils.aoa_to_sheet(wsResumenData);
+            XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen Global");
+
+            // 3. Agrupar historial por Meses para crear pestañas
+            let mesesAgrupados = {};
+            historial.forEach(h => {
+                let nombreMes = MESES[h.mes];
+                let key = `${nombreMes} ${h.anio}`; // Ej. "MARZO 2026"
+                if(!mesesAgrupados[key]) mesesAgrupados[key] = [];
+                mesesAgrupados[key].push(h);
+            });
+
+            // 4. Crear una pestaña por cada Mes
+            for(let key in mesesAgrupados) {
+                let datosMes = mesesAgrupados[key];
+                
+                // Encabezados de la tabla del mes
+                let wsData = [["FECHA", "GANANCIA ($)", "META ($)", "¿LOGRADO?"]];
+
+                // Invertimos para que salga desde el día 1 hasta el día 30 hacia abajo
+                let datosOrdenados = [...datosMes].reverse(); 
+
+                datosOrdenados.forEach(h => {
+                    let m = parseFloat(h.m);
+                    let logrado = m >= goal ? "✅ SÍ" : "❌ NO";
+                    // Pasamos los números "crudos" para que Excel los reconozca y permita hacer sumas/fórmulas
+                    wsData.push([h.f, m, goal, logrado]); 
+                });
+
+                let ws = XLSX.utils.aoa_to_sheet(wsData);
+                XLSX.utils.book_append_sheet(wb, ws, key); // Añadir pestaña con el nombre del mes
             }
+
+            // 5. Generar y descargar el archivo .xlsx
+            XLSX.writeFile(wb, `SproutGigs_Master_${info.id}.xlsx`);
         }
 
-        // --- 7. INICIALIZACIÓN ---
         document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
         document.getElementById('withdrawTarget').value = localStorage.getItem('retiroJhon') || 13.00;
         document.getElementById('goal').addEventListener('input', calcular);
