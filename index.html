@@ -21,19 +21,19 @@
         }
         .card { 
             background: var(--card); border: 4px solid var(--border);
-            border-radius: 20px; padding: 25px; width: 460px;
+            border-radius: 20px; padding: 25px; width: 480px;
             box-shadow: 0 0 40px rgba(0,0,0,0.5);
         }
         .top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
         .big-money { font-size: 5.5rem; line-height: 1; margin: 10px 0; text-align: center; }
-        details { background: var(--bg); border: 2px solid var(--border); border-radius: 10px; margin-top: 10px; }
+        details { background: var(--bg); border: 2px solid var(--border); border-radius: 10px; margin-top: 15px; }
         summary { padding: 12px; cursor: pointer; color: var(--blue); font-size: 1rem; outline: none; text-transform: uppercase; }
         .content { padding: 10px; border-top: 2px solid var(--border); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 15px 0; }
         .box { border: 2px solid var(--border); padding: 12px; border-radius: 10px; text-align: center; }
-        .label { font-size: 0.8rem; color: #8b949e; display: block; text-transform: uppercase; }
+        .label { font-size: 0.75rem; color: #8b949e; display: block; text-transform: uppercase; margin-bottom: 5px; }
         input { background: var(--card); border: 3px solid var(--blue); color: var(--text); width: 95px; text-align: center; font-size: 1.6rem; font-weight: 900; border-radius: 8px; outline: none; }
-        .btn-theme { background: var(--blue); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 900; }
+        .btn-theme { background: var(--blue); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 900; text-transform: uppercase; }
         .progress-bar { background: #333; border-radius: 12px; height: 22px; margin: 15px 0; overflow: hidden; border: 1px solid #555; }
         #fill { height: 100%; width: 0%; transition: width 1s ease; }
         .month-header { background: var(--border); color: var(--text); padding: 8px; font-size: 0.85rem; margin-top: 12px; border-radius: 4px; text-align: center; }
@@ -45,7 +45,7 @@
         <div class="top-bar">
             <div>
                 <span id="txtDia" style="color: var(--blue); font-size: 1.5rem; display: block;">---</span>
-                <span id="txtDateTime" style="font-size: 1rem;">--/--/-- | --:--</span>
+                <span id="txtDateTime" style="font-size: 0.9rem;">--/--/-- | --:--</span>
             </div>
             <button class="btn-theme" onclick="toggleTheme()">TEMA 🌓</button>
         </div>
@@ -58,17 +58,21 @@
         </div>
 
         <div class="grid">
-            <div class="box"><span class="label">EN GANADO</span><span id="valEarned" style="font-size: 1.4rem;">$0.00</span></div>
-            <div class="box"><span class="label">PENDIENTE</span><span id="valPending" style="font-size: 1.4rem;">$0.00</span></div>
-            <div class="box" style="grid-column: span 2; border-color: var(--green); background: rgba(46, 176, 67, 0.05);">
-                <span class="label" style="color: var(--green); font-weight: 900;">SALDO TOTAL REAL</span>
+            <div class="box"><span class="label">EN GANADO</span><span id="valEarned" style="font-size: 1.2rem;">$0.00</span></div>
+            <div class="box"><span class="label">PENDIENTE</span><span id="valPending" style="font-size: 1.2rem;">$0.00</span></div>
+            <div class="box" style="border-color: var(--yellow);"><span class="label" style="color: var(--yellow);">RACHA 🔥</span><span id="valRacha" style="font-size: 1.2rem; color: var(--yellow);">0</span></div>
+            <div class="box" style="grid-column: span 3; border-color: var(--green); background: rgba(46, 176, 67, 0.05);">
+                <span class="label" style="color: var(--green); font-weight: 900; font-size: 1rem;">SALDO TOTAL REAL</span>
                 <span id="valTotalReal" style="font-size: 2.2rem; color: var(--green);">$0.00</span>
             </div>
         </div>
 
         <details>
-            <summary>📊 HISTORIAL POR MESES</summary>
+            <summary>📊 HISTORIAL Y PROYECCIÓN</summary>
             <div class="content">
+                <div style="text-align: center; font-size: 0.95rem; color: var(--blue); margin-bottom: 12px; padding: 8px; border: 1px dashed var(--blue); border-radius: 8px;">
+                    PROYECCIÓN FIN DE MES: <b id="valProyeccion" style="font-size: 1.2rem;">$0.00</b> 🚀
+                </div>
                 <div style="display:flex; justify-content:space-between; margin-bottom: 10px; padding: 10px; background: var(--green); color: white; border-radius: 8px; font-size: 1.2rem;">
                     <span>TOTAL MES:</span> <b id="valMes">$0.00</b>
                 </div>
@@ -88,6 +92,8 @@
             META DIARIA: $ <input type="number" id="goal" value="1.00" step="0.10">
             <span onclick="testSound()" style="cursor:pointer; display:block; color: var(--blue); font-size: 0.9rem; margin-top: 15px; text-decoration: underline;">🔊 PROBAR KA-CHING</span>
         </div>
+
+        <button class="btn-theme" style="width: 100%; margin-top: 20px; background: var(--green); font-size: 0.9rem;" onclick="exportarCSV()">💾 DESCARGAR RESPALDO (EXCEL)</button>
     </div>
 
     <audio id="cashSound" src="https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3"></audio>
@@ -106,11 +112,15 @@
             const ahora = new Date();
             const vzla = new Date(ahora.getTime() + (ahora.getTimezoneOffset() * 60000) - (4 * 3600000));
             const dias = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
-            let h = vzla.getHours();
-            const am = h >= 12 ? 'PM' : 'AM';
-            h = h % 12 || 12;
+            let h = vzla.getHours(); const am = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
             const m = vzla.getMinutes().toString().padStart(2, '0');
-            return { id: vzla.toISOString().split('T')[0], mesIdx: vzla.getMonth(), anio: vzla.getFullYear(), diaNom: dias[vzla.getDay()], fecha: vzla.toLocaleDateString('es-VE'), hora: `${h}:${m} ${am}` };
+            // Calculamos cuántos días tiene el mes actual para la proyección
+            const diasEnMes = new Date(vzla.getFullYear(), vzla.getMonth() + 1, 0).getDate();
+            return { 
+                id: vzla.toISOString().split('T')[0], mesIdx: vzla.getMonth(), anio: vzla.getFullYear(), 
+                diaNom: dias[vzla.getDay()], fecha: vzla.toLocaleDateString('es-VE'), hora: `${h}:${m} ${am}`,
+                diaNumero: vzla.getDate(), totalDiasMes: diasEnMes
+            };
         }
 
         const info = getVzlaData();
@@ -119,17 +129,12 @@
         document.body.setAttribute('data-theme', localStorage.getItem('jhonTheme') || 'dark');
 
         const params = new URLSearchParams(window.location.search);
-        let earned = parseFloat(params.get('earned'));
-        let pending = parseFloat(params.get('pending'));
+        let earned = parseFloat(params.get('earned')); let pending = parseFloat(params.get('pending'));
 
-        // PROTECCIÓN Y BROADCAST: Si vienen datos nuevos en la URL, los guardamos y avisamos a las otras pestañas
         if (!isNaN(earned) && !isNaN(pending)) {
-            localStorage.setItem('lastEarnedJhon', earned);
-            localStorage.setItem('lastPendingJhon', pending);
-            // Esto dispara el evento 'storage' en la pestaña principal
+            localStorage.setItem('lastEarnedJhon', earned); localStorage.setItem('lastPendingJhon', pending);
             localStorage.setItem('syncTrigger', Date.now()); 
         } else {
-            // Si no hay datos en la URL, leemos los últimos guardados
             earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
             pending = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
         }
@@ -139,14 +144,24 @@
         let ultimaFecha = localStorage.getItem('fechaJhon');
         let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
 
+        // PARCHE HISTÓRICO: Arreglar los "Anteriores" como el 3 de marzo
+        let guardoCambios = false;
+        historial.forEach(h => {
+            if (h.mes === undefined || h.anio === undefined) {
+                const d = new Date(h.f + "T12:00:00");
+                h.mes = d.getMonth(); h.anio = d.getFullYear();
+                guardoCambios = true;
+            }
+        });
+        if(guardoCambios) localStorage.setItem('histJhon', JSON.stringify(historial));
+
         if (ultimaFecha && ultimaFecha !== info.id) {
             const ganadoAyer = Math.max(0, totalActual - base);
             const d = new Date(ultimaFecha + "T12:00:00");
             historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), mes: d.getMonth(), anio: d.getFullYear() });
             if(historial.length > 90) historial.pop();
             localStorage.setItem('histJhon', JSON.stringify(historial));
-            base = totalActual;
-            localStorage.setItem('baseJhon', base);
+            base = totalActual; localStorage.setItem('baseJhon', base);
         }
         if (!base) { base = totalActual; localStorage.setItem('baseJhon', base); }
         localStorage.setItem('fechaJhon', info.id);
@@ -154,8 +169,7 @@
         function calcular() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
             const wTarget = parseFloat(document.getElementById('withdrawTarget').value) || 13.00;
-            localStorage.setItem('metaJhon', goal);
-            localStorage.setItem('retiroJhon', wTarget);
+            localStorage.setItem('metaJhon', goal); localStorage.setItem('retiroJhon', wTarget);
 
             const ganadoHoy = Math.max(0, totalActual - base);
             const hoyRedondeo = Math.round(ganadoHoy * 100) / 100;
@@ -169,9 +183,23 @@
             document.getElementById('valPending').innerText = '$' + pending.toFixed(4);
             document.getElementById('valTotalReal').innerText = '$' + totalActual.toFixed(4);
 
+            // Cálculos del Mes y Proyección
             const sumMesActual = historial.filter(h => h.mes === info.mesIdx && h.anio === info.anio).reduce((acc, h) => acc + parseFloat(h.m), 0) + hoyRedondeo;
             document.getElementById('valMes').innerText = '$' + sumMesActual.toFixed(2);
+            
+            let proyeccion = (sumMesActual / info.diaNumero) * info.totalDiasMes;
+            document.getElementById('valProyeccion').innerText = '$' + proyeccion.toFixed(2);
+
             document.getElementById('labelHoy').innerText = `GANADO HOY (${MESES[info.mesIdx]}):`;
+
+            // Racha de Fuego
+            let rachaDias = 0;
+            for(let i=0; i < historial.length; i++) {
+                if(parseFloat(historial[i].m) >= goal) rachaDias++;
+                else break;
+            }
+            if(hoyRedondeo >= goal) rachaDias++;
+            document.getElementById('valRacha').innerText = rachaDias + (rachaDias === 1 ? " DÍA" : " DÍAS");
 
             const faltaW = Math.max(0, wTarget - totalActual);
             document.getElementById('withdrawRemaining').innerText = faltaW > 0 ? `FALTAN $${faltaW.toFixed(2)}` : "¡RETIRA YA! 🔥";
@@ -186,26 +214,40 @@
 
             document.getElementById('message').innerText = ganadoHoy >= goal ? "META LOGRADA! 🏆" : `FALTAN $${(goal - ganadoHoy).toFixed(2)}`;
             
-            let htmlHist = "";
-            let ultimoMesAnio = "";
+            let htmlHist = ""; let ultimoMesAnio = "";
             historial.forEach(h => {
-                let nombreMes = (h.mes !== undefined) ? MESES[h.mes] : "ANTERIORES";
-                let numeroAnio = (h.anio !== undefined) ? h.anio : "";
-                let mesAnio = `${nombreMes} ${numeroAnio}`.trim();
+                let nombreMes = MESES[h.mes];
+                let mesAnio = `${nombreMes} ${h.anio}`.trim();
                 if (mesAnio !== ultimoMesAnio) { htmlHist += `<div class="month-header">${mesAnio}</div>`; ultimoMesAnio = mesAnio; }
-                htmlHist += `<div class="hist-item"><span>${h.f}</span> <b>$${h.m}</b></div>`;
+                
+                // Color de éxito para el historial
+                let colorExito = parseFloat(h.m) >= goal ? 'color: var(--green);' : 'color: var(--text); opacity: 0.7;';
+                htmlHist += `<div class="hist-item"><span>${h.f}</span> <b style="${colorExito}">$${h.m}</b></div>`;
             });
             document.getElementById('historyList').innerHTML = htmlHist || '<div style="text-align:center;padding:10px;color:#666">SIN REGISTROS</div>';
         }
 
-        // ESCUCHA ACTIVA: Recarga la pestaña principal cuando el mensajero avisa
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'syncTrigger') {
-                location.reload();
-            }
-        });
+        window.addEventListener('storage', (e) => { if (e.key === 'syncTrigger') location.reload(); });
 
         function testSound() { document.getElementById('cashSound').play(); }
+        
+        // Exportar a Excel (CSV)
+        function exportarCSV() {
+            let csv = "FECHA,GANANCIA,MES,AÑO\n";
+            historial.forEach(h => { csv += `${h.f},$${h.m},${MESES[h.mes]},${h.anio}\n`; });
+            let blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+            let link = document.createElement("a");
+            if (link.download !== undefined) {
+                let url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", `SproutGigs_Respaldo_${info.id}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
         document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
         document.getElementById('withdrawTarget').value = localStorage.getItem('retiroJhon') || 13.00;
         document.getElementById('goal').addEventListener('input', calcular);
