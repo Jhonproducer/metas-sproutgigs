@@ -61,13 +61,14 @@
             filter: drop-shadow(0px 3px 6px rgba(251, 191, 36, 0.2));
         }
         
-        /* EL NUEVO GRID 2x2 PARA LAS CAJITAS (Adiós al texto pegado) */
-        .grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } 
+        /* GRID DE 3 CAJAS (Saldo Real ocupa 2 columnas) */
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } 
         .box { 
             background: var(--bg-panel); border: 1px solid var(--border-color); 
             padding: 12px; border-radius: 14px; text-align: center; 
             box-shadow: var(--shadow-box); transition: transform 0.2s;
         }
+        .box-full { grid-column: span 2; } /* Clase para que ocupe todo el ancho */
         .box:hover { transform: translateY(-2px); }
         .label { font-size: 0.85rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; display: block; }
         .box-val { font-size: 1.4rem; font-weight: 800; display: block; }
@@ -80,7 +81,7 @@
         }
         input:focus { border-color: var(--accent-blue); box-shadow: 0 0 8px rgba(59, 130, 246, 0.3); }
         
-        /* BOTÓN MODO OSCURO */
+        /* BOTONES */
         .btn-theme { 
             background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color); 
             padding: 10px 18px; border-radius: 50px; cursor: pointer; font-weight: 700; 
@@ -88,7 +89,6 @@
         }
         .btn-theme:hover { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
         
-        /* BOTÓN EXCEL (MUDADO ARRIBA) */
         .btn-excel { 
             background: linear-gradient(135deg, var(--accent-green), #059669); 
             color: white; border: none; padding: 10px 20px; 
@@ -156,11 +156,10 @@
         </div>
 
         <div class="col-right">
-            <div class="grid-4">
+            <div class="grid-3">
                 <div class="box"><span class="label">EN GANADO</span><span id="valEarned" class="box-val text-main">$0.00</span></div>
                 <div class="box"><span class="label">PENDIENTE</span><span id="valPending" class="box-val text-main">$0.00</span></div>
-                <div class="box" style="border-bottom: 3px solid var(--accent-yellow);"><span class="label" style="color: var(--accent-yellow);">RACHA 🔥</span><span id="valRacha" class="box-val" style="color: var(--accent-yellow);">0</span></div>
-                <div class="box" style="border-bottom: 3px solid var(--accent-green); background: rgba(16, 185, 129, 0.05);"><span class="label" style="color: var(--accent-green);">SALDO REAL</span><span id="valTotalReal" class="box-val" style="color: var(--accent-green);">$0.00</span></div>
+                <div class="box box-full" style="border-bottom: 3px solid var(--accent-green); background: rgba(16, 185, 129, 0.05);"><span class="label" style="color: var(--accent-green);">SALDO REAL TOTAL</span><span id="valTotalReal" class="box-val" style="color: var(--accent-green); font-size: 1.6rem;">$0.00</span></div>
             </div>
 
             <div style="display:flex; justify-content:space-between; align-items: center; background: var(--bg-panel); padding: 10px 18px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-box);">
@@ -267,12 +266,7 @@
             document.getElementById('valProyeccion').innerText = '$' + proyeccion.toFixed(2);
             document.getElementById('labelHoy').innerText = `HOY (${MESES[info.mesIdx]}):`; 
 
-            let rachaDias = 0;
-            for(let i=0; i < historial.length; i++) {
-                if(parseFloat(historial[i].m) >= goal) rachaDias++; else break;
-            }
-            if(hoyRedondeo >= goal) rachaDias++;
-            document.getElementById('valRacha').innerText = rachaDias + (rachaDias === 1 ? " DÍA" : " DÍAS");
+            // SE ELIMINÓ EL CÓDIGO DE CÁLCULO DE RACHA
 
             const faltaW = Math.max(0, wTarget - totalActual);
             document.getElementById('withdrawRemaining').innerText = faltaW > 0 ? `FALTAN $${faltaW.toFixed(2)}` : "¡YA PUEDES RETIRAR! 🔥";
