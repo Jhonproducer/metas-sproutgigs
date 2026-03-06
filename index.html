@@ -3,97 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <title>Jhonproducer - Master Dashboard PRO</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg: #000000; --card: #161b22; --text: #ffffff;
             --green: #2eb043; --red: #ff4444; --yellow: #ffcc00; --blue: #58a6ff; --border: #30363d;
         }
         [data-theme="light"] {
-            --bg: #ffffff; --card: #f6f8fa; --text: #000000;
+            --bg: #f0f2f5; --card: #ffffff; --text: #000000;
             --green: #1a7f37; --red: #cf222e; --yellow: #9a6700; --blue: #0969da; --border: #d0d7de;
         }
         body { 
             background: var(--bg); color: var(--text); 
             font-family: 'Arial Black', Gadget, sans-serif; 
-            display: flex; justify-content: center; align-items: flex-start; 
-            min-height: 100vh; margin: 0; overflow-y: auto; padding: 30px 10px;
-            font-weight: 900;
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; padding: 20px; font-weight: 900;
         }
+        /* Panel Panorámico Ultra Ancho */
         .card { 
             background: var(--card); border: 4px solid var(--border);
-            border-radius: 20px; padding: 25px; width: 480px;
-            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            border-radius: 15px; padding: 25px; width: 100%; max-width: 1050px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.6);
+            display: grid; grid-template-columns: 350px 1fr; gap: 25px; align-items: start;
         }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .top-bar { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .col-left { display: flex; flex-direction: column; gap: 15px; }
+        .col-right { display: flex; flex-direction: column; gap: 15px; }
+        
         .big-money { font-size: 5.5rem; line-height: 1; margin: 10px 0; text-align: center; }
-        details { background: var(--bg); border: 2px solid var(--border); border-radius: 10px; margin-top: 15px; }
-        summary { padding: 12px; cursor: pointer; color: var(--blue); font-size: 1rem; outline: none; text-transform: uppercase; }
-        .content { padding: 10px; border-top: 2px solid var(--border); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 15px 0; }
-        .box { border: 2px solid var(--border); padding: 12px; border-radius: 10px; text-align: center; }
+        
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+        .box { border: 2px solid var(--border); padding: 10px; border-radius: 10px; text-align: center; background: rgba(0,0,0,0.2); }
         .label { font-size: 0.75rem; color: #8b949e; display: block; text-transform: uppercase; margin-bottom: 5px; }
-        input { background: var(--card); border: 3px solid var(--blue); color: var(--text); width: 95px; text-align: center; font-size: 1.6rem; font-weight: 900; border-radius: 8px; outline: none; }
-        .btn-theme { background: var(--blue); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 900; text-transform: uppercase; }
-        .progress-bar { background: #333; border-radius: 12px; height: 22px; margin: 15px 0; overflow: hidden; border: 1px solid #555; }
+        input { background: var(--card); border: 2px solid var(--blue); color: var(--text); width: 85px; text-align: center; font-size: 1.4rem; font-weight: 900; border-radius: 6px; outline: none; }
+        
+        .btn-theme { background: var(--blue); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 900; text-transform: uppercase; }
+        .btn-excel { background: var(--green); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 900; width: 100%; text-transform: uppercase; font-size: 1rem; transition: transform 0.2s; }
+        .btn-excel:hover { transform: scale(1.02); }
+        
+        .progress-bar { background: #333; border-radius: 10px; height: 25px; overflow: hidden; border: 1px solid #555; }
         #fill { height: 100%; width: 0%; transition: width 1s ease; }
-        .month-header { background: var(--border); color: var(--text); padding: 8px; font-size: 0.85rem; margin-top: 12px; border-radius: 4px; text-align: center; }
-        .hist-item { display:flex; justify-content:space-between; padding:8px 5px; border-bottom:1px solid var(--border); font-size: 1rem; }
+        
+        /* Contenedor del Gráfico */
+        .chart-container { position: relative; height: 280px; width: 100%; background: var(--bg); border: 2px solid var(--border); border-radius: 10px; padding: 10px; box-sizing: border-box; }
+        
+        .panel-info { text-align: center; font-size: 1rem; padding: 15px; border-radius: 10px; border: 1px dashed var(--blue); }
     </style>
 </head>
 <body data-theme="dark">
     <div class="card">
         <div class="top-bar">
             <div>
-                <span id="txtDia" style="color: var(--blue); font-size: 1.5rem; display: block;">---</span>
-                <span id="txtDateTime" style="font-size: 0.9rem;">--/--/-- | --:--</span>
+                <span id="txtDia" style="color: var(--blue); font-size: 1.6rem; margin-right: 10px;">---</span>
+                <span id="txtDateTime" style="font-size: 1rem; color: #8b949e;">--/--/-- | --:--</span>
             </div>
             <button class="btn-theme" onclick="toggleTheme()">TEMA 🌓</button>
         </div>
 
-        <div style="text-align: center; margin-top: 15px;">
-            <span id="labelHoy" style="font-size: 1rem;">GANADO HOY:</span>
-            <div class="big-money" id="gananciaHoy">$0.00</div>
-            <div id="message" style="font-size: 1.4rem; margin-bottom: 8px;">---</div>
-            <div class="progress-bar"><div id="fill"></div></div>
-        </div>
+        <div class="col-left">
+            <div style="text-align: center; padding-top: 10px;">
+                <span id="labelHoy" style="font-size: 1.2rem; color: var(--yellow);">GANADO HOY:</span>
+                <div class="big-money" id="gananciaHoy">$0.00</div>
+                <div id="message" style="font-size: 1.3rem; margin-bottom: 5px;">---</div>
+                <div class="progress-bar"><div id="fill"></div></div>
+            </div>
 
-        <div class="grid">
-            <div class="box"><span class="label">EN GANADO</span><span id="valEarned" style="font-size: 1.2rem;">$0.00</span></div>
-            <div class="box"><span class="label">PENDIENTE</span><span id="valPending" style="font-size: 1.2rem;">$0.00</span></div>
-            <div class="box" style="border-color: var(--yellow);"><span class="label" style="color: var(--yellow);">RACHA 🔥</span><span id="valRacha" style="font-size: 1.2rem; color: var(--yellow);">0</span></div>
-            <div class="box" style="grid-column: span 3; border-color: var(--green); background: rgba(46, 176, 67, 0.05);">
-                <span class="label" style="color: var(--green); font-weight: 900; font-size: 1rem;">SALDO TOTAL REAL</span>
-                <span id="valTotalReal" style="font-size: 2.2rem; color: var(--green);">$0.00</span>
+            <div class="panel-info" style="background: rgba(88, 166, 255, 0.05);">
+                META DIARIA: $ <input type="number" id="goal" value="1.00" step="0.10">
+                <span onclick="testSound()" style="cursor:pointer; display:block; color: var(--blue); font-size: 0.85rem; margin-top: 15px; text-decoration: underline;">🔊 PROBAR KA-CHING</span>
+            </div>
+            
+            <div class="panel-info" style="border-color: var(--yellow);">
+                RETIRO META: $ <input type="number" id="withdrawTarget" value="13.00" style="width: 70px; font-size: 1.2rem;">
+                <div id="withdrawRemaining" style="color: var(--yellow); font-size: 1.2rem; margin-top: 10px;">---</div>
             </div>
         </div>
 
-        <details>
-            <summary>📊 HISTORIAL Y PROYECCIÓN</summary>
-            <div class="content">
-                <div style="text-align: center; font-size: 0.95rem; color: var(--blue); margin-bottom: 12px; padding: 8px; border: 1px dashed var(--blue); border-radius: 8px;">
-                    PROYECCIÓN FIN DE MES: <b id="valProyeccion" style="font-size: 1.2rem;">$0.00</b> 🚀
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-bottom: 10px; padding: 10px; background: var(--green); color: white; border-radius: 8px; font-size: 1.2rem;">
-                    <span>TOTAL MES:</span> <b id="valMes">$0.00</b>
-                </div>
-                <div id="historyList"></div>
+        <div class="col-right">
+            <div class="grid-4">
+                <div class="box"><span class="label">EN GANADO</span><span id="valEarned" style="font-size: 1.2rem;">$0.00</span></div>
+                <div class="box"><span class="label">PENDIENTE</span><span id="valPending" style="font-size: 1.2rem;">$0.00</span></div>
+                <div class="box" style="border-color: var(--yellow);"><span class="label" style="color: var(--yellow);">RACHA 🔥</span><span id="valRacha" style="font-size: 1.2rem; color: var(--yellow);">0</span></div>
+                <div class="box" style="border-color: var(--green); background: rgba(46, 176, 67, 0.1);"><span class="label" style="color: var(--green);">SALDO REAL</span><span id="valTotalReal" style="font-size: 1.4rem; color: var(--green);">$0.00</span></div>
             </div>
-        </details>
 
-        <details>
-            <summary>💰 CALCULADORA DE RETIRO</summary>
-            <div class="content">
-                META DE RETIRO: $ <input type="number" id="withdrawTarget" value="13.00">
-                <div id="withdrawRemaining" style="margin-top: 15px; color: var(--yellow); font-size: 1.4rem; text-align: center;">---</div>
+            <div style="display:flex; justify-content:space-between; align-items: center; background: var(--card); padding: 5px 15px; border-radius: 8px; border: 1px solid var(--border);">
+                <span style="font-size: 1.1rem;">MES ACTUAL: <b id="valMes" style="color: var(--green);">$0.00</b></span>
+                <span style="font-size: 1.1rem;">PROYECCIÓN FIN MES: <b id="valProyeccion" style="color: var(--blue);">$0.00 🚀</b></span>
             </div>
-        </details>
 
-        <div style="margin-top: 25px; text-align: center; font-size: 1.1rem;">
-            META DIARIA: $ <input type="number" id="goal" value="1.00" step="0.10">
-            <span onclick="testSound()" style="cursor:pointer; display:block; color: var(--blue); font-size: 0.9rem; margin-top: 15px; text-decoration: underline;">🔊 PROBAR KA-CHING</span>
+            <div class="chart-container">
+                <canvas id="historialChart"></canvas>
+            </div>
+
+            <button class="btn-excel" onclick="exportarCSV()">💾 DESCARGAR HISTORIAL COMPLETO (.CSV)</button>
         </div>
-
-        <button class="btn-theme" style="width: 100%; margin-top: 20px; background: var(--green); font-size: 0.9rem;" onclick="exportarCSV()">💾 DESCARGAR RESPALDO (EXCEL)</button>
     </div>
 
     <audio id="cashSound" src="https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3"></audio>
@@ -104,6 +108,7 @@
             const t = b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
             b.setAttribute('data-theme', t);
             localStorage.setItem('jhonTheme', t);
+            calcular(); // Recarga el gráfico para que tome los colores del nuevo tema
         }
 
         const MESES = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
@@ -114,7 +119,6 @@
             const dias = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
             let h = vzla.getHours(); const am = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
             const m = vzla.getMinutes().toString().padStart(2, '0');
-            // Calculamos cuántos días tiene el mes actual para la proyección
             const diasEnMes = new Date(vzla.getFullYear(), vzla.getMonth() + 1, 0).getDate();
             return { 
                 id: vzla.toISOString().split('T')[0], mesIdx: vzla.getMonth(), anio: vzla.getFullYear(), 
@@ -144,13 +148,10 @@
         let ultimaFecha = localStorage.getItem('fechaJhon');
         let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
 
-        // PARCHE HISTÓRICO: Arreglar los "Anteriores" como el 3 de marzo
         let guardoCambios = false;
         historial.forEach(h => {
             if (h.mes === undefined || h.anio === undefined) {
-                const d = new Date(h.f + "T12:00:00");
-                h.mes = d.getMonth(); h.anio = d.getFullYear();
-                guardoCambios = true;
+                const d = new Date(h.f + "T12:00:00"); h.mes = d.getMonth(); h.anio = d.getFullYear(); guardoCambios = true;
             }
         });
         if(guardoCambios) localStorage.setItem('histJhon', JSON.stringify(historial));
@@ -165,6 +166,8 @@
         }
         if (!base) { base = totalActual; localStorage.setItem('baseJhon', base); }
         localStorage.setItem('fechaJhon', info.id);
+
+        let miGrafico; // Variable global para el gráfico
 
         function calcular() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
@@ -183,26 +186,22 @@
             document.getElementById('valPending').innerText = '$' + pending.toFixed(4);
             document.getElementById('valTotalReal').innerText = '$' + totalActual.toFixed(4);
 
-            // Cálculos del Mes y Proyección
             const sumMesActual = historial.filter(h => h.mes === info.mesIdx && h.anio === info.anio).reduce((acc, h) => acc + parseFloat(h.m), 0) + hoyRedondeo;
             document.getElementById('valMes').innerText = '$' + sumMesActual.toFixed(2);
             
             let proyeccion = (sumMesActual / info.diaNumero) * info.totalDiasMes;
             document.getElementById('valProyeccion').innerText = '$' + proyeccion.toFixed(2);
-
             document.getElementById('labelHoy').innerText = `GANADO HOY (${MESES[info.mesIdx]}):`;
 
-            // Racha de Fuego
             let rachaDias = 0;
             for(let i=0; i < historial.length; i++) {
-                if(parseFloat(historial[i].m) >= goal) rachaDias++;
-                else break;
+                if(parseFloat(historial[i].m) >= goal) rachaDias++; else break;
             }
             if(hoyRedondeo >= goal) rachaDias++;
             document.getElementById('valRacha').innerText = rachaDias + (rachaDias === 1 ? " DÍA" : " DÍAS");
 
             const faltaW = Math.max(0, wTarget - totalActual);
-            document.getElementById('withdrawRemaining').innerText = faltaW > 0 ? `FALTAN $${faltaW.toFixed(2)}` : "¡RETIRA YA! 🔥";
+            document.getElementById('withdrawRemaining').innerText = faltaW > 0 ? `FALTAN $${faltaW.toFixed(2)}` : "¡YA PUEDES RETIRAR! 🔥";
 
             const pct = Math.min((ganadoHoy / goal) * 100, 100);
             const fill = document.getElementById('fill');
@@ -212,39 +211,71 @@
             else if(pct < 75) { fill.style.backgroundColor = "#ffcc00"; bigNum.style.color = "#ffcc00"; }
             else { fill.style.backgroundColor = "#2eb043"; bigNum.style.color = "#2eb043"; }
 
-            document.getElementById('message').innerText = ganadoHoy >= goal ? "META LOGRADA! 🏆" : `FALTAN $${(goal - ganadoHoy).toFixed(2)}`;
-            
-            let htmlHist = ""; let ultimoMesAnio = "";
-            historial.forEach(h => {
-                let nombreMes = MESES[h.mes];
-                let mesAnio = `${nombreMes} ${h.anio}`.trim();
-                if (mesAnio !== ultimoMesAnio) { htmlHist += `<div class="month-header">${mesAnio}</div>`; ultimoMesAnio = mesAnio; }
-                
-                // Color de éxito para el historial
-                let colorExito = parseFloat(h.m) >= goal ? 'color: var(--green);' : 'color: var(--text); opacity: 0.7;';
-                htmlHist += `<div class="hist-item"><span>${h.f}</span> <b style="${colorExito}">$${h.m}</b></div>`;
+            actualizarGrafico(goal);
+        }
+
+        function actualizarGrafico(goal) {
+            const ctx = document.getElementById('historialChart').getContext('2d');
+            if (miGrafico) { miGrafico.destroy(); } // Destruir gráfico viejo antes de redibujar
+
+            // Preparar datos para el gráfico (últimos 30 días, ordenados de izquierda a derecha)
+            let datosGrafico = historial.slice(0, 30).reverse();
+            let etiquetas = datosGrafico.map(h => {
+                let partes = h.f.split('-'); return `${partes[2]}/${partes[1]}`; // Formato corto DD/MM
             });
-            document.getElementById('historyList').innerHTML = htmlHist || '<div style="text-align:center;padding:10px;color:#666">SIN REGISTROS</div>';
+            let valores = datosGrafico.map(h => parseFloat(h.m));
+            let colores = valores.map(val => val >= goal ? '#2eb043' : '#ffcc00'); // Verde si lograste la meta, amarillo si no
+
+            const isLight = document.body.getAttribute('data-theme') === 'light';
+            const gridColor = isLight ? '#d0d7de' : '#30363d';
+            const textColor = isLight ? '#000000' : '#ffffff';
+
+            miGrafico = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: etiquetas,
+                    datasets: [{
+                        label: 'Ganancia Diaria ($)',
+                        data: valores,
+                        backgroundColor: colores,
+                        borderRadius: 6,
+                        borderWidth: 1,
+                        borderColor: isLight ? '#fff' : '#000'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)', titleFont: { size: 14, family: 'Arial Black' },
+                            bodyFont: { size: 16, weight: 'bold' }, displayColors: false,
+                            callbacks: {
+                                label: function(context) { return '$' + context.parsed.y.toFixed(2); }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, font: { weight: 'bold' }, callback: function(value) { return '$' + value; } } },
+                        x: { grid: { display: false }, ticks: { color: textColor, font: { weight: 'bold' } } }
+                    }
+                }
+            });
         }
 
         window.addEventListener('storage', (e) => { if (e.key === 'syncTrigger') location.reload(); });
-
         function testSound() { document.getElementById('cashSound').play(); }
         
-        // Exportar a Excel (CSV)
         function exportarCSV() {
             let csv = "FECHA,GANANCIA,MES,AÑO\n";
             historial.forEach(h => { csv += `${h.f},$${h.m},${MESES[h.mes]},${h.anio}\n`; });
             let blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
             let link = document.createElement("a");
             if (link.download !== undefined) {
-                let url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                link.setAttribute("download", `SproutGigs_Respaldo_${info.id}.csv`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                let url = URL.createObjectURL(blob); link.setAttribute("href", url);
+                link.setAttribute("download", `SproutGigs_Respaldo_${info.id}.csv`); link.style.visibility = 'hidden';
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
             }
         }
 
