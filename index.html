@@ -2,146 +2,170 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Jhonproducer - Master Dashboard PRO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jhonproducer - Terminal Financiera</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
-        /* 🎨 VARIABLES FINTECH PREMIUM */
+        /* 🎨 SISTEMA DE DISEÑO BASE (Design System) */
         :root {
-            --bg-page: #0B1121;       /* Fondo oscuro medianoche */
-            --bg-card: #151C2C;       /* Fondo de tarjetas */
-            --bg-input: #1E293B;      /* Fondo de inputs */
-            --text-main: #F8FAFC;     /* Texto principal blanco */
-            --text-muted: #94A3B8;    /* Texto grisáceo elegante */
-            --border-color: #2A3241;  /* Bordes sutiles */
-            --accent-blue: #3B82F6;   /* Azul vibrante */
-            --accent-green: #10B981;  /* Verde éxito */
-            --accent-yellow: #F59E0B; /* Amarillo/Dorado oro */
-            --accent-red: #EF4444;    /* Rojo alerta */
-            --shadow-card: 0 10px 30px -10px rgba(0,0,0,0.5);
+            --bg-page: #0B1121;
+            --bg-card: #151C2C;
+            --bg-input: #1E293B;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --border-color: #2A3241;
+            --accent-blue: #3B82F6;
+            --accent-green: #10B981;
+            --accent-yellow: #F59E0B;
+            --accent-red: #EF4444;
+            --shadow-card: 0 8px 25px -8px rgba(0,0,0,0.6);
             --radius-main: 16px;
-            --radius-sm: 10px;
+            --radius-sm: 8px;
         }
         
         [data-theme="light"] {
-            --bg-page: #F3F4F6;       /* Fondo gris perla claro */
-            --bg-card: #FFFFFF;       /* Tarjetas blancas puras */
-            --bg-input: #F9FAFB;      /* Inputs gris super suave */
-            --text-main: #111827;     /* Texto negro intenso */
-            --text-muted: #6B7280;    /* Gris texto medio */
-            --border-color: #E5E7EB;  /* Bordes delicados */
-            --shadow-card: 0 10px 25px -5px rgba(0,0,0,0.05);
+            --bg-page: #F3F4F6;
+            --bg-card: #FFFFFF;
+            --bg-input: #F9FAFB;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --border-color: #E5E7EB;
+            --shadow-card: 0 8px 20px -5px rgba(0,0,0,0.05);
         }
 
-        /* 📐 ESTRUCTURA BASE */
+        /* 📐 ESTRUCTURA MAESTRA */
+        * { box-sizing: border-box; }
+        
         body { 
             background: var(--bg-page); color: var(--text-main); 
             font-family: 'Poppins', sans-serif; 
             margin: 0; padding: 20px; 
-            display: flex; justify-content: center; align-items: center;
+            display: flex; justify-content: center; align-items: flex-start;
             min-height: 100vh; overflow-y: auto; overflow-x: hidden;
-            transition: background 0.4s ease;
+            transition: background 0.3s ease;
         }
 
         .dashboard-container {
             width: 100%; max-width: 1100px;
-            display: flex; flex-direction: column; gap: 15px;
+            display: flex; flex-direction: column; gap: 18px;
         }
 
         /* 🔝 CABECERA */
         .header {
             display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-card); padding: 15px 25px;
+            background: var(--bg-card); padding: 16px 24px;
             border-radius: var(--radius-main); border: 1px solid var(--border-color);
             box-shadow: var(--shadow-card);
         }
-        .date-group h1 { margin: 0; font-size: 1.5rem; color: var(--accent-blue); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .date-group p { margin: 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
-        .controls { display: flex; gap: 10px; }
+        .header h1 { margin: 0; font-size: 1.4rem; color: var(--accent-blue); font-weight: 800; letter-spacing: 0.5px; }
+        .header p { margin: 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+        .controls { display: flex; gap: 12px; }
 
-        /* 💳 FILA 1: TARJETAS DE BALANCE (4 Columnas) */
-        .stats-row {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;
+        /* 💳 TARJETAS SUPERIORES (CSS Grid Estricto) */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px;
         }
         .stat-card {
             background: var(--bg-card); border: 1px solid var(--border-color);
-            border-radius: var(--radius-main); padding: 15px;
-            box-shadow: var(--shadow-card); transition: transform 0.2s;
+            border-radius: var(--radius-main); padding: 18px;
+            box-shadow: var(--shadow-card);
             display: flex; flex-direction: column; justify-content: center;
         }
-        .stat-card:hover { transform: translateY(-3px); }
-        .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-        .stat-value { font-size: 1.8rem; font-weight: 800; line-height: 1; }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .stat-value { font-size: 1.7rem; font-weight: 800; line-height: 1.2; }
 
-        /* 📊 FILA 2: HOY + GRÁFICO (2 Columnas) */
-        .main-row {
-            display: grid; grid-template-columns: 320px 1fr; gap: 15px;
+        /* 📊 BLOQUE CENTRAL */
+        .main-grid {
+            display: grid; grid-template-columns: 330px 1fr; gap: 18px;
         }
-        .today-card, .chart-card {
+        .card-panel {
             background: var(--bg-card); border: 1px solid var(--border-color);
             border-radius: var(--radius-main); padding: 20px;
             box-shadow: var(--shadow-card);
+            display: flex; flex-direction: column; gap: 15px; /* Flujo natural para evitar fragmentación */
         }
         
-        .today-card { text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+        /* SOLUCIÓN AL BUG CHROMIUM: Color sólido + Sombra */
         .big-money { 
-            font-size: 4.2rem; font-weight: 800; line-height: 1; margin: 10px 0;
-            background: linear-gradient(135deg, var(--accent-yellow), var(--accent-gold));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0px 4px 6px rgba(245, 158, 11, 0.2));
+            font-size: 4.5rem; font-weight: 800; line-height: 1.1; margin: 10px 0;
+            text-align: center;
+            color: var(--accent-yellow);
+            text-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .progress-bar-bg { background: var(--bg-input); border-radius: 50px; height: 16px; width: 100%; overflow: hidden; margin: 10px 0; border: 1px solid var(--border-color); }
-        .progress-bar-fill { height: 100%; width: 0%; transition: width 1s ease, background-color 0.5s ease; }
-        
-        .goal-input-group { display: flex; justify-content: space-between; align-items: center; background: var(--bg-input); padding: 8px 15px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-top: 10px; }
-        .goal-input-group input { background: transparent; border: none; color: var(--text-main); font-size: 1.2rem; font-weight: 700; width: 60px; text-align: right; outline: none; font-family: 'Poppins', sans-serif; }
 
+        /* BARRA DE PROGRESO */
+        .progress-wrapper { text-align: center; }
+        .progress-msg { font-size: 1.1rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
+        .progress-track { background: var(--bg-input); border-radius: 50px; height: 14px; width: 100%; overflow: hidden; border: 1px solid var(--border-color); }
+        .progress-fill { height: 100%; width: 0%; transition: width 0.8s ease, background-color 0.4s ease; }
+        
+        /* INPUT META */
+        .goal-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: var(--bg-input); padding: 10px 15px; 
+            border-radius: var(--radius-sm); border: 1px solid var(--border-color); 
+        }
+        .goal-row span { font-weight: 600; font-size: 0.95rem; color: var(--text-muted); }
+        .goal-input { 
+            background: transparent; border: none; color: var(--text-main); 
+            font-size: 1.2rem; font-weight: 700; width: 70px; text-align: right; outline: none; 
+            font-family: 'Poppins', sans-serif; border-bottom: 2px solid transparent; transition: border 0.2s;
+        }
+        .goal-input:focus { border-bottom: 2px solid var(--accent-blue); }
+
+        /* GRÁFICO */
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+        .chart-header span { font-weight: 700; font-size: 1.1rem; }
         .chart-container { position: relative; height: 230px; width: 100%; }
 
-        /* 🏦 FILA 3: PANEL DE RETIRO FINTECH (Horizontal) */
-        .withdraw-panel {
+        /* 🏦 TERMINAL DE FINANZAS (CSS Grid Estricto 5 Columnas) */
+        .finance-panel {
             background: var(--bg-card); border: 1px solid var(--border-color);
-            border-radius: var(--radius-main); padding: 15px 25px;
-            box-shadow: var(--shadow-card); display: flex; justify-content: space-between; align-items: center;
-            flex-wrap: wrap; gap: 15px;
+            border-radius: var(--radius-main); padding: 20px 24px;
+            box-shadow: var(--shadow-card);
+            display: grid; grid-template-columns: 1.2fr 1fr 1fr 1.5fr auto; gap: 20px; align-items: center;
         }
-        .w-step { display: flex; flex-direction: column; }
-        .w-title { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
-        .w-value { font-size: 1.3rem; font-weight: 800; }
+        .f-col { display: flex; flex-direction: column; border-right: 1px solid var(--border-color); padding-right: 15px; }
+        .f-col:last-child { border-right: none; padding-right: 0; }
+        .f-title { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .f-val { font-size: 1.3rem; font-weight: 800; }
         
-        .w-divider { width: 1px; height: 40px; background: var(--border-color); }
-        
-        .action-group { display: flex; gap: 10px; align-items: center; }
-        .action-group input {
+        .action-group { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; border-right: none;}
+        .action-inputs { display: flex; gap: 8px; }
+        .action-inputs input {
             background: var(--bg-input); border: 1px solid var(--border-color);
-            color: var(--text-main); padding: 10px 15px; border-radius: var(--radius-sm);
-            font-size: 1.1rem; font-weight: 700; width: 100px; text-align: center; outline: none;
-            font-family: 'Poppins', sans-serif;
+            color: var(--text-main); padding: 8px 12px; border-radius: var(--radius-sm);
+            font-size: 1rem; font-weight: 700; width: 100px; text-align: center; outline: none;
+            font-family: 'Poppins', sans-serif; transition: border 0.2s;
         }
-        .action-group input:focus { border-color: var(--accent-gold); }
+        .action-inputs input:focus { border-color: var(--accent-gold); }
 
-        /* BOTONES */
+        /* BOTONES INTERFAZ */
         .btn {
             padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer;
-            text-transform: uppercase; font-size: 0.8rem; border: none; transition: all 0.2s ease;
+            text-transform: uppercase; font-size: 0.85rem; border: none; transition: all 0.2s ease;
             font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 6px;
+            justify-content: center;
         }
         .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
-        .btn-outline:hover { background: var(--bg-input); border-color: var(--accent-blue); color: var(--accent-blue); }
+        .btn-outline:hover { background: var(--bg-input); color: var(--accent-blue); border-color: var(--accent-blue); }
         .btn-excel { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
-        .btn-excel:hover { background: var(--accent-green); color: white; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
-        .btn-withdraw { background: linear-gradient(135deg, var(--accent-gold), #d97706); color: white; padding: 10px 20px; font-size: 0.95rem; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); }
-        .btn-withdraw:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-excel:hover { background: var(--accent-green); color: white; }
+        .btn-withdraw { background: linear-gradient(135deg, var(--accent-gold), #d97706); color: white; padding: 8px 20px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.25); }
+        .btn-withdraw:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.4); }
 
-        /* STATUS DOTS */
-        .pulse-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
-        .pulse-green { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); animation: pulseG 1.5s infinite; }
-        .pulse-red { background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); animation: pulseR 1.5s infinite; }
-        @keyframes pulseG { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes pulseR { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+        /* UTILIDADES VISUALES */
+        .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        .dot-green { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); animation: pulse 2s infinite; }
+        .dot-red { background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.8; } }
 
     </style>
 </head>
@@ -149,9 +173,9 @@
 
     <div class="dashboard-container">
         
-        <div class="header">
-            <div class="date-group">
-                <h1 id="txtDia">---</h1>
+        <header class="header">
+            <div>
+                <h1 id="txtDia">DÍA</h1>
                 <p id="txtDateTime">--/--/---- | --:--</p>
             </div>
             <div class="controls">
@@ -161,9 +185,9 @@
                 </button>
                 <button class="btn btn-outline" onclick="toggleTheme()">🌓 Tema</button>
             </div>
-        </div>
+        </header>
 
-        <div class="stats-row">
+        <section class="stats-grid">
             <div class="stat-card" style="border-bottom: 3px solid var(--accent-blue);">
                 <span class="stat-label">EN GANADO (Retirable)</span>
                 <span class="stat-value" id="valEarned" style="color: var(--text-main);">$0.00</span>
@@ -180,87 +204,85 @@
                 <span class="stat-label" style="color: var(--accent-gold);">TOTAL RETIRADO 🏦</span>
                 <span class="stat-value" id="valRetirado" style="color: var(--accent-gold);">$0.00</span>
             </div>
-        </div>
+        </section>
 
-        <div class="main-row">
-            <div class="today-card">
-                <div>
-                    <span class="stat-label" style="color: var(--accent-yellow); font-size: 1rem;">TRABAJO DE HOY</span>
+        <section class="main-grid">
+            <div class="card-panel">
+                <div style="text-align: center; margin-top: 10px;">
+                    <span class="stat-label" style="color: var(--accent-yellow);">TRABAJO DE HOY</span>
                     <div class="big-money" id="gananciaHoy">$0.00</div>
-                    <div id="message" style="font-size: 1.1rem; font-weight: 700; color: var(--text-muted);">---</div>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="fill"></div></div>
                 </div>
                 
-                <div class="goal-input-group">
-                    <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-muted);">META DIARIA:</span>
-                    <div style="display: flex; align-items: center;">
-                        <span style="color: var(--text-muted); font-weight: 700; margin-right: 2px;">$</span>
-                        <input type="number" id="goal" value="1.00" step="0.10">
-                    </div>
+                <div class="progress-wrapper">
+                    <div class="progress-msg" id="message">---</div>
+                    <div class="progress-track"><div class="progress-fill" id="fill"></div></div>
+                </div>
+                
+                <div class="goal-row">
+                    <span>META DIARIA: $</span>
+                    <input type="number" id="goal" class="goal-input" value="1.00" step="0.10">
                 </div>
             </div>
 
-            <div class="chart-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
-                    <span style="font-weight: 700; font-size: 1.1rem;">Mes Actual: <span id="valMes" style="color: var(--accent-green);">$0.00</span></span>
-                    <span style="font-weight: 700; font-size: 1.1rem; color: var(--text-muted);">Proyección: <span id="valProyeccion" style="color: var(--accent-blue);">$0.00 🚀</span></span>
+            <div class="card-panel">
+                <div class="chart-header">
+                    <span style="color: var(--text-main);">Mes Actual: <span id="valMes" style="color: var(--accent-green);">$0.00</span></span>
+                    <span style="color: var(--text-muted);">Proyección: <span id="valProyeccion" style="color: var(--accent-blue);">$0.00 🚀</span></span>
                 </div>
                 <div class="chart-container">
                     <canvas id="historialChart"></canvas>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="withdraw-panel">
-            <div class="w-step">
-                <span class="w-title">Status SproutGigs</span>
-                <span id="withdrawStatusText" class="w-value" style="font-size: 1.1rem;"><span class="pulse-dot pulse-red"></span> Bloqueado (< $5)</span>
+        <section class="finance-panel">
+            
+            <div class="f-col">
+                <span class="f-title">Status SproutGigs</span>
+                <span id="withdrawStatusText" class="f-val"><span class="dot dot-red"></span> Verificando...</span>
             </div>
             
-            <div class="w-divider"></div>
-
-            <div class="w-step">
-                <span class="w-title">Comisión (20%)</span>
-                <span id="calcFee" class="w-value" style="color: var(--accent-red);">-$0.00</span>
+            <div class="f-col">
+                <span class="f-title">Comisión (20%)</span>
+                <span id="calcFee" class="f-val" style="color: var(--accent-red);">-$0.00</span>
             </div>
 
-            <div class="w-step">
-                <span class="w-title">Neto a Recibir</span>
-                <span id="calcNeto" class="w-value" style="color: var(--accent-green);">$0.00</span>
+            <div class="f-col">
+                <span class="f-title">Neto a Recibir</span>
+                <span id="calcNeto" class="f-val" style="color: var(--accent-green);">$0.00</span>
             </div>
             
-            <div class="w-divider"></div>
-
-            <div class="w-step">
-                <span class="w-title" style="display: flex; justify-content: space-between;">
+            <div class="f-col">
+                <span class="f-title" style="display: flex; justify-content: space-between;">
                     <span>Equivalente Binance</span>
-                    <span id="liveLtcPrice" style="color: var(--accent-blue);">Cargando...</span>
+                    <span id="liveLtcPrice" style="color: var(--accent-blue);">---</span>
                 </span>
-                <span id="valCoinsLTC" class="w-value" style="color: var(--accent-gold); font-size: 1.4rem;">0.00000 LTC 🪙</span>
+                <span id="valCoinsLTC" class="f-val" style="color: var(--accent-gold);">0.00000 LTC 🪙</span>
             </div>
 
-            <div class="action-group">
-                <div style="display: flex; flex-direction: column; align-items: flex-end;">
-                    <span onclick="corregirRetiro()" style="font-size: 0.65rem; color: var(--accent-red); cursor: pointer; text-decoration: underline; margin-bottom: 3px; font-weight: bold;">Deshacer error</span>
+            <div class="f-col action-group">
+                <span onclick="corregirRetiro()" style="font-size: 0.65rem; color: var(--accent-red); cursor: pointer; text-decoration: underline; font-weight: 700;">Deshacer Error</span>
+                <div class="action-inputs">
                     <input type="number" id="inputRetiro" placeholder="Monto $" step="0.50">
+                    <button class="btn btn-withdraw" onclick="ejecutarRetiro()">Retirar</button>
                 </div>
-                <button class="btn btn-withdraw" onclick="ejecutarRetiro()">💸 Retirar</button>
             </div>
-        </div>
+
+        </section>
 
     </div>
 
-    <audio id="cashSound" src="https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3"></audio>
-    <audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="cashSound" src="https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3" preload="auto"></audio>
+    <audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
 
     <script>
-        // 🌓 TEMA
+        // ⚙️ INICIALIZACIÓN E INFRAESTRUCTURA DE DATOS
         function toggleTheme() {
             const b = document.body;
             const t = b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
             b.setAttribute('data-theme', t);
             localStorage.setItem('jhonTheme', t);
-            calcular(); 
+            calcularMetricas(); 
         }
 
         const MESES = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
@@ -284,12 +306,15 @@
         document.getElementById('txtDateTime').innerText = `${info.fecha} | ${info.hora}`;
         document.body.setAttribute('data-theme', localStorage.getItem('jhonTheme') || 'dark');
 
-        let base = parseFloat(localStorage.getItem('baseJhon'));
+        let base = parseFloat(localStorage.getItem('baseJhon')) || 0;
         let ultimaFecha = localStorage.getItem('fechaJhon');
         let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
 
-        function revisarCambioDeDia() {
-            let totalA = (parseFloat(localStorage.getItem('lastEarnedJhon')) || 0) + (parseFloat(localStorage.getItem('lastPendingJhon')) || 0);
+        function auditarCierreDia() {
+            let e = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
+            let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
+            let totalA = e + p;
+            
             if (ultimaFecha && ultimaFecha !== info.id) {
                 const ganadoAyer = Math.max(0, totalA - base);
                 const d = new Date(ultimaFecha + "T12:00:00");
@@ -299,218 +324,198 @@
                 base = totalA; localStorage.setItem('baseJhon', base);
                 ultimaFecha = info.id; localStorage.setItem('fechaJhon', info.id);
             }
-            if (!base && base !== 0) { base = totalA; localStorage.setItem('baseJhon', base); }
+            if (base === 0 && totalA > 0) { base = totalA; localStorage.setItem('baseJhon', base); }
             if (!ultimaFecha) { localStorage.setItem('fechaJhon', info.id); }
         }
-        revisarCambioDeDia();
+        auditarCierreDia();
 
-        // 🌟 API BINANCE LTC
+        // 📈 INTEGRACIÓN API BINANCE
         let precioLTCEnVivo = 0;
-        async function actualizarPrecioLTC() {
+        async function fetchLTCPrice() {
             try {
-                const respuesta = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT');
-                const datos = await respuesta.json();
-                precioLTCEnVivo = parseFloat(datos.price);
+                const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT');
+                if(!res.ok) throw new Error("API Error");
+                const data = await res.json();
+                precioLTCEnVivo = parseFloat(data.price);
                 document.getElementById('liveLtcPrice').innerText = `($${precioLTCEnVivo.toFixed(2)})`;
-                calcular();
-            } catch (error) {
-                document.getElementById('liveLtcPrice').innerText = `(Error API)`;
+                calcularMetricas();
+            } catch (err) {
+                document.getElementById('liveLtcPrice').innerText = `(Error)`;
+                console.error("Fallo de conexión API Binance");
             }
         }
-        actualizarPrecioLTC();
-        setInterval(actualizarPrecioLTC, 60000);
+        fetchLTCPrice();
+        setInterval(fetchLTCPrice, 60000);
 
         let miGrafico; 
 
-        // 💸 LÓGICA DE RETIRO
+        // 🔒 MÓDULO TRANSACCIONAL (Retiros y Reversos)
         function ejecutarRetiro() {
             let monto = parseFloat(document.getElementById('inputRetiro').value);
             let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
             
-            if (isNaN(monto) || monto === 0) {
-                alert("Ingresa un monto válido."); return;
-            }
-            if (monto > earned) {
-                alert("¡Hey! No puedes retirar más de lo que tienes 'En Ganado'."); return;
-            }
+            if (isNaN(monto) || monto <= 0) { alert("Transacción declinada: Monto inválido."); return; }
+            if (monto > earned) { alert("Transacción declinada: Fondos insuficientes en 'En Ganado'."); return; }
 
-            base -= monto;
-            localStorage.setItem('baseJhon', base);
-
-            // Ajustar el "lastEarnedJhon" para que baje en el sistema inmediatamente
-            let nuevoEarned = earned - monto;
-            if(nuevoEarned < 0) nuevoEarned = 0;
+            // Ajuste transaccional estricto
+            base -= monto; localStorage.setItem('baseJhon', base);
+            let nuevoEarned = Math.max(0, earned - monto);
             localStorage.setItem('lastEarnedJhon', nuevoEarned);
 
             let retiradoHistorico = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
-            retiradoHistorico += monto;
-            if (retiradoHistorico < 0) retiradoHistorico = 0; 
-            localStorage.setItem('totalRetiradoJhon', retiradoHistorico);
+            localStorage.setItem('totalRetiradoJhon', retiradoHistorico + monto);
 
-            if (monto > 0) {
-                document.getElementById('winSound').play().catch(e=>{});
-                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#f59e0b', '#10b981', '#ffffff'] });
-            }
+            document.getElementById('winSound').play().catch(e=>{});
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#F59E0B', '#10B981', '#FFFFFF'] });
 
             document.getElementById('inputRetiro').value = "";
-            calcular();
+            calcularMetricas();
         }
 
         function corregirRetiro() {
-            let confirmacion = confirm("⚠️ ¿Borrar historial de retiros y restaurar saldo?");
-            if (confirmacion) {
+            if (confirm("⚠️ ¿Autoriza la reversión completa del historial de retiros? Los fondos volverán al saldo base.")) {
                 let retirado = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
-                base += retirado; 
+                base += retirado; localStorage.setItem('baseJhon', base);
                 
                 let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
                 localStorage.setItem('lastEarnedJhon', earned + retirado);
-
-                localStorage.setItem('baseJhon', base);
                 localStorage.setItem('totalRetiradoJhon', 0); 
-                alert("Historial reiniciado.");
-                calcular();
+                
+                calcularMetricas();
             }
         }
 
-        // 🧮 MOTOR DE CÁLCULO PRINCIPAL
-        function calcular() {
+        // 🧠 MOTOR DE PROCESAMIENTO CENTRAL
+        function calcularMetricas() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
             localStorage.setItem('metaJhon', goal);
 
-            let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
-            let pending = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
-            let totalActual = earned + pending;
+            let e = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
+            let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
+            let totalActual = e + p;
 
-            // STATUS DE RETIRO (SproutGigs rule: Min $5 in Earned)
-            const statusText = document.getElementById('withdrawStatusText');
-            if (earned >= 5) {
-                statusText.innerHTML = `<span class="pulse-dot pulse-green"></span> ¡Disponible!`;
-                statusText.style.color = 'var(--accent-green)';
-            } else {
-                let faltan = 5 - earned;
-                statusText.innerHTML = `<span class="pulse-dot pulse-red"></span> Faltan $${faltan.toFixed(2)}`;
-                statusText.style.color = 'var(--text-main)';
-            }
-
-            // CÁLCULOS FINANCIEROS (Neto y Crypto)
-            let feeComision = earned * 0.20;
-            let ltcNeto = earned - feeComision; 
-
-            document.getElementById('calcFee').innerText = '-$' + feeComision.toFixed(2);
-            document.getElementById('calcNeto').innerText = '$' + ltcNeto.toFixed(2);
-            
-            if (precioLTCEnVivo > 0 && earned > 0) {
-                let cantidadLTC = ltcNeto / precioLTCEnVivo;
-                document.getElementById('valCoinsLTC').innerText = cantidadLTC.toFixed(5) + ' LTC 🪙';
-            } else {
-                document.getElementById('valCoinsLTC').innerText = '0.00000 LTC 🪙';
-            }
-
-            if (totalActual < base) {
-                base = totalActual;
-                localStorage.setItem('baseJhon', base);
-            }
+            // Escudo Anti-Fugas de Capital
+            if (totalActual < base) { base = totalActual; localStorage.setItem('baseJhon', base); }
 
             const ganadoHoy = Math.max(0, totalActual - base);
             const hoyRedondeo = Math.round(ganadoHoy * 100) / 100;
 
+            // Detección de Inyección de Capital
             const ant = parseFloat(localStorage.getItem('antJhon')) || 0;
             if (hoyRedondeo > ant) { 
                 document.getElementById('cashSound').play().catch(e=>{}); 
                 const bigNumber = document.getElementById('gananciaHoy');
-                bigNumber.style.transform = "scale(1.15)";
-                setTimeout(() => { bigNumber.style.transform = "scale(1)"; }, 300);
+                bigNumber.style.transform = "scale(1.1)";
+                setTimeout(() => { bigNumber.style.transform = "scale(1)"; }, 200);
             }
             localStorage.setItem('antJhon', hoyRedondeo);
 
+            // Renderizado de UI Principal
             document.getElementById('gananciaHoy').innerText = '$' + hoyRedondeo.toFixed(2);
-            document.getElementById('valEarned').innerText = '$' + earned.toFixed(4);
-            document.getElementById('valPending').innerText = '$' + pending.toFixed(4);
+            document.getElementById('valEarned').innerText = '$' + e.toFixed(4);
+            document.getElementById('valPending').innerText = '$' + p.toFixed(4);
             document.getElementById('valTotalReal').innerText = '$' + totalActual.toFixed(4);
             
             let retiradoHistorico = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
             document.getElementById('valRetirado').innerText = '$' + retiradoHistorico.toFixed(2);
 
-            const sumMesActual = historial.filter(h => h.mes === info.mesIdx && h.anio === info.anio).reduce((acc, h) => acc + parseFloat(h.m), 0) + hoyRedondeo;
-            document.getElementById('valMes').innerText = '$' + sumMesActual.toFixed(2);
-            
-            let proyeccion = (sumMesActual / info.diaNumero) * info.totalDiasMes;
-            document.getElementById('valProyeccion').innerText = '$' + proyeccion.toFixed(2);
-
-            // BARRA DE PROGRESO DIARIA
+            // Análisis de Progreso
             const pct = Math.min((ganadoHoy / goal) * 100, 100);
             const fill = document.getElementById('fill');
             fill.style.width = pct + '%';
             
+            const msgNode = document.getElementById('message');
             if(pct < 35) { fill.style.backgroundColor = "var(--accent-red)"; }
             else if(pct < 99) { fill.style.backgroundColor = "var(--accent-yellow)"; }
             else { fill.style.backgroundColor = "var(--accent-green)"; }
 
-            document.getElementById('message').innerText = ganadoHoy >= goal ? "¡META DIARIA LOGRADA! 🏆" : `Faltan $${(goal - ganadoHoy).toFixed(2)} hoy`;
-            if(ganadoHoy >= goal) document.getElementById('message').style.color = "var(--accent-green)";
-            else document.getElementById('message').style.color = "var(--text-muted)";
+            if(ganadoHoy >= goal) { msgNode.innerText = "¡OBJETIVO ALCANZADO! 🏆"; msgNode.style.color = "var(--accent-green)"; }
+            else { msgNode.innerText = `Faltan $${(goal - ganadoHoy).toFixed(2)}`; msgNode.style.color = "var(--text-muted)"; }
 
-            actualizarGrafico(goal);
+            // Cálculos Financieros Terminal Inferior
+            const statusNode = document.getElementById('withdrawStatusText');
+            if (e >= 5) {
+                statusNode.innerHTML = `<span class="dot dot-green"></span> Disponible`;
+                statusNode.style.color = 'var(--accent-green)';
+            } else {
+                statusNode.innerHTML = `<span class="dot dot-red"></span> Faltan $${(5 - e).toFixed(2)}`;
+                statusNode.style.color = 'var(--text-main)';
+            }
+
+            let fee = e * 0.20;
+            let neto = e - fee;
+            document.getElementById('calcFee').innerText = '-$' + fee.toFixed(2);
+            document.getElementById('calcNeto').innerText = '$' + neto.toFixed(2);
+            
+            if (precioLTCEnVivo > 0 && e > 0) {
+                document.getElementById('valCoinsLTC').innerText = (neto / precioLTCEnVivo).toFixed(5) + ' LTC 🪙';
+            } else {
+                document.getElementById('valCoinsLTC').innerText = '0.00000 LTC 🪙';
+            }
+
+            // Cálculos Históricos Mensuales
+            const sumMes = historial.filter(h => h.mes === info.mesIdx && h.anio === info.anio).reduce((a, h) => a + parseFloat(h.m), 0) + hoyRedondeo;
+            document.getElementById('valMes').innerText = '$' + sumMes.toFixed(2);
+            document.getElementById('valProyeccion').innerText = '$' + ((sumMes / info.diaNumero) * info.totalDiasMes).toFixed(2);
+
+            renderizarGrafico(goal);
         }
 
-        // 📈 RENDER GRÁFICO
-        function actualizarGrafico(goal) {
+        // 📊 RENDERIZADO DE GRÁFICO (Chart.js)
+        function renderizarGrafico(goal) {
             const ctx = document.getElementById('historialChart').getContext('2d');
             if (miGrafico) { miGrafico.destroy(); } 
 
             let datosGrafico = historial.slice(0, 30).reverse();
-            let etiquetas = datosGrafico.map(h => { let partes = h.f.split('-'); return `${partes[2]}/${partes[1]}`; });
-            let valores = datosGrafico.map(h => parseFloat(h.m));
+            let labels = datosGrafico.map(h => { let p = h.f.split('-'); return `${p[2]}/${p[1]}`; });
+            let values = datosGrafico.map(h => parseFloat(h.m));
             
             const isLight = document.body.getAttribute('data-theme') === 'light';
-            const gridColor = isLight ? '#E5E7EB' : '#2A3241';
-            const textColor = isLight ? '#6B7280' : '#94A3B8';
+            const gridC = isLight ? '#E5E7EB' : '#2A3241';
+            const textC = isLight ? '#6B7280' : '#94A3B8';
 
-            let gradienteVerde = ctx.createLinearGradient(0, 0, 0, 230);
-            gradienteVerde.addColorStop(0, '#10B981'); gradienteVerde.addColorStop(1, 'rgba(16, 185, 129, 0.2)');
-
-            let gradienteAmarillo = ctx.createLinearGradient(0, 0, 0, 230);
-            gradienteAmarillo.addColorStop(0, '#F59E0B'); gradienteAmarillo.addColorStop(1, 'rgba(245, 158, 11, 0.2)');
-            
-            let bgColorsGradient = valores.map(val => val >= goal ? gradienteVerde : gradienteAmarillo);
+            let gradV = ctx.createLinearGradient(0, 0, 0, 230); gradV.addColorStop(0, '#10B981'); gradV.addColorStop(1, 'rgba(16,185,129,0.1)');
+            let gradY = ctx.createLinearGradient(0, 0, 0, 230); gradY.addColorStop(0, '#F59E0B'); gradY.addColorStop(1, 'rgba(245,158,11,0.1)');
+            let bgColors = values.map(v => v >= goal ? gradV : gradY);
 
             miGrafico = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: etiquetas, datasets: [{ label: 'Ganancia ($)', data: valores, backgroundColor: bgColorsGradient, borderRadius: 4, borderWidth: 0, hoverBackgroundColor: '#3B82F6' }] },
+                data: { labels: labels, datasets: [{ data: values, backgroundColor: bgColors, borderRadius: 4, borderWidth: 0, hoverBackgroundColor: '#3B82F6' }] },
                 options: {
                     animation: { duration: 0 }, responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(21,28,44,0.95)', titleColor: isLight ? '#111827' : '#F8FAFC', bodyColor: isLight ? '#111827' : '#F8FAFC', borderColor: gridColor, borderWidth: 1, titleFont: { size: 12, family: 'Poppins' }, bodyFont: { size: 16, weight: 'bold', family: 'Poppins' }, displayColors: false, padding: 10, cornerRadius: 8, callbacks: { label: function(context) { return '$' + context.parsed.y.toFixed(2); } } } },
-                    scales: { y: { beginAtZero: true, grid: { color: gridColor, drawBorder: false }, ticks: { color: textColor, font: { family: 'Poppins', weight: '600', size: 11 }, callback: function(value) { return '$' + value; } } }, x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Poppins', weight: '600', size: 11 } } } }
+                    plugins: { legend: { display: false }, tooltip: { backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(21,28,44,0.95)', titleColor: isLight ? '#111827' : '#F8FAFC', bodyColor: isLight ? '#111827' : '#F8FAFC', borderColor: gridC, borderWidth: 1, titleFont: { size: 12, family: 'Poppins' }, bodyFont: { size: 16, weight: 'bold', family: 'Poppins' }, displayColors: false, padding: 10, cornerRadius: 8, callbacks: { label: function(context) { return '$' + context.parsed.y.toFixed(2); } } } },
+                    scales: { y: { beginAtZero: true, grid: { color: gridC, drawBorder: false }, ticks: { color: textC, font: { family: 'Poppins', weight: '600' }, callback: function(v) { return '$' + v; } } }, x: { grid: { display: false }, ticks: { color: textC, font: { family: 'Poppins', weight: '600' } } } }
                 }
             });
         }
 
-        // 📡 RADAR DE DATOS
+        // 📡 RADAR DE SINCRONIZACIÓN
         let ultimoSync = localStorage.getItem('syncTrigger');
         setInterval(() => {
             let syncActual = localStorage.getItem('syncTrigger');
-            if (syncActual !== ultimoSync) { ultimoSync = syncActual; calcular(); }
+            if (syncActual !== ultimoSync) { ultimoSync = syncActual; calcularMetricas(); }
         }, 1500);
-
-        function testSound() { document.getElementById('cashSound').play(); }
         
-        // 💾 EXCEL
+        // 💾 EXPORTACIÓN DE DATOS MÚLTIPLE (SheetJS)
         function exportarExcelPro() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
             let wb = XLSX.utils.book_new();
-            let totalGanado = 0; let diasExito = 0;
-            historial.forEach(h => { let m = parseFloat(h.m); totalGanado += m; if(m >= goal) diasExito++; });
-            let wsResumenData = [ ["REPORTE MAESTRO - SPROUTGIGS"], [], ["MÉTRICA", "RESULTADO"], ["Total de Días Trabajados", historial.length], ["Días con Meta Cumplida", diasExito], ["Días con Meta Fallida", historial.length - diasExito], ["Ganancia Histórica Total ($)", totalGanado], ["Total Retirado del Sistema ($)", parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0] ];
-            let wsResumen = XLSX.utils.aoa_to_sheet(wsResumenData); XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen Global");
-            let mesesAgrupados = {};
-            historial.forEach(h => { let nombreMes = MESES[h.mes]; let key = `${nombreMes} ${h.anio}`; if(!mesesAgrupados[key]) mesesAgrupados[key] = []; mesesAgrupados[key].push(h); });
-            for(let key in mesesAgrupados) { let datosMes = mesesAgrupados[key]; let wsData = [["FECHA", "GANANCIA ($)", "META ($)", "¿LOGRADO?"]]; let datosOrdenados = [...datosMes].reverse(); datosOrdenados.forEach(h => { let m = parseFloat(h.m); let logrado = m >= goal ? "✅ SÍ" : "❌ NO"; wsData.push([h.f, m, goal, logrado]); }); let ws = XLSX.utils.aoa_to_sheet(wsData); XLSX.utils.book_append_sheet(wb, ws, key); }
+            let totalG = 0; let dExito = 0;
+            historial.forEach(h => { let m = parseFloat(h.m); totalG += m; if(m >= goal) dExito++; });
+            
+            let wsR = XLSX.utils.aoa_to_sheet([ ["REPORTE SPROUTGIGS"], [], ["MÉTRICA", "RESULTADO"], ["Total Días", historial.length], ["Días Meta Cumplida", dExito], ["Total Histórico ($)", totalG], ["Retirado Histórico ($)", parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0] ]);
+            XLSX.utils.book_append_sheet(wb, wsR, "Resumen Global");
+            
+            let mesesGrp = {};
+            historial.forEach(h => { let k = `${MESES[h.mes]} ${h.anio}`; if(!mesesGrp[k]) mesesGrp[k] = []; mesesGrp[k].push(h); });
+            for(let k in mesesGrp) { let d = [...mesesGrp[k]].reverse(); let wsD = [["FECHA", "GANANCIA ($)", "META ($)", "¿LOGRADO?"]]; d.forEach(h => { let m = parseFloat(h.m); wsD.push([h.f, m, goal, m >= goal ? "✅ SÍ" : "❌ NO"]); }); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsD), k); }
             XLSX.writeFile(wb, `SproutGigs_Master_${info.id}.xlsx`);
         }
 
-        document.getElementById('goal').addEventListener('input', calcular);
+        // Listeners y Arranque Inicial
+        document.getElementById('goal').addEventListener('input', calcularMetricas);
         document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
-        calcular();
+        calcularMetricas();
     </script>
 </body>
 </html>
