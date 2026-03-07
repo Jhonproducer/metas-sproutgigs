@@ -36,25 +36,25 @@
         
         .card { 
             background: var(--bg-card); border: 1px solid var(--border-color);
-            border-radius: 20px; padding: 25px; width: 100%; max-width: 1050px; 
+            border-radius: 20px; padding: 20px; width: 100%; max-width: 1020px; 
             box-shadow: var(--shadow-main);
-            display: grid; grid-template-columns: 330px 1fr; gap: 25px; 
+            display: grid; grid-template-columns: 310px 1fr; gap: 20px; 
             align-items: start; transition: all 0.4s ease; box-sizing: border-box;
         }
         
         .top-bar { 
             grid-column: span 2; display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 2px solid var(--border-color); padding-bottom: 15px; margin-bottom: -5px; 
+            border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: -5px; 
         }
-        .date-title { font-size: 1.7rem; font-weight: 800; color: var(--accent-blue); margin-right: 12px; text-transform: uppercase; }
-        .date-sub { font-size: 1rem; color: var(--text-muted); font-weight: 600; }
-        .header-buttons { display: flex; gap: 12px; align-items: center; }
+        .date-title { font-size: 1.5rem; font-weight: 800; color: var(--accent-blue); margin-right: 10px; text-transform: uppercase; }
+        .date-sub { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; }
+        .header-buttons { display: flex; gap: 10px; align-items: center; }
         
-        .col-left { display: flex; flex-direction: column; gap: 15px; } 
-        .col-right { display: flex; flex-direction: column; gap: 15px; } 
+        .col-left { display: flex; flex-direction: column; gap: 12px; } 
+        .col-right { display: flex; flex-direction: column; gap: 12px; } 
         
         .big-money { 
-            font-size: 4.8rem; font-weight: 800; line-height: 1; margin: 5px 0; 
+            font-size: 4.5rem; font-weight: 800; line-height: 1; margin: 5px 0; 
             text-align: center; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-gold));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             filter: drop-shadow(0px 3px 6px rgba(251, 191, 36, 0.2));
@@ -62,36 +62,36 @@
             display: inline-block; width: 100%;
         }
         
-        .grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } 
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; } 
         .box { 
             background: var(--bg-panel); border: 1px solid var(--border-color); 
-            padding: 12px; border-radius: 14px; text-align: center; 
+            padding: 10px; border-radius: 12px; text-align: center; 
             box-shadow: var(--shadow-box); transition: transform 0.2s;
         }
         .box:hover { transform: translateY(-2px); }
-        .label { font-size: 0.85rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; display: block; }
-        .box-val { font-size: 1.4rem; font-weight: 800; display: block; transition: color 0.3s; }
+        .label { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; display: block; }
+        .box-val { font-size: 1.3rem; font-weight: 800; display: block; transition: color 0.3s; }
         
         input { 
             background: var(--bg-panel); border: 2px solid var(--border-color); 
-            color: var(--text-main); width: 85px; text-align: center; 
-            font-size: 1.2rem; font-weight: 800; border-radius: 10px; 
+            color: var(--text-main); width: 80px; text-align: center; 
+            font-size: 1.1rem; font-weight: 800; border-radius: 8px; 
             padding: 4px; outline: none; transition: all 0.3s; font-family: 'Poppins', sans-serif;
         }
         input:focus { border-color: var(--accent-blue); box-shadow: 0 0 8px rgba(59, 130, 246, 0.3); }
         
         .btn-theme { 
             background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color); 
-            padding: 10px 18px; border-radius: 50px; cursor: pointer; font-weight: 700; 
-            text-transform: uppercase; transition: all 0.3s; font-size: 0.85rem; box-shadow: var(--shadow-box);
+            padding: 8px 15px; border-radius: 50px; cursor: pointer; font-weight: 700; 
+            text-transform: uppercase; transition: all 0.3s; font-size: 0.8rem; box-shadow: var(--shadow-box);
         }
         .btn-theme:hover { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
         
         .btn-excel { 
             background: linear-gradient(135deg, var(--accent-green), #059669); 
-            color: white; border: none; padding: 10px 20px; 
+            color: white; border: none; padding: 8px 15px; 
             border-radius: 50px; cursor: pointer; font-weight: 800; 
-            text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px;
+            text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px;
             transition: all 0.3s ease; box-shadow: 0 4px 10px -2px rgba(16, 185, 129, 0.4); 
             display: flex; justify-content: center; align-items: center; gap: 8px;
         }
@@ -99,39 +99,41 @@
 
         .btn-withdraw {
             background: linear-gradient(135deg, var(--accent-gold), #d97706);
-            color: white; border: none; padding: 6px 15px; border-radius: 8px;
-            font-weight: 800; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;
-            text-transform: uppercase; margin-top: 8px; width: 100%; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+            color: white; border: none; padding: 6px 12px; border-radius: 8px;
+            font-weight: 800; cursor: pointer; transition: all 0.2s; font-size: 0.85rem;
+            text-transform: uppercase; width: 100%; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
         }
         .btn-withdraw:hover { transform: translateY(-2px); filter: brightness(1.1); }
         
         .progress-bar { 
-            background: var(--bg-panel); border-radius: 50px; height: 24px; 
+            background: var(--bg-panel); border-radius: 50px; height: 20px; 
             overflow: hidden; border: 1px solid var(--border-color); 
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); margin-top: 10px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); margin-top: 8px;
         }
         #fill { height: 100%; width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease; }
         
         .chart-container { 
-            position: relative; height: 240px; width: 100%; background: var(--bg-card); 
+            position: relative; height: 250px; width: 100%; background: var(--bg-card); 
             border: 1px solid var(--border-color); border-radius: 14px; padding: 10px; 
             box-sizing: border-box; box-shadow: var(--shadow-box); 
         }
         .panel-info { 
-            text-align: center; padding: 12px; border-radius: 14px; 
+            text-align: center; padding: 10px; border-radius: 12px; 
             border: 2px dashed var(--border-color); background: var(--bg-panel); transition: all 0.3s;
         }
         
-        .text-xl { font-size: 1.15rem; font-weight: 700; } 
-        .text-2xl { font-size: 1.4rem; font-weight: 800; } 
+        .text-xl { font-size: 1.1rem; font-weight: 700; } 
+        .text-2xl { font-size: 1.3rem; font-weight: 800; } 
         
-        /* PULSO ROJO PARA EL PRECIO EN VIVO */
         .pulse-red {
-            display: inline-block; width: 8px; height: 8px; background-color: #ef4444;
-            border-radius: 50%; margin-left: 4px; box-shadow: 0 0 8px #ef4444;
+            display: inline-block; width: 6px; height: 6px; background-color: #ef4444;
+            border-radius: 50%; margin-left: 4px; box-shadow: 0 0 6px #ef4444;
             animation: pulse 1.5s infinite;
         }
         @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* Estilo para la mini tabla de cálculo */
+        .mini-calc { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px; font-weight: 600; padding: 0 5px; }
     </style>
 </head>
 <body data-theme="dark">
@@ -143,7 +145,7 @@
             </div>
             <div class="header-buttons">
                 <button class="btn-excel" onclick="exportarExcelPro()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M8 13h8"></path><path d="M8 17h8"></path><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M8 13h8"></path><path d="M8 17h8"></path><polyline points="10 9 9 9 8 9"></polyline></svg>
                     GENERAR EXCEL
                 </button>
                 <button class="btn-theme" onclick="toggleTheme()">🌓 MODO</button>
@@ -159,35 +161,44 @@
             </div>
 
             <div class="panel-info" style="border-color: rgba(59, 130, 246, 0.4);">
-                <span class="text-xl">META DIARIA: $ </span><input type="number" id="goal" value="1.00" step="0.10">
-                <span onclick="testSound()" style="cursor:pointer; display:block; color: var(--accent-blue); font-size: 0.85rem; margin-top: 8px; font-weight: 600;">🔊 Probar Sonido</span>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="text-xl">META DIARIA: $ </span>
+                    <input type="number" id="goal" value="1.00" step="0.10">
+                </div>
+                <span onclick="testSound()" style="cursor:pointer; display:block; color: var(--accent-blue); font-size: 0.8rem; margin-top: 5px; font-weight: 600; text-align: right;">🔊 Probar Sonido</span>
             </div>
             
             <div class="panel-info" style="border-color: rgba(245, 158, 11, 0.6); background: rgba(245, 158, 11, 0.05);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <span class="text-xl" style="color: var(--accent-gold);">META RETIRO:</span>
-                    <input type="number" id="withdrawTarget" value="5.00" min="5.00" style="border-color: var(--accent-gold);">
+                    <input type="number" id="withdrawTarget" value="5.00" style="border-color: var(--accent-gold);">
                 </div>
-                <div id="withdrawRemaining" class="text-xl" style="color: var(--text-main); margin-bottom: 8px;">FALTAN $0.00</div>
+                <div id="withdrawRemaining" style="font-size: 0.95rem; font-weight: bold; color: var(--text-main); margin-bottom: 8px;">FALTAN $0.00</div>
                 
-                <div style="background: rgba(16, 185, 129, 0.15); padding: 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(16, 185, 129, 0.3);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                        <span style="font-size: 0.8rem; color: var(--accent-green); font-weight: bold; letter-spacing: 0.5px;">ESTIMADO EN LTC (80%):</span>
-                        <span id="liveLtcPrice" style="font-size: 0.75rem; color: var(--text-muted); font-weight: bold;">Cargando... <span class="pulse-red"></span></span>
+                <div style="background: rgba(16, 185, 129, 0.15); padding: 8px; border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span style="font-size: 0.75rem; color: var(--accent-green); font-weight: bold; letter-spacing: 0.5px;">CONVERSIÓN EN VIVO:</span>
+                        <span id="liveLtcPrice" style="font-size: 0.7rem; color: var(--text-muted); font-weight: bold;">LTC: --- <span class="pulse-red"></span></span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                        <span id="valNetoLTC" style="font-size: 1.3rem; color: var(--accent-green); font-weight: 800;">$0.00</span>
-                        <span id="valCoinsLTC" style="font-size: 1.1rem; color: var(--accent-gold); font-weight: 800; text-shadow: 0px 2px 4px rgba(0,0,0,0.5);">0.00000 LTC 🪙</span>
+                    
+                    <div class="mini-calc">
+                        <span style="color: var(--text-muted);">Bruto: <b id="calcBruto">$0.00</b></span>
+                        <span style="color: var(--accent-red);">-20%: <b id="calcFee">-$0.00</b></span>
+                        <span style="color: var(--accent-green);">Neto: <b id="calcNeto">$0.00</b></span>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 4px;">
+                        <span id="valCoinsLTC" style="font-size: 1.2rem; color: var(--accent-gold); font-weight: 800; text-shadow: 0px 2px 4px rgba(0,0,0,0.5);">0.00000 LTC 🪙</span>
                     </div>
                 </div>
                 
-                <div style="border-top: 1px solid var(--border-color); padding-top: 10px;">
-                    <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px;">¿Retiraste Dinero?</span>
+                <div style="border-top: 1px solid var(--border-color); padding-top: 8px;">
+                    <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px;">¿Retiraste Dinero?</span>
                     <div style="display: flex; gap: 8px;">
                         <input type="number" id="inputRetiro" placeholder="0.00" step="0.50" style="width: 100%;">
                         <button class="btn-withdraw" onclick="ejecutarRetiro()">💸 REGISTRAR</button>
                     </div>
-                    <span onclick="corregirRetiro()" style="cursor:pointer; display:block; color: var(--accent-red); font-size: 0.75rem; margin-top: 10px; text-decoration: underline; text-align: right; font-weight: bold;">⚠️ Me equivoqué (Deshacer)</span>
+                    <span onclick="corregirRetiro()" style="cursor:pointer; display:block; color: var(--accent-red); font-size: 0.7rem; margin-top: 6px; text-decoration: underline; text-align: right; font-weight: bold;">⚠️ Error (Deshacer)</span>
                 </div>
             </div>
         </div>
@@ -198,7 +209,7 @@
                 <div class="box"><span class="label">PENDIENTE</span><span id="valPending" class="box-val text-main">$0.00</span></div>
                 
                 <div class="box" style="border-bottom: 3px solid var(--accent-gold); background: rgba(245, 158, 11, 0.05);">
-                    <span class="label" style="color: var(--accent-gold);">TOTAL RETIRADO 🏦</span>
+                    <span class="label" style="color: var(--accent-gold);">RETIRADO 🏦</span>
                     <span id="valRetirado" class="box-val" style="color: var(--accent-gold);">$0.00</span>
                 </div>
                 
@@ -208,7 +219,7 @@
                 </div>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items: center; background: var(--bg-panel); padding: 8px 18px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-box);">
+            <div style="display:flex; justify-content:space-between; align-items: center; background: var(--bg-panel); padding: 8px 15px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-box);">
                 <span class="text-xl">TOTAL MES: <b id="valMes" style="color: var(--accent-green);">$0.00</b></span>
                 <span class="text-xl">PROYECCIÓN: <b id="valProyeccion" style="color: var(--accent-blue);">$0.00 🚀</b></span>
             </div>
@@ -272,28 +283,19 @@
         }
         revisarCambioDeDia();
 
-        // 🌟 INTEGRACIÓN DE LA API BINANCE (LTC/USDT)
+        // 🌟 API BINANCE
         let precioLTCEnVivo = 0;
-        
         async function actualizarPrecioLTC() {
             try {
-                // Llama a la API oficial y pública de Binance
                 const respuesta = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT');
                 const datos = await respuesta.json();
                 precioLTCEnVivo = parseFloat(datos.price);
-                
-                // Actualiza el texto con el punto rojo titilando
                 document.getElementById('liveLtcPrice').innerHTML = `LTC: $${precioLTCEnVivo.toFixed(2)} <span class="pulse-red"></span>`;
-                
-                // Recalcula para mostrar cuántas monedas te tocan inmediatamente
                 calcular();
             } catch (error) {
-                console.error("Fallo al conectar con Binance:", error);
                 document.getElementById('liveLtcPrice').innerHTML = `LTC: Error 🔴`;
             }
         }
-        
-        // Arranca la búsqueda del precio al abrir la página y luego cada 60 segundos
         actualizarPrecioLTC();
         setInterval(actualizarPrecioLTC, 60000);
 
@@ -305,10 +307,8 @@
                 alert("Jhon, ingresa un monto diferente de cero.");
                 return;
             }
-
             base -= monto;
             localStorage.setItem('baseJhon', base);
-
             let retiradoHistorico = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
             retiradoHistorico += monto;
             if (retiradoHistorico < 0) retiradoHistorico = 0; 
@@ -320,7 +320,6 @@
             } else {
                 alert("¡Corrección aplicada! El dinero fue devuelto al sistema.");
             }
-
             document.getElementById('inputRetiro').value = "";
             calcular();
         }
@@ -339,9 +338,8 @@
 
         function calcular() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
+            // Quitamos la restricción forzada que bloqueaba el teclado. Solo calculamos en base a lo que esté o 5 por defecto.
             let wTarget = parseFloat(document.getElementById('withdrawTarget').value) || 5.00;
-            
-            if(wTarget < 5) { wTarget = 5.00; document.getElementById('withdrawTarget').value = 5.00; }
             
             localStorage.setItem('metaJhon', goal); localStorage.setItem('retiroJhon', wTarget);
 
@@ -349,11 +347,14 @@
             let pending = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalActual = earned + pending;
 
-            // 🪙 CÁLCULO DE LITECOIN (Dólares y Criptomonedas exactas)
-            let ltcNeto = earned * 0.80;
-            document.getElementById('valNetoLTC').innerText = '$' + ltcNeto.toFixed(2);
+            // 🪙 CÁLCULO DETALLADO DEL MINI-RECIBO
+            let feeComision = earned * 0.20;
+            let ltcNeto = earned - feeComision; // 80%
+
+            document.getElementById('calcBruto').innerText = '$' + earned.toFixed(2);
+            document.getElementById('calcFee').innerText = '-$' + feeComision.toFixed(2);
+            document.getElementById('calcNeto').innerText = '$' + ltcNeto.toFixed(2);
             
-            // Si Binance nos dio el precio, calculamos los LTC. Si no, mostramos ceros.
             if (precioLTCEnVivo > 0) {
                 let cantidadLTC = ltcNeto / precioLTCEnVivo;
                 document.getElementById('valCoinsLTC').innerText = cantidadLTC.toFixed(5) + ' LTC 🪙';
@@ -468,10 +469,19 @@
             XLSX.writeFile(wb, `SproutGigs_Master_${info.id}.xlsx`);
         }
 
+        // EL FIX DEL TECLADO: Ahora el mínimo de 5 se aplica solo cuando sales de la cajita (blur), permitiéndote teclear libremente.
+        document.getElementById('withdrawTarget').addEventListener('blur', function() {
+            if(parseFloat(this.value) < 5) {
+                alert("Jhon, recuerda que el mínimo de retiro en SproutGigs es de $5.00");
+                this.value = 5.00;
+                calcular();
+            }
+        });
+
         document.getElementById('goal').addEventListener('input', calcular);
-        document.getElementById('withdrawTarget').addEventListener('input', calcular);
-        document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
+        document.getElementById('withdrawTarget').addEventListener('input', calcular); // Calcula en vivo sin borrarte lo que escribes
         
+        document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
         let savedRetiro = parseFloat(localStorage.getItem('retiroJhon')) || 5.00;
         document.getElementById('withdrawTarget').value = savedRetiro < 5 ? 5.00 : savedRetiro;
         
