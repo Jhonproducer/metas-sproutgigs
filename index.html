@@ -6,13 +6,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <style>
-        /* PALETA DE COLORES */
         :root {
             --bg-body: #0f172a; --bg-card: #1e293b; --bg-panel: #334155;
             --text-main: #f8fafc; --text-muted: #94a3b8;
             --accent-blue: #3b82f6; --accent-green: #10b981;
-            --accent-yellow: #fbbf24; --accent-red: #ef4444;
+            --accent-yellow: #fbbf24; --accent-red: #ef4444; --accent-gold: #f59e0b;
             --border-color: #334155;
             --shadow-main: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
             --shadow-box: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
@@ -35,9 +36,9 @@
         
         .card { 
             background: var(--bg-card); border: 1px solid var(--border-color);
-            border-radius: 20px; padding: 25px; width: 100%; max-width: 1000px; 
+            border-radius: 20px; padding: 25px; width: 100%; max-width: 1050px; 
             box-shadow: var(--shadow-main);
-            display: grid; grid-template-columns: 320px 1fr; gap: 25px; 
+            display: grid; grid-template-columns: 330px 1fr; gap: 25px; 
             align-items: start; transition: all 0.4s ease; box-sizing: border-box;
         }
         
@@ -47,38 +48,35 @@
         }
         .date-title { font-size: 1.7rem; font-weight: 800; color: var(--accent-blue); margin-right: 12px; text-transform: uppercase; }
         .date-sub { font-size: 1rem; color: var(--text-muted); font-weight: 600; }
-        
         .header-buttons { display: flex; gap: 12px; align-items: center; }
         
         .col-left { display: flex; flex-direction: column; gap: 15px; } 
         .col-right { display: flex; flex-direction: column; gap: 15px; } 
         
-        /* EFECTO DE REBOTE PARA EL NÚMERO AL ACTUALIZAR */
         .big-money { 
             font-size: 4.8rem; font-weight: 800; line-height: 1; margin: 5px 0; 
-            text-align: center; background: linear-gradient(135deg, var(--accent-yellow), #f59e0b);
+            text-align: center; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-gold));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             filter: drop-shadow(0px 3px 6px rgba(251, 191, 36, 0.2));
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             display: inline-block; width: 100%;
         }
         
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } 
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } 
         .box { 
             background: var(--bg-panel); border: 1px solid var(--border-color); 
             padding: 12px; border-radius: 14px; text-align: center; 
             box-shadow: var(--shadow-box); transition: transform 0.2s;
         }
-        .box-full { grid-column: span 2; } 
         .box:hover { transform: translateY(-2px); }
         .label { font-size: 0.85rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; display: block; }
         .box-val { font-size: 1.4rem; font-weight: 800; display: block; transition: color 0.3s; }
         
         input { 
             background: var(--bg-panel); border: 2px solid var(--border-color); 
-            color: var(--text-main); width: 90px; text-align: center; 
-            font-size: 1.3rem; font-weight: 800; border-radius: 10px; 
-            padding: 3px; outline: none; transition: all 0.3s; font-family: 'Poppins', sans-serif;
+            color: var(--text-main); width: 85px; text-align: center; 
+            font-size: 1.2rem; font-weight: 800; border-radius: 10px; 
+            padding: 4px; outline: none; transition: all 0.3s; font-family: 'Poppins', sans-serif;
         }
         input:focus { border-color: var(--accent-blue); box-shadow: 0 0 8px rgba(59, 130, 246, 0.3); }
         
@@ -98,6 +96,14 @@
             display: flex; justify-content: center; align-items: center; gap: 8px;
         }
         .btn-excel:hover { transform: translateY(-2px); box-shadow: 0 6px 15px -2px rgba(16, 185, 129, 0.5); }
+
+        .btn-withdraw {
+            background: linear-gradient(135deg, var(--accent-gold), #d97706);
+            color: white; border: none; padding: 6px 15px; border-radius: 8px;
+            font-weight: 800; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;
+            text-transform: uppercase; margin-top: 8px; width: 100%; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+        }
+        .btn-withdraw:hover { transform: translateY(-2px); filter: brightness(1.1); }
         
         .progress-bar { 
             background: var(--bg-panel); border-radius: 50px; height: 24px; 
@@ -107,12 +113,12 @@
         #fill { height: 100%; width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease; }
         
         .chart-container { 
-            position: relative; height: 260px; width: 100%; background: var(--bg-card); 
+            position: relative; height: 240px; width: 100%; background: var(--bg-card); 
             border: 1px solid var(--border-color); border-radius: 14px; padding: 10px; 
             box-sizing: border-box; box-shadow: var(--shadow-box); 
         }
         .panel-info { 
-            text-align: center; padding: 15px; border-radius: 14px; 
+            text-align: center; padding: 12px; border-radius: 14px; 
             border: 2px dashed var(--border-color); background: var(--bg-panel); transition: all 0.3s;
         }
         
@@ -137,7 +143,7 @@
         </div>
 
         <div class="col-left">
-            <div style="text-align: center; padding-top: 5px;">
+            <div style="text-align: center;">
                 <span id="labelHoy" class="text-xl" style="color: var(--accent-yellow);">GANADO HOY:</span>
                 <div class="big-money" id="gananciaHoy">$0.00</div>
                 <div id="message" class="text-2xl" style="margin-bottom: 2px;">---</div>
@@ -146,23 +152,44 @@
 
             <div class="panel-info" style="border-color: rgba(59, 130, 246, 0.4);">
                 <span class="text-xl">META DIARIA: $ </span><input type="number" id="goal" value="1.00" step="0.10">
-                <span onclick="testSound()" style="cursor:pointer; display:block; color: var(--accent-blue); font-size: 0.9rem; margin-top: 10px; font-weight: 600;">🔊 Sonido</span>
+                <span onclick="testSound()" style="cursor:pointer; display:block; color: var(--accent-blue); font-size: 0.85rem; margin-top: 8px; font-weight: 600;">🔊 Probar Sonido</span>
             </div>
             
-            <div class="panel-info" style="border-color: rgba(251, 191, 36, 0.4);">
-                <span class="text-xl">RETIRO: $ </span><input type="number" id="withdrawTarget" value="13.00">
-                <div id="withdrawRemaining" class="text-xl" style="color: var(--accent-yellow); margin-top: 8px;">---</div>
+            <div class="panel-info" style="border-color: rgba(245, 158, 11, 0.6); background: rgba(245, 158, 11, 0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span class="text-xl" style="color: var(--accent-gold);">META RETIRO:</span>
+                    <input type="number" id="withdrawTarget" value="13.00" style="border-color: var(--accent-gold);">
+                </div>
+                <div id="withdrawRemaining" class="text-xl" style="color: var(--text-main); margin-bottom: 10px;">FALTAN $0.00</div>
+                
+                <div style="border-top: 1px solid var(--border-color); padding-top: 10px;">
+                    <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px;">¿Retiraste Dinero?</span>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" id="inputRetiro" placeholder="0.00" step="0.50" style="width: 100%;">
+                        <button class="btn-withdraw" onclick="ejecutarRetiro()">💸 REGISTRAR</button>
+                    </div>
+                    <span onclick="corregirRetiro()" style="cursor:pointer; display:block; color: var(--accent-red); font-size: 0.75rem; margin-top: 10px; text-decoration: underline; text-align: right; font-weight: bold;">⚠️ Me equivoqué (Deshacer)</span>
+                </div>
             </div>
         </div>
 
         <div class="col-right">
-            <div class="grid-3">
+            <div class="grid-4">
                 <div class="box"><span class="label">EN GANADO</span><span id="valEarned" class="box-val text-main">$0.00</span></div>
                 <div class="box"><span class="label">PENDIENTE</span><span id="valPending" class="box-val text-main">$0.00</span></div>
-                <div class="box box-full" style="border-bottom: 3px solid var(--accent-green); background: rgba(16, 185, 129, 0.05);"><span class="label" style="color: var(--accent-green);">SALDO REAL TOTAL</span><span id="valTotalReal" class="box-val" style="color: var(--accent-green); font-size: 1.6rem;">$0.00</span></div>
+                
+                <div class="box" style="border-bottom: 3px solid var(--accent-gold); background: rgba(245, 158, 11, 0.05);">
+                    <span class="label" style="color: var(--accent-gold);">TOTAL RETIRADO 🏦</span>
+                    <span id="valRetirado" class="box-val" style="color: var(--accent-gold);">$0.00</span>
+                </div>
+                
+                <div class="box" style="border-bottom: 3px solid var(--accent-green); background: rgba(16, 185, 129, 0.05);">
+                    <span class="label" style="color: var(--accent-green);">SALDO REAL</span>
+                    <span id="valTotalReal" class="box-val" style="color: var(--accent-green);">$0.00</span>
+                </div>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items: center; background: var(--bg-panel); padding: 10px 18px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-box);">
+            <div style="display:flex; justify-content:space-between; align-items: center; background: var(--bg-panel); padding: 8px 18px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-box);">
                 <span class="text-xl">TOTAL MES: <b id="valMes" style="color: var(--accent-green);">$0.00</b></span>
                 <span class="text-xl">PROYECCIÓN: <b id="valProyeccion" style="color: var(--accent-blue);">$0.00 🚀</b></span>
             </div>
@@ -174,6 +201,7 @@
     </div>
 
     <audio id="cashSound" src="https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3"></audio>
+    <audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
 
     <script>
         function toggleTheme() {
@@ -205,28 +233,9 @@
         document.getElementById('txtDateTime').innerText = `${info.fecha} | ${info.hora}`;
         document.body.setAttribute('data-theme', localStorage.getItem('jhonTheme') || 'dark');
 
-        // 1. EL MENSAJERO FANTASMA (Lee la URL si el script de SproutGigs abre el iframe)
-        const params = new URLSearchParams(window.location.search);
-        let eParam = parseFloat(params.get('earned')); let pParam = parseFloat(params.get('pending'));
-
-        if (!isNaN(eParam) && !isNaN(pParam)) {
-            localStorage.setItem('lastEarnedJhon', eParam); 
-            localStorage.setItem('lastPendingJhon', pParam);
-            localStorage.setItem('syncTrigger', Date.now()); 
-        }
-        
-        // 2. CONFIGURACIÓN BASE
         let base = parseFloat(localStorage.getItem('baseJhon'));
         let ultimaFecha = localStorage.getItem('fechaJhon');
         let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
-
-        let guardoCambios = false;
-        historial.forEach(h => {
-            if (h.mes === undefined || h.anio === undefined) {
-                const d = new Date(h.f + "T12:00:00"); h.mes = d.getMonth(); h.anio = d.getFullYear(); guardoCambios = true;
-            }
-        });
-        if(guardoCambios) localStorage.setItem('histJhon', JSON.stringify(historial));
 
         function revisarCambioDeDia() {
             let totalA = (parseFloat(localStorage.getItem('lastEarnedJhon')) || 0) + (parseFloat(localStorage.getItem('lastPendingJhon')) || 0);
@@ -246,37 +255,88 @@
 
         let miGrafico; 
 
-        // 3. FUNCIÓN MAESTRA (AHORA ES REACTIVA)
+        // 🌟 FUNCIÓN CAJERO (Con opción de Reverso usando negativos)
+        function ejecutarRetiro() {
+            let monto = parseFloat(document.getElementById('inputRetiro').value);
+            
+            // Si está vacío o es exactamente 0, no hace nada
+            if (isNaN(monto) || monto === 0) {
+                alert("Jhon, ingresa un monto diferente de cero.");
+                return;
+            }
+
+            // 1. Modifica la base (Si el monto es negativo, suma el dinero de vuelta)
+            base -= monto;
+            localStorage.setItem('baseJhon', base);
+
+            // 2. Modifica el Historial de Retirado
+            let retiradoHistorico = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
+            retiradoHistorico += monto;
+            
+            // Seguro: El retirado no puede ser menor a $0
+            if (retiradoHistorico < 0) retiradoHistorico = 0; 
+            localStorage.setItem('totalRetiradoJhon', retiradoHistorico);
+
+            // 3. Efectos Visuales
+            if (monto > 0) {
+                document.getElementById('winSound').play().catch(e=>{});
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#f59e0b', '#10b981', '#ffffff'] });
+            } else {
+                alert("¡Corrección aplicada! El dinero fue devuelto al sistema.");
+            }
+
+            // 4. Limpiar y refrescar
+            document.getElementById('inputRetiro').value = "";
+            calcular();
+        }
+
+        // 🚨 FUNCIÓN DE PÁNICO: BORRAR TODO EL RETIRO Y REVERTIR
+        function corregirRetiro() {
+            let confirmacion = confirm("¿Seguro que quieres BORRAR tu historial de retiros? Esto devolverá todo el dinero a tu saldo base. (Úsalo solo si te equivocaste feo probando los botones)");
+            if (confirmacion) {
+                let retirado = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
+                base += retirado; // Devuelve el dinero a la base
+                localStorage.setItem('baseJhon', base);
+                localStorage.setItem('totalRetiradoJhon', 0); // Borra el historial
+                alert("¡Historial de retiros reiniciado a $0.00! Todo volvió a la normalidad.");
+                calcular();
+            }
+        }
+
         function calcular() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
             const wTarget = parseFloat(document.getElementById('withdrawTarget').value) || 13.00;
             localStorage.setItem('metaJhon', goal); localStorage.setItem('retiroJhon', wTarget);
 
-            // Leer datos FRESCOS directo de la memoria
             let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
             let pending = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalActual = earned + pending;
 
+            // 🛡️ ESCUDO ANTI-FUGAS
+            if (totalActual < base) {
+                base = totalActual;
+                localStorage.setItem('baseJhon', base);
+            }
+
             const ganadoHoy = Math.max(0, totalActual - base);
             const hoyRedondeo = Math.round(ganadoHoy * 100) / 100;
 
-            // DETECTOR DE DINERO NUEVO (Sonido y Animación)
             const ant = parseFloat(localStorage.getItem('antJhon')) || 0;
             if (hoyRedondeo > ant) { 
                 document.getElementById('cashSound').play().catch(e=>{}); 
-                
-                // Efecto POP visual en el número
                 const bigNumber = document.getElementById('gananciaHoy');
                 bigNumber.style.transform = "scale(1.15)";
                 setTimeout(() => { bigNumber.style.transform = "scale(1)"; }, 300);
             }
             localStorage.setItem('antJhon', hoyRedondeo);
 
-            // Actualizar Textos dinámicamente
             document.getElementById('gananciaHoy').innerText = '$' + hoyRedondeo.toFixed(2);
             document.getElementById('valEarned').innerText = '$' + earned.toFixed(4);
             document.getElementById('valPending').innerText = '$' + pending.toFixed(4);
             document.getElementById('valTotalReal').innerText = '$' + totalActual.toFixed(4);
+            
+            let retiradoHistorico = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
+            document.getElementById('valRetirado').innerText = '$' + retiradoHistorico.toFixed(2);
 
             const sumMesActual = historial.filter(h => h.mes === info.mesIdx && h.anio === info.anio).reduce((acc, h) => acc + parseFloat(h.m), 0) + hoyRedondeo;
             document.getElementById('valMes').innerText = '$' + sumMesActual.toFixed(2);
@@ -308,9 +368,7 @@
             if (miGrafico) { miGrafico.destroy(); } 
 
             let datosGrafico = historial.slice(0, 30).reverse();
-            let etiquetas = datosGrafico.map(h => {
-                let partes = h.f.split('-'); return `${partes[2]}/${partes[1]}`;
-            });
+            let etiquetas = datosGrafico.map(h => { let partes = h.f.split('-'); return `${partes[2]}/${partes[1]}`; });
             let valores = datosGrafico.map(h => parseFloat(h.m));
             
             const isLight = document.body.getAttribute('data-theme') === 'light';
@@ -329,7 +387,7 @@
                 type: 'bar',
                 data: { labels: etiquetas, datasets: [{ label: 'Ganancia Diaria ($)', data: valores, backgroundColor: bgColorsGradient, borderRadius: 6, borderWidth: 0, hoverBackgroundColor: '#3b82f6' }] },
                 options: {
-                    animation: { duration: 0 }, /* Apaga la animación para que la auto-actualización sea limpia */
+                    animation: { duration: 0 },
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false }, tooltip: { backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(15,23,42,0.95)', titleColor: isLight ? '#0f172a' : '#f8fafc', bodyColor: isLight ? '#0f172a' : '#f8fafc', borderColor: gridColor, borderWidth: 1, titleFont: { size: 12, family: 'Poppins' }, bodyFont: { size: 16, weight: 'bold', family: 'Poppins' }, displayColors: false, padding: 8, cornerRadius: 6, callbacks: { label: function(context) { return '$' + context.parsed.y.toFixed(2); } } } },
                     scales: { y: { beginAtZero: true, grid: { color: gridColor, drawBorder: false }, ticks: { color: textColor, font: { family: 'Poppins', weight: '600', size: 11 }, callback: function(value) { return '$' + value; } } }, x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Poppins', weight: '600', size: 11 } } } }
@@ -337,15 +395,14 @@
             });
         }
 
-        // 4. EL RADAR (AUTO-ACTUALIZACIÓN SILENCIOSA)
         let ultimoSync = localStorage.getItem('syncTrigger');
         setInterval(() => {
             let syncActual = localStorage.getItem('syncTrigger');
             if (syncActual !== ultimoSync) {
                 ultimoSync = syncActual;
-                calcular(); // ¡Magia! Se actualiza la pantalla sin recargar
+                calcular(); 
             }
-        }, 1500); // Escanea cada 1.5 segundos
+        }, 1500);
 
         function testSound() { document.getElementById('cashSound').play(); }
         
@@ -354,7 +411,7 @@
             let wb = XLSX.utils.book_new();
             let totalGanado = 0; let diasExito = 0;
             historial.forEach(h => { let m = parseFloat(h.m); totalGanado += m; if(m >= goal) diasExito++; });
-            let wsResumenData = [ ["REPORTE MAESTRO - SPROUTGIGS"], [], ["MÉTRICA", "RESULTADO"], ["Total de Días Trabajados", historial.length], ["Días con Meta Cumplida", diasExito], ["Días con Meta Fallida", historial.length - diasExito], ["Ganancia Histórica Total", totalGanado], ["Meta Diaria Configurada", goal] ];
+            let wsResumenData = [ ["REPORTE MAESTRO - SPROUTGIGS"], [], ["MÉTRICA", "RESULTADO"], ["Total de Días Trabajados", historial.length], ["Días con Meta Cumplida", diasExito], ["Días con Meta Fallida", historial.length - diasExito], ["Ganancia Histórica Total ($)", totalGanado], ["Total Retirado del Sistema ($)", parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0] ];
             let wsResumen = XLSX.utils.aoa_to_sheet(wsResumenData);
             XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen Global");
             let mesesAgrupados = {};
@@ -365,11 +422,8 @@
 
         document.getElementById('goal').addEventListener('input', calcular);
         document.getElementById('withdrawTarget').addEventListener('input', calcular);
-        
         document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
         document.getElementById('withdrawTarget').value = localStorage.getItem('retiroJhon') || 13.00;
-        
-        // Ejecución inicial
         calcular();
     </script>
 </body>
