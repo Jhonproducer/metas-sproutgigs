@@ -3,243 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <title>Jhonproducer - Master Dashboard PRO</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
+        /* 🎨 VARIABLES FINTECH PREMIUM */
         :root {
-            --bg-body: #0f172a; --bg-card: #1e293b; --bg-panel: #334155;
-            --text-main: #f8fafc; --text-muted: #94a3b8;
-            --accent-blue: #3b82f6; --accent-green: #10b981;
-            --accent-yellow: #fbbf24; --accent-red: #ef4444; --accent-gold: #f59e0b;
-            --border-color: #334155;
-            --shadow-main: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
-            --shadow-box: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --bg-page: #0B1121;       /* Fondo oscuro medianoche */
+            --bg-card: #151C2C;       /* Fondo de tarjetas */
+            --bg-input: #1E293B;      /* Fondo de inputs */
+            --text-main: #F8FAFC;     /* Texto principal blanco */
+            --text-muted: #94A3B8;    /* Texto grisáceo elegante */
+            --border-color: #2A3241;  /* Bordes sutiles */
+            --accent-blue: #3B82F6;   /* Azul vibrante */
+            --accent-green: #10B981;  /* Verde éxito */
+            --accent-yellow: #F59E0B; /* Amarillo/Dorado oro */
+            --accent-red: #EF4444;    /* Rojo alerta */
+            --shadow-card: 0 10px 30px -10px rgba(0,0,0,0.5);
+            --radius-main: 16px;
+            --radius-sm: 10px;
         }
+        
         [data-theme="light"] {
-            --bg-body: #f1f5f9; --bg-card: #ffffff; --bg-panel: #f8fafc;
-            --text-main: #0f172a; --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --shadow-main: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
-            --shadow-box: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --bg-page: #F3F4F6;       /* Fondo gris perla claro */
+            --bg-card: #FFFFFF;       /* Tarjetas blancas puras */
+            --bg-input: #F9FAFB;      /* Inputs gris super suave */
+            --text-main: #111827;     /* Texto negro intenso */
+            --text-muted: #6B7280;    /* Gris texto medio */
+            --border-color: #E5E7EB;  /* Bordes delicados */
+            --shadow-card: 0 10px 25px -5px rgba(0,0,0,0.05);
         }
-        
-        /* FIX EDGE: Se cambió el overflow para no "mochar" y se ajustó el padding */
+
+        /* 📐 ESTRUCTURA BASE */
         body { 
-            background: var(--bg-body); color: var(--text-main); 
+            background: var(--bg-page); color: var(--text-main); 
             font-family: 'Poppins', sans-serif; 
-            display: flex; justify-content: center; align-items: center; 
-            min-height: 100vh; margin: 0; padding: 15px 10px; 
-            transition: background 0.4s ease; 
-            overflow-y: auto; overflow-x: hidden; 
+            margin: 0; padding: 20px; 
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow-y: auto; overflow-x: hidden;
+            transition: background 0.4s ease;
         }
-        
-        .card { 
+
+        .dashboard-container {
+            width: 100%; max-width: 1100px;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+
+        /* 🔝 CABECERA */
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-card); padding: 15px 25px;
+            border-radius: var(--radius-main); border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-card);
+        }
+        .date-group h1 { margin: 0; font-size: 1.5rem; color: var(--accent-blue); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .date-group p { margin: 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
+        .controls { display: flex; gap: 10px; }
+
+        /* 💳 FILA 1: TARJETAS DE BALANCE (4 Columnas) */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;
+        }
+        .stat-card {
             background: var(--bg-card); border: 1px solid var(--border-color);
-            border-radius: 20px; 
-            padding: 15px 25px; /* Más ajustado arriba y abajo */
-            width: 100%; max-width: 1020px; 
-            box-shadow: var(--shadow-main);
-            display: grid; grid-template-columns: 310px 1fr; 
-            gap: 15px; /* Reducido de 20px a 15px */
-            align-items: start; transition: all 0.4s ease; box-sizing: border-box;
+            border-radius: var(--radius-main); padding: 15px;
+            box-shadow: var(--shadow-card); transition: transform 0.2s;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+        .stat-value { font-size: 1.8rem; font-weight: 800; line-height: 1; }
+
+        /* 📊 FILA 2: HOY + GRÁFICO (2 Columnas) */
+        .main-row {
+            display: grid; grid-template-columns: 320px 1fr; gap: 15px;
+        }
+        .today-card, .chart-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-main); padding: 20px;
+            box-shadow: var(--shadow-card);
         }
         
-        .top-bar { 
-            grid-column: span 2; display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-bottom: -5px; 
-        }
-        .date-title { font-size: 1.4rem; font-weight: 800; color: var(--accent-blue); margin-right: 10px; text-transform: uppercase; }
-        .date-sub { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
-        .header-buttons { display: flex; gap: 10px; align-items: center; }
-        
-        .col-left { display: flex; flex-direction: column; gap: 10px; } 
-        .col-right { display: flex; flex-direction: column; gap: 10px; } 
-        
-        /* FIX EDGE: Tamaño un poco más compacto */
+        .today-card { text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
         .big-money { 
-            font-size: 3.8rem; font-weight: 800; line-height: 1; margin: 2px 0; 
-            text-align: center; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-gold));
+            font-size: 4.2rem; font-weight: 800; line-height: 1; margin: 10px 0;
+            background: linear-gradient(135deg, var(--accent-yellow), var(--accent-gold));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0px 3px 6px rgba(251, 191, 36, 0.2));
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            display: inline-block; width: 100%;
+            filter: drop-shadow(0px 4px 6px rgba(245, 158, 11, 0.2));
         }
+        .progress-bar-bg { background: var(--bg-input); border-radius: 50px; height: 16px; width: 100%; overflow: hidden; margin: 10px 0; border: 1px solid var(--border-color); }
+        .progress-bar-fill { height: 100%; width: 0%; transition: width 1s ease, background-color 0.5s ease; }
         
-        .grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; } 
-        .box { 
-            background: var(--bg-panel); border: 1px solid var(--border-color); 
-            padding: 10px; border-radius: 12px; text-align: center; 
-            box-shadow: var(--shadow-box); transition: transform 0.2s;
-        }
-        .box:hover { transform: translateY(-2px); }
-        .label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 2px; letter-spacing: 0.5px; display: block; }
-        .box-val { font-size: 1.25rem; font-weight: 800; display: block; transition: color 0.3s; }
-        
-        input { 
-            background: var(--bg-panel); border: 2px solid var(--border-color); 
-            color: var(--text-main); width: 75px; text-align: center; 
-            font-size: 1.1rem; font-weight: 800; border-radius: 8px; 
-            padding: 2px; outline: none; transition: all 0.3s; font-family: 'Poppins', sans-serif;
-        }
-        input:focus { border-color: var(--accent-blue); box-shadow: 0 0 8px rgba(59, 130, 246, 0.3); }
-        
-        .btn-theme { 
-            background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color); 
-            padding: 6px 12px; border-radius: 50px; cursor: pointer; font-weight: 700; 
-            text-transform: uppercase; transition: all 0.3s; font-size: 0.75rem; box-shadow: var(--shadow-box);
-        }
-        .btn-theme:hover { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
-        
-        .btn-excel { 
-            background: linear-gradient(135deg, var(--accent-green), #059669); 
-            color: white; border: none; padding: 6px 12px; 
-            border-radius: 50px; cursor: pointer; font-weight: 800; 
-            text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;
-            transition: all 0.3s ease; box-shadow: 0 4px 10px -2px rgba(16, 185, 129, 0.4); 
-            display: flex; justify-content: center; align-items: center; gap: 6px;
-        }
-        .btn-excel:hover { transform: translateY(-2px); box-shadow: 0 6px 15px -2px rgba(16, 185, 129, 0.5); }
+        .goal-input-group { display: flex; justify-content: space-between; align-items: center; background: var(--bg-input); padding: 8px 15px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-top: 10px; }
+        .goal-input-group input { background: transparent; border: none; color: var(--text-main); font-size: 1.2rem; font-weight: 700; width: 60px; text-align: right; outline: none; font-family: 'Poppins', sans-serif; }
 
-        .btn-withdraw {
-            background: linear-gradient(135deg, var(--accent-gold), #d97706);
-            color: white; border: none; padding: 5px 10px; border-radius: 8px;
-            font-weight: 800; cursor: pointer; transition: all 0.2s; font-size: 0.8rem;
-            text-transform: uppercase; width: 100%; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+        .chart-container { position: relative; height: 230px; width: 100%; }
+
+        /* 🏦 FILA 3: PANEL DE RETIRO FINTECH (Horizontal) */
+        .withdraw-panel {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-main); padding: 15px 25px;
+            box-shadow: var(--shadow-card); display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 15px;
         }
+        .w-step { display: flex; flex-direction: column; }
+        .w-title { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+        .w-value { font-size: 1.3rem; font-weight: 800; }
+        
+        .w-divider { width: 1px; height: 40px; background: var(--border-color); }
+        
+        .action-group { display: flex; gap: 10px; align-items: center; }
+        .action-group input {
+            background: var(--bg-input); border: 1px solid var(--border-color);
+            color: var(--text-main); padding: 10px 15px; border-radius: var(--radius-sm);
+            font-size: 1.1rem; font-weight: 700; width: 100px; text-align: center; outline: none;
+            font-family: 'Poppins', sans-serif;
+        }
+        .action-group input:focus { border-color: var(--accent-gold); }
+
+        /* BOTONES */
+        .btn {
+            padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer;
+            text-transform: uppercase; font-size: 0.8rem; border: none; transition: all 0.2s ease;
+            font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 6px;
+        }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
+        .btn-outline:hover { background: var(--bg-input); border-color: var(--accent-blue); color: var(--accent-blue); }
+        .btn-excel { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .btn-excel:hover { background: var(--accent-green); color: white; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
+        .btn-withdraw { background: linear-gradient(135deg, var(--accent-gold), #d97706); color: white; padding: 10px 20px; font-size: 0.95rem; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); }
         .btn-withdraw:hover { transform: translateY(-2px); filter: brightness(1.1); }
-        
-        .progress-bar { 
-            background: var(--bg-panel); border-radius: 50px; height: 18px; 
-            overflow: hidden; border: 1px solid var(--border-color); 
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); margin-top: 6px;
-        }
-        #fill { height: 100%; width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease; }
-        
-        /* FIX EDGE: Gráfico un poco más bajito (210px en vez de 250px) */
-        .chart-container { 
-            position: relative; height: 210px; width: 100%; background: var(--bg-card); 
-            border: 1px solid var(--border-color); border-radius: 14px; padding: 10px; 
-            box-sizing: border-box; box-shadow: var(--shadow-box); 
-        }
-        .panel-info { 
-            text-align: center; padding: 10px; border-radius: 12px; 
-            border: 2px dashed var(--border-color); background: var(--bg-panel); transition: all 0.3s;
-        }
-        
-        .text-xl { font-size: 1.05rem; font-weight: 700; } 
-        .text-2xl { font-size: 1.2rem; font-weight: 800; } 
-        
-        .pulse-red {
-            display: inline-block; width: 6px; height: 6px; background-color: #ef4444;
-            border-radius: 50%; margin-left: 4px; box-shadow: 0 0 6px #ef4444;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
 
-        .mini-calc { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 3px; font-weight: 600; padding: 0 5px; }
+        /* STATUS DOTS */
+        .pulse-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+        .pulse-green { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); animation: pulseG 1.5s infinite; }
+        .pulse-red { background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); animation: pulseR 1.5s infinite; }
+        @keyframes pulseG { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes pulseR { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+
     </style>
 </head>
 <body data-theme="dark">
-    <div class="card">
-        <div class="top-bar">
-            <div>
-                <span id="txtDia" class="date-title">---</span>
-                <span id="txtDateTime" class="date-sub">--/--/-- | --:--</span>
+
+    <div class="dashboard-container">
+        
+        <div class="header">
+            <div class="date-group">
+                <h1 id="txtDia">---</h1>
+                <p id="txtDateTime">--/--/---- | --:--</p>
             </div>
-            <div class="header-buttons">
-                <button class="btn-excel" onclick="exportarExcelPro()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M8 13h8"></path><path d="M8 17h8"></path><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    GENERAR EXCEL
+            <div class="controls">
+                <button class="btn btn-excel" onclick="exportarExcelPro()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M8 13h8"></path><path d="M8 17h8"></path><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Exportar Excel
                 </button>
-                <button class="btn-theme" onclick="toggleTheme()">🌓 MODO</button>
+                <button class="btn btn-outline" onclick="toggleTheme()">🌓 Tema</button>
             </div>
         </div>
 
-        <div class="col-left">
-            <div style="text-align: center;">
-                <span id="labelHoy" class="text-xl" style="color: var(--accent-yellow);">GANADO HOY:</span>
-                <div class="big-money" id="gananciaHoy">$0.00</div>
-                <div id="message" class="text-2xl" style="margin-bottom: 2px;">---</div>
-                <div class="progress-bar"><div id="fill" style="background-color: var(--accent-yellow);"></div></div>
+        <div class="stats-row">
+            <div class="stat-card" style="border-bottom: 3px solid var(--accent-blue);">
+                <span class="stat-label">EN GANADO (Retirable)</span>
+                <span class="stat-value" id="valEarned" style="color: var(--text-main);">$0.00</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">PENDIENTE</span>
+                <span class="stat-value" id="valPending" style="color: var(--text-muted);">$0.00</span>
+            </div>
+            <div class="stat-card" style="border-bottom: 3px solid var(--accent-green); background: rgba(16, 185, 129, 0.03);">
+                <span class="stat-label" style="color: var(--accent-green);">SALDO REAL TOTAL</span>
+                <span class="stat-value" id="valTotalReal" style="color: var(--accent-green);">$0.00</span>
+            </div>
+            <div class="stat-card" style="border-bottom: 3px solid var(--accent-gold);">
+                <span class="stat-label" style="color: var(--accent-gold);">TOTAL RETIRADO 🏦</span>
+                <span class="stat-value" id="valRetirado" style="color: var(--accent-gold);">$0.00</span>
+            </div>
+        </div>
+
+        <div class="main-row">
+            <div class="today-card">
+                <div>
+                    <span class="stat-label" style="color: var(--accent-yellow); font-size: 1rem;">TRABAJO DE HOY</span>
+                    <div class="big-money" id="gananciaHoy">$0.00</div>
+                    <div id="message" style="font-size: 1.1rem; font-weight: 700; color: var(--text-muted);">---</div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="fill"></div></div>
+                </div>
+                
+                <div class="goal-input-group">
+                    <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-muted);">META DIARIA:</span>
+                    <div style="display: flex; align-items: center;">
+                        <span style="color: var(--text-muted); font-weight: 700; margin-right: 2px;">$</span>
+                        <input type="number" id="goal" value="1.00" step="0.10">
+                    </div>
+                </div>
             </div>
 
-            <div class="panel-info" style="border-color: rgba(59, 130, 246, 0.4);">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span class="text-xl">META DIARIA: $ </span>
-                    <input type="number" id="goal" value="1.00" step="0.10">
+            <div class="chart-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
+                    <span style="font-weight: 700; font-size: 1.1rem;">Mes Actual: <span id="valMes" style="color: var(--accent-green);">$0.00</span></span>
+                    <span style="font-weight: 700; font-size: 1.1rem; color: var(--text-muted);">Proyección: <span id="valProyeccion" style="color: var(--accent-blue);">$0.00 🚀</span></span>
                 </div>
-                <span onclick="testSound()" style="cursor:pointer; display:block; color: var(--accent-blue); font-size: 0.75rem; margin-top: 5px; font-weight: 600; text-align: right;">🔊 Probar Sonido</span>
+                <div class="chart-container">
+                    <canvas id="historialChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="withdraw-panel">
+            <div class="w-step">
+                <span class="w-title">Status SproutGigs</span>
+                <span id="withdrawStatusText" class="w-value" style="font-size: 1.1rem;"><span class="pulse-dot pulse-red"></span> Bloqueado (< $5)</span>
             </div>
             
-            <div class="panel-info" style="border-color: rgba(245, 158, 11, 0.6); background: rgba(245, 158, 11, 0.05);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span class="text-xl" style="color: var(--accent-gold);">META RETIRO:</span>
-                    <input type="number" id="withdrawTarget" value="5.00" style="border-color: var(--accent-gold);">
+            <div class="w-divider"></div>
+
+            <div class="w-step">
+                <span class="w-title">Comisión (20%)</span>
+                <span id="calcFee" class="w-value" style="color: var(--accent-red);">-$0.00</span>
+            </div>
+
+            <div class="w-step">
+                <span class="w-title">Neto a Recibir</span>
+                <span id="calcNeto" class="w-value" style="color: var(--accent-green);">$0.00</span>
+            </div>
+            
+            <div class="w-divider"></div>
+
+            <div class="w-step">
+                <span class="w-title" style="display: flex; justify-content: space-between;">
+                    <span>Equivalente Binance</span>
+                    <span id="liveLtcPrice" style="color: var(--accent-blue);">Cargando...</span>
+                </span>
+                <span id="valCoinsLTC" class="w-value" style="color: var(--accent-gold); font-size: 1.4rem;">0.00000 LTC 🪙</span>
+            </div>
+
+            <div class="action-group">
+                <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                    <span onclick="corregirRetiro()" style="font-size: 0.65rem; color: var(--accent-red); cursor: pointer; text-decoration: underline; margin-bottom: 3px; font-weight: bold;">Deshacer error</span>
+                    <input type="number" id="inputRetiro" placeholder="Monto $" step="0.50">
                 </div>
-                <div id="withdrawRemaining" style="font-size: 0.9rem; font-weight: bold; color: var(--text-main); margin-bottom: 8px;">FALTAN $0.00</div>
-                
-                <div style="background: rgba(16, 185, 129, 0.15); padding: 8px; border-radius: 8px; margin-bottom: 8px; border: 1px solid rgba(16, 185, 129, 0.3);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <span style="font-size: 0.7rem; color: var(--accent-green); font-weight: bold; letter-spacing: 0.5px;">CONVERSIÓN EN VIVO:</span>
-                        <span id="liveLtcPrice" style="font-size: 0.65rem; color: var(--text-muted); font-weight: bold;">LTC: --- <span class="pulse-red"></span></span>
-                    </div>
-                    
-                    <div class="mini-calc">
-                        <span style="color: var(--text-muted);">Bruto: <b id="calcBruto">$0.00</b></span>
-                        <span style="color: var(--accent-red);">-20%: <b id="calcFee">-$0.00</b></span>
-                        <span style="color: var(--accent-green);">Neto: <b id="calcNeto">$0.00</b></span>
-                    </div>
-                    
-                    <div style="text-align: center; margin-top: 2px;">
-                        <span id="valCoinsLTC" style="font-size: 1.1rem; color: var(--accent-gold); font-weight: 800; text-shadow: 0px 2px 4px rgba(0,0,0,0.5);">0.00000 LTC 🪙</span>
-                    </div>
-                </div>
-                
-                <div style="border-top: 1px solid var(--border-color); padding-top: 8px;">
-                    <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px;">¿Retiraste Dinero?</span>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="number" id="inputRetiro" placeholder="0.00" step="0.50" style="width: 100%;">
-                        <button class="btn-withdraw" onclick="ejecutarRetiro()">💸 REGISTRAR</button>
-                    </div>
-                    <span onclick="corregirRetiro()" style="cursor:pointer; display:block; color: var(--accent-red); font-size: 0.65rem; margin-top: 6px; text-decoration: underline; text-align: right; font-weight: bold;">⚠️ Error (Deshacer)</span>
-                </div>
+                <button class="btn btn-withdraw" onclick="ejecutarRetiro()">💸 Retirar</button>
             </div>
         </div>
 
-        <div class="col-right">
-            <div class="grid-4">
-                <div class="box"><span class="label">EN GANADO</span><span id="valEarned" class="box-val text-main">$0.00</span></div>
-                <div class="box"><span class="label">PENDIENTE</span><span id="valPending" class="box-val text-main">$0.00</span></div>
-                
-                <div class="box" style="border-bottom: 3px solid var(--accent-gold); background: rgba(245, 158, 11, 0.05);">
-                    <span class="label" style="color: var(--accent-gold);">RETIRADO 🏦</span>
-                    <span id="valRetirado" class="box-val" style="color: var(--accent-gold);">$0.00</span>
-                </div>
-                
-                <div class="box" style="border-bottom: 3px solid var(--accent-green); background: rgba(16, 185, 129, 0.05);">
-                    <span class="label" style="color: var(--accent-green);">SALDO REAL</span>
-                    <span id="valTotalReal" class="box-val" style="color: var(--accent-green);">$0.00</span>
-                </div>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; align-items: center; background: var(--bg-panel); padding: 8px 15px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-box);">
-                <span class="text-xl">TOTAL MES: <b id="valMes" style="color: var(--accent-green);">$0.00</b></span>
-                <span class="text-xl">PROYECCIÓN: <b id="valProyeccion" style="color: var(--accent-blue);">$0.00 🚀</b></span>
-            </div>
-
-            <div class="chart-container">
-                <canvas id="historialChart"></canvas>
-            </div>
-        </div>
     </div>
 
     <audio id="cashSound" src="https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3"></audio>
     <audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
 
     <script>
+        // 🌓 TEMA
         function toggleTheme() {
             const b = document.body;
             const t = b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -289,16 +304,17 @@
         }
         revisarCambioDeDia();
 
+        // 🌟 API BINANCE LTC
         let precioLTCEnVivo = 0;
         async function actualizarPrecioLTC() {
             try {
                 const respuesta = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT');
                 const datos = await respuesta.json();
                 precioLTCEnVivo = parseFloat(datos.price);
-                document.getElementById('liveLtcPrice').innerHTML = `LTC: $${precioLTCEnVivo.toFixed(2)} <span class="pulse-red"></span>`;
+                document.getElementById('liveLtcPrice').innerText = `($${precioLTCEnVivo.toFixed(2)})`;
                 calcular();
             } catch (error) {
-                document.getElementById('liveLtcPrice').innerHTML = `LTC: Error 🔴`;
+                document.getElementById('liveLtcPrice').innerText = `(Error API)`;
             }
         }
         actualizarPrecioLTC();
@@ -306,14 +322,26 @@
 
         let miGrafico; 
 
+        // 💸 LÓGICA DE RETIRO
         function ejecutarRetiro() {
             let monto = parseFloat(document.getElementById('inputRetiro').value);
+            let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
+            
             if (isNaN(monto) || monto === 0) {
-                alert("Jhon, ingresa un monto diferente de cero.");
-                return;
+                alert("Ingresa un monto válido."); return;
             }
+            if (monto > earned) {
+                alert("¡Hey! No puedes retirar más de lo que tienes 'En Ganado'."); return;
+            }
+
             base -= monto;
             localStorage.setItem('baseJhon', base);
+
+            // Ajustar el "lastEarnedJhon" para que baje en el sistema inmediatamente
+            let nuevoEarned = earned - monto;
+            if(nuevoEarned < 0) nuevoEarned = 0;
+            localStorage.setItem('lastEarnedJhon', nuevoEarned);
+
             let retiradoHistorico = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
             retiradoHistorico += monto;
             if (retiradoHistorico < 0) retiradoHistorico = 0; 
@@ -322,43 +350,56 @@
             if (monto > 0) {
                 document.getElementById('winSound').play().catch(e=>{});
                 confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#f59e0b', '#10b981', '#ffffff'] });
-            } else {
-                alert("¡Corrección aplicada! El dinero fue devuelto al sistema.");
             }
+
             document.getElementById('inputRetiro').value = "";
             calcular();
         }
 
         function corregirRetiro() {
-            let confirmacion = confirm("¿Seguro que quieres BORRAR tu historial de retiros? Esto devolverá todo el dinero a tu saldo base.");
+            let confirmacion = confirm("⚠️ ¿Borrar historial de retiros y restaurar saldo?");
             if (confirmacion) {
                 let retirado = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
                 base += retirado; 
+                
+                let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
+                localStorage.setItem('lastEarnedJhon', earned + retirado);
+
                 localStorage.setItem('baseJhon', base);
                 localStorage.setItem('totalRetiradoJhon', 0); 
-                alert("¡Historial de retiros reiniciado a $0.00! Todo volvió a la normalidad.");
+                alert("Historial reiniciado.");
                 calcular();
             }
         }
 
+        // 🧮 MOTOR DE CÁLCULO PRINCIPAL
         function calcular() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
-            let wTarget = parseFloat(document.getElementById('withdrawTarget').value) || 5.00;
-            
-            localStorage.setItem('metaJhon', goal); localStorage.setItem('retiroJhon', wTarget);
+            localStorage.setItem('metaJhon', goal);
 
             let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
             let pending = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalActual = earned + pending;
 
+            // STATUS DE RETIRO (SproutGigs rule: Min $5 in Earned)
+            const statusText = document.getElementById('withdrawStatusText');
+            if (earned >= 5) {
+                statusText.innerHTML = `<span class="pulse-dot pulse-green"></span> ¡Disponible!`;
+                statusText.style.color = 'var(--accent-green)';
+            } else {
+                let faltan = 5 - earned;
+                statusText.innerHTML = `<span class="pulse-dot pulse-red"></span> Faltan $${faltan.toFixed(2)}`;
+                statusText.style.color = 'var(--text-main)';
+            }
+
+            // CÁLCULOS FINANCIEROS (Neto y Crypto)
             let feeComision = earned * 0.20;
             let ltcNeto = earned - feeComision; 
 
-            document.getElementById('calcBruto').innerText = '$' + earned.toFixed(2);
             document.getElementById('calcFee').innerText = '-$' + feeComision.toFixed(2);
             document.getElementById('calcNeto').innerText = '$' + ltcNeto.toFixed(2);
             
-            if (precioLTCEnVivo > 0) {
+            if (precioLTCEnVivo > 0 && earned > 0) {
                 let cantidadLTC = ltcNeto / precioLTCEnVivo;
                 document.getElementById('valCoinsLTC').innerText = cantidadLTC.toFixed(5) + ' LTC 🪙';
             } else {
@@ -395,11 +436,8 @@
             
             let proyeccion = (sumMesActual / info.diaNumero) * info.totalDiasMes;
             document.getElementById('valProyeccion').innerText = '$' + proyeccion.toFixed(2);
-            document.getElementById('labelHoy').innerText = `HOY (${MESES[info.mesIdx]}):`; 
 
-            const faltaW = Math.max(0, wTarget - earned);
-            document.getElementById('withdrawRemaining').innerText = faltaW > 0 ? `FALTAN $${faltaW.toFixed(2)} EN GANADO` : "¡YA PUEDES RETIRAR! 🔥";
-
+            // BARRA DE PROGRESO DIARIA
             const pct = Math.min((ganadoHoy / goal) * 100, 100);
             const fill = document.getElementById('fill');
             fill.style.width = pct + '%';
@@ -408,13 +446,14 @@
             else if(pct < 99) { fill.style.backgroundColor = "var(--accent-yellow)"; }
             else { fill.style.backgroundColor = "var(--accent-green)"; }
 
-            document.getElementById('message').innerText = ganadoHoy >= goal ? "¡META LOGRADA! 🏆" : `FALTAN $${(goal - ganadoHoy).toFixed(2)}`;
+            document.getElementById('message').innerText = ganadoHoy >= goal ? "¡META DIARIA LOGRADA! 🏆" : `Faltan $${(goal - ganadoHoy).toFixed(2)} hoy`;
             if(ganadoHoy >= goal) document.getElementById('message').style.color = "var(--accent-green)";
-            else document.getElementById('message').style.color = "var(--text-main)";
+            else document.getElementById('message').style.color = "var(--text-muted)";
 
             actualizarGrafico(goal);
         }
 
+        // 📈 RENDER GRÁFICO
         function actualizarGrafico(goal) {
             const ctx = document.getElementById('historialChart').getContext('2d');
             if (miGrafico) { miGrafico.destroy(); } 
@@ -424,69 +463,53 @@
             let valores = datosGrafico.map(h => parseFloat(h.m));
             
             const isLight = document.body.getAttribute('data-theme') === 'light';
-            const gridColor = isLight ? '#e2e8f0' : '#334155';
-            const textColor = isLight ? '#64748b' : '#94a3b8';
+            const gridColor = isLight ? '#E5E7EB' : '#2A3241';
+            const textColor = isLight ? '#6B7280' : '#94A3B8';
 
-            let gradienteVerde = ctx.createLinearGradient(0, 0, 0, 210);
-            gradienteVerde.addColorStop(0, '#34d399'); gradienteVerde.addColorStop(1, '#059669');
+            let gradienteVerde = ctx.createLinearGradient(0, 0, 0, 230);
+            gradienteVerde.addColorStop(0, '#10B981'); gradienteVerde.addColorStop(1, 'rgba(16, 185, 129, 0.2)');
 
-            let gradienteAmarillo = ctx.createLinearGradient(0, 0, 0, 210);
-            gradienteAmarillo.addColorStop(0, '#fcd34d'); gradienteAmarillo.addColorStop(1, '#d97706');
+            let gradienteAmarillo = ctx.createLinearGradient(0, 0, 0, 230);
+            gradienteAmarillo.addColorStop(0, '#F59E0B'); gradienteAmarillo.addColorStop(1, 'rgba(245, 158, 11, 0.2)');
             
             let bgColorsGradient = valores.map(val => val >= goal ? gradienteVerde : gradienteAmarillo);
 
             miGrafico = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: etiquetas, datasets: [{ label: 'Ganancia Diaria ($)', data: valores, backgroundColor: bgColorsGradient, borderRadius: 6, borderWidth: 0, hoverBackgroundColor: '#3b82f6' }] },
+                data: { labels: etiquetas, datasets: [{ label: 'Ganancia ($)', data: valores, backgroundColor: bgColorsGradient, borderRadius: 4, borderWidth: 0, hoverBackgroundColor: '#3B82F6' }] },
                 options: {
-                    animation: { duration: 0 },
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(15,23,42,0.95)', titleColor: isLight ? '#0f172a' : '#f8fafc', bodyColor: isLight ? '#0f172a' : '#f8fafc', borderColor: gridColor, borderWidth: 1, titleFont: { size: 12, family: 'Poppins' }, bodyFont: { size: 16, weight: 'bold', family: 'Poppins' }, displayColors: false, padding: 8, cornerRadius: 6, callbacks: { label: function(context) { return '$' + context.parsed.y.toFixed(2); } } } },
+                    animation: { duration: 0 }, responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(21,28,44,0.95)', titleColor: isLight ? '#111827' : '#F8FAFC', bodyColor: isLight ? '#111827' : '#F8FAFC', borderColor: gridColor, borderWidth: 1, titleFont: { size: 12, family: 'Poppins' }, bodyFont: { size: 16, weight: 'bold', family: 'Poppins' }, displayColors: false, padding: 10, cornerRadius: 8, callbacks: { label: function(context) { return '$' + context.parsed.y.toFixed(2); } } } },
                     scales: { y: { beginAtZero: true, grid: { color: gridColor, drawBorder: false }, ticks: { color: textColor, font: { family: 'Poppins', weight: '600', size: 11 }, callback: function(value) { return '$' + value; } } }, x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Poppins', weight: '600', size: 11 } } } }
                 }
             });
         }
 
+        // 📡 RADAR DE DATOS
         let ultimoSync = localStorage.getItem('syncTrigger');
         setInterval(() => {
             let syncActual = localStorage.getItem('syncTrigger');
-            if (syncActual !== ultimoSync) {
-                ultimoSync = syncActual;
-                calcular(); 
-            }
+            if (syncActual !== ultimoSync) { ultimoSync = syncActual; calcular(); }
         }, 1500);
 
         function testSound() { document.getElementById('cashSound').play(); }
         
+        // 💾 EXCEL
         function exportarExcelPro() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
             let wb = XLSX.utils.book_new();
             let totalGanado = 0; let diasExito = 0;
             historial.forEach(h => { let m = parseFloat(h.m); totalGanado += m; if(m >= goal) diasExito++; });
             let wsResumenData = [ ["REPORTE MAESTRO - SPROUTGIGS"], [], ["MÉTRICA", "RESULTADO"], ["Total de Días Trabajados", historial.length], ["Días con Meta Cumplida", diasExito], ["Días con Meta Fallida", historial.length - diasExito], ["Ganancia Histórica Total ($)", totalGanado], ["Total Retirado del Sistema ($)", parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0] ];
-            let wsResumen = XLSX.utils.aoa_to_sheet(wsResumenData);
-            XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen Global");
+            let wsResumen = XLSX.utils.aoa_to_sheet(wsResumenData); XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen Global");
             let mesesAgrupados = {};
             historial.forEach(h => { let nombreMes = MESES[h.mes]; let key = `${nombreMes} ${h.anio}`; if(!mesesAgrupados[key]) mesesAgrupados[key] = []; mesesAgrupados[key].push(h); });
             for(let key in mesesAgrupados) { let datosMes = mesesAgrupados[key]; let wsData = [["FECHA", "GANANCIA ($)", "META ($)", "¿LOGRADO?"]]; let datosOrdenados = [...datosMes].reverse(); datosOrdenados.forEach(h => { let m = parseFloat(h.m); let logrado = m >= goal ? "✅ SÍ" : "❌ NO"; wsData.push([h.f, m, goal, logrado]); }); let ws = XLSX.utils.aoa_to_sheet(wsData); XLSX.utils.book_append_sheet(wb, ws, key); }
             XLSX.writeFile(wb, `SproutGigs_Master_${info.id}.xlsx`);
         }
 
-        document.getElementById('withdrawTarget').addEventListener('blur', function() {
-            if(parseFloat(this.value) < 5) {
-                alert("Jhon, recuerda que el mínimo de retiro en SproutGigs es de $5.00");
-                this.value = 5.00;
-                calcular();
-            }
-        });
-
         document.getElementById('goal').addEventListener('input', calcular);
-        document.getElementById('withdrawTarget').addEventListener('input', calcular); 
-        
         document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
-        let savedRetiro = parseFloat(localStorage.getItem('retiroJhon')) || 5.00;
-        document.getElementById('withdrawTarget').value = savedRetiro < 5 ? 5.00 : savedRetiro;
-        
         calcular();
     </script>
 </body>
