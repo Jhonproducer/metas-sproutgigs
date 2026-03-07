@@ -124,6 +124,14 @@
         
         .text-xl { font-size: 1.15rem; font-weight: 700; } 
         .text-2xl { font-size: 1.4rem; font-weight: 800; } 
+        
+        /* PULSO ROJO PARA EL PRECIO EN VIVO */
+        .pulse-red {
+            display: inline-block; width: 8px; height: 8px; background-color: #ef4444;
+            border-radius: 50%; margin-left: 4px; box-shadow: 0 0 8px #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body data-theme="dark">
@@ -158,9 +166,20 @@
             <div class="panel-info" style="border-color: rgba(245, 158, 11, 0.6); background: rgba(245, 158, 11, 0.05);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <span class="text-xl" style="color: var(--accent-gold);">META RETIRO:</span>
-                    <input type="number" id="withdrawTarget" value="13.00" style="border-color: var(--accent-gold);">
+                    <input type="number" id="withdrawTarget" value="5.00" min="5.00" style="border-color: var(--accent-gold);">
                 </div>
-                <div id="withdrawRemaining" class="text-xl" style="color: var(--text-main); margin-bottom: 10px;">FALTAN $0.00</div>
+                <div id="withdrawRemaining" class="text-xl" style="color: var(--text-main); margin-bottom: 8px;">FALTAN $0.00</div>
+                
+                <div style="background: rgba(16, 185, 129, 0.15); padding: 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: var(--accent-green); font-weight: bold; letter-spacing: 0.5px;">ESTIMADO EN LTC (80%):</span>
+                        <span id="liveLtcPrice" style="font-size: 0.75rem; color: var(--text-muted); font-weight: bold;">Cargando... <span class="pulse-red"></span></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <span id="valNetoLTC" style="font-size: 1.3rem; color: var(--accent-green); font-weight: 800;">$0.00</span>
+                        <span id="valCoinsLTC" style="font-size: 1.1rem; color: var(--accent-gold); font-weight: 800; text-shadow: 0px 2px 4px rgba(0,0,0,0.5);">0.00000 LTC 🪙</span>
+                    </div>
+                </div>
                 
                 <div style="border-top: 1px solid var(--border-color); padding-top: 10px;">
                     <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px;">¿Retiraste Dinero?</span>
@@ -253,31 +272,48 @@
         }
         revisarCambioDeDia();
 
+        // 🌟 INTEGRACIÓN DE LA API BINANCE (LTC/USDT)
+        let precioLTCEnVivo = 0;
+        
+        async function actualizarPrecioLTC() {
+            try {
+                // Llama a la API oficial y pública de Binance
+                const respuesta = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT');
+                const datos = await respuesta.json();
+                precioLTCEnVivo = parseFloat(datos.price);
+                
+                // Actualiza el texto con el punto rojo titilando
+                document.getElementById('liveLtcPrice').innerHTML = `LTC: $${precioLTCEnVivo.toFixed(2)} <span class="pulse-red"></span>`;
+                
+                // Recalcula para mostrar cuántas monedas te tocan inmediatamente
+                calcular();
+            } catch (error) {
+                console.error("Fallo al conectar con Binance:", error);
+                document.getElementById('liveLtcPrice').innerHTML = `LTC: Error 🔴`;
+            }
+        }
+        
+        // Arranca la búsqueda del precio al abrir la página y luego cada 60 segundos
+        actualizarPrecioLTC();
+        setInterval(actualizarPrecioLTC, 60000);
+
         let miGrafico; 
 
-        // 🌟 FUNCIÓN CAJERO (Con opción de Reverso usando negativos)
         function ejecutarRetiro() {
             let monto = parseFloat(document.getElementById('inputRetiro').value);
-            
-            // Si está vacío o es exactamente 0, no hace nada
             if (isNaN(monto) || monto === 0) {
                 alert("Jhon, ingresa un monto diferente de cero.");
                 return;
             }
 
-            // 1. Modifica la base (Si el monto es negativo, suma el dinero de vuelta)
             base -= monto;
             localStorage.setItem('baseJhon', base);
 
-            // 2. Modifica el Historial de Retirado
             let retiradoHistorico = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
             retiradoHistorico += monto;
-            
-            // Seguro: El retirado no puede ser menor a $0
             if (retiradoHistorico < 0) retiradoHistorico = 0; 
             localStorage.setItem('totalRetiradoJhon', retiradoHistorico);
 
-            // 3. Efectos Visuales
             if (monto > 0) {
                 document.getElementById('winSound').play().catch(e=>{});
                 confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#f59e0b', '#10b981', '#ffffff'] });
@@ -285,19 +321,17 @@
                 alert("¡Corrección aplicada! El dinero fue devuelto al sistema.");
             }
 
-            // 4. Limpiar y refrescar
             document.getElementById('inputRetiro').value = "";
             calcular();
         }
 
-        // 🚨 FUNCIÓN DE PÁNICO: BORRAR TODO EL RETIRO Y REVERTIR
         function corregirRetiro() {
-            let confirmacion = confirm("¿Seguro que quieres BORRAR tu historial de retiros? Esto devolverá todo el dinero a tu saldo base. (Úsalo solo si te equivocaste feo probando los botones)");
+            let confirmacion = confirm("¿Seguro que quieres BORRAR tu historial de retiros? Esto devolverá todo el dinero a tu saldo base.");
             if (confirmacion) {
                 let retirado = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
-                base += retirado; // Devuelve el dinero a la base
+                base += retirado; 
                 localStorage.setItem('baseJhon', base);
-                localStorage.setItem('totalRetiradoJhon', 0); // Borra el historial
+                localStorage.setItem('totalRetiradoJhon', 0); 
                 alert("¡Historial de retiros reiniciado a $0.00! Todo volvió a la normalidad.");
                 calcular();
             }
@@ -305,14 +339,28 @@
 
         function calcular() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
-            const wTarget = parseFloat(document.getElementById('withdrawTarget').value) || 13.00;
+            let wTarget = parseFloat(document.getElementById('withdrawTarget').value) || 5.00;
+            
+            if(wTarget < 5) { wTarget = 5.00; document.getElementById('withdrawTarget').value = 5.00; }
+            
             localStorage.setItem('metaJhon', goal); localStorage.setItem('retiroJhon', wTarget);
 
             let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
             let pending = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalActual = earned + pending;
 
-            // 🛡️ ESCUDO ANTI-FUGAS
+            // 🪙 CÁLCULO DE LITECOIN (Dólares y Criptomonedas exactas)
+            let ltcNeto = earned * 0.80;
+            document.getElementById('valNetoLTC').innerText = '$' + ltcNeto.toFixed(2);
+            
+            // Si Binance nos dio el precio, calculamos los LTC. Si no, mostramos ceros.
+            if (precioLTCEnVivo > 0) {
+                let cantidadLTC = ltcNeto / precioLTCEnVivo;
+                document.getElementById('valCoinsLTC').innerText = cantidadLTC.toFixed(5) + ' LTC 🪙';
+            } else {
+                document.getElementById('valCoinsLTC').innerText = '0.00000 LTC 🪙';
+            }
+
             if (totalActual < base) {
                 base = totalActual;
                 localStorage.setItem('baseJhon', base);
@@ -345,8 +393,8 @@
             document.getElementById('valProyeccion').innerText = '$' + proyeccion.toFixed(2);
             document.getElementById('labelHoy').innerText = `HOY (${MESES[info.mesIdx]}):`; 
 
-            const faltaW = Math.max(0, wTarget - totalActual);
-            document.getElementById('withdrawRemaining').innerText = faltaW > 0 ? `FALTAN $${faltaW.toFixed(2)}` : "¡YA PUEDES RETIRAR! 🔥";
+            const faltaW = Math.max(0, wTarget - earned);
+            document.getElementById('withdrawRemaining').innerText = faltaW > 0 ? `FALTAN $${faltaW.toFixed(2)} EN GANADO` : "¡YA PUEDES RETIRAR! 🔥";
 
             const pct = Math.min((ganadoHoy / goal) * 100, 100);
             const fill = document.getElementById('fill');
@@ -423,7 +471,10 @@
         document.getElementById('goal').addEventListener('input', calcular);
         document.getElementById('withdrawTarget').addEventListener('input', calcular);
         document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
-        document.getElementById('withdrawTarget').value = localStorage.getItem('retiroJhon') || 13.00;
+        
+        let savedRetiro = parseFloat(localStorage.getItem('retiroJhon')) || 5.00;
+        document.getElementById('withdrawTarget').value = savedRetiro < 5 ? 5.00 : savedRetiro;
+        
         calcular();
     </script>
 </body>
