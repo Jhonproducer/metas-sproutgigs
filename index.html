@@ -190,29 +190,31 @@
 
         const MESES = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
 
-        function getLondonData() {
+        function getVzlaData() {
             const now = new Date();
-            const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now);
+            
+            // 🛡️ NÚCLEO BLINDADO: Anclado estrictamente a Caracas (VET)
+            const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Caracas', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now);
             const y = parts.find(p => p.type === 'year').value;
             const m = parts.find(p => p.type === 'month').value;
             const d = parts.find(p => p.type === 'day').value;
             const idFecha = `${y}-${m}-${d}`;
             
-            const londonDate = new Date(now.toLocaleString("en-US", {timeZone: "Europe/London"}));
+            const vzlaDate = new Date(now.toLocaleString("en-US", {timeZone: "America/Caracas"}));
             const diasNom = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
             
-            let h = londonDate.getHours(); const am = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
-            const min = londonDate.getMinutes().toString().padStart(2, '0');
-            const diasEnMes = new Date(londonDate.getFullYear(), londonDate.getMonth() + 1, 0).getDate();
+            let h = vzlaDate.getHours(); const am = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+            const min = vzlaDate.getMinutes().toString().padStart(2, '0');
+            const diasEnMes = new Date(vzlaDate.getFullYear(), vzlaDate.getMonth() + 1, 0).getDate();
             
             return { 
-                id: idFecha, mesIdx: londonDate.getMonth(), anio: londonDate.getFullYear(), 
-                diaNom: diasNom[londonDate.getDay()], fecha: `${d}/${m}/${y}`, 
-                hora: `${h}:${min} ${am} (LONDRES)`, diaNumero: londonDate.getDate(), totalDiasMes: diasEnMes
+                id: idFecha, mesIdx: vzlaDate.getMonth(), anio: vzlaDate.getFullYear(), 
+                diaNom: diasNom[vzlaDate.getDay()], fecha: `${d}/${m}/${y}`, 
+                hora: `${h}:${min} ${am}`, diaNumero: vzlaDate.getDate(), totalDiasMes: diasEnMes
             };
         }
 
-        const info = getLondonData();
+        const info = getVzlaData();
         document.getElementById('txtDia').innerText = info.diaNom;
         document.getElementById('txtDateTime').innerText = `${info.fecha} | ${info.hora}`;
         document.body.setAttribute('data-theme', localStorage.getItem('jhonTheme') || 'dark');
@@ -223,13 +225,9 @@
             let historialLimpio = [];
             let fechasVistas = new Set();
             
-            // Filtra solo los que tienen formato de fecha real (ej. 2026-03-29) y desecha basuras como "0.06"
             historialBruto = historialBruto.filter(h => h && h.f && h.f.includes('-') && h.f.length >= 8);
-            
-            // Ordena cronológicamente: lo más nuevo primero
             historialBruto.sort((a, b) => new Date(b.f) - new Date(a.f));
 
-            // Elimina clones dejando solo la primera entrada de cada día
             for (let h of historialBruto) {
                 if (!fechasVistas.has(h.f)) {
                     fechasVistas.add(h.f);
@@ -237,6 +235,21 @@
                 }
             }
             localStorage.setItem('histJhon', JSON.stringify(historialLimpio));
+        }
+
+        // 🚑 PROTOCOLO DE AUTO-CURACIÓN (Detección de viaje en el tiempo)
+        let savedFecha = localStorage.getItem('fechaJhon');
+        if (savedFecha && savedFecha > info.id) {
+            let hist = JSON.parse(localStorage.getItem('histJhon')) || [];
+            if (hist.length > 0 && hist[0].f === savedFecha) {
+                let entradaCorrupta = hist.shift(); 
+                localStorage.setItem('histJhon', JSON.stringify(hist));
+                let b = parseFloat(localStorage.getItem('baseJhon')) || 0;
+                b = Math.max(0, b - parseFloat(entradaCorrupta.m));
+                localStorage.setItem('baseJhon', b);
+            }
+            localStorage.setItem('fechaJhon', info.id);
+            location.reload(); 
         }
 
         let base = parseFloat(localStorage.getItem('baseJhon')) || 0;
