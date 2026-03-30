@@ -33,8 +33,9 @@
         .dashboard-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 18px; }
         
         .header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 16px 24px; border-radius: var(--radius-main); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); }
-        .header h1 { margin: 0; font-size: 1.4rem; color: var(--accent-blue); font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
-        .header p { margin: 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+        /* Ajuste para que la fecha se vea grande y clara */
+        .header h1 { margin: 0; font-size: 1.6rem; color: var(--accent-blue); font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+        .header p { margin: 0; font-size: 1rem; color: var(--text-muted); font-weight: 600; }
         .controls { display: flex; gap: 12px; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
@@ -90,8 +91,8 @@
     <div class="dashboard-container">
         <header class="header">
             <div>
-                <h1 id="txtDia">DÍA</h1>
-                <p id="txtDateTime">--/--/---- | --:--</p>
+                <h1 id="txtDia">FECHA</h1>
+                <p id="txtDateTime">--:--</p>
             </div>
             <div class="controls">
                 <button class="btn btn-excel" onclick="exportarExcelPro()">
@@ -189,55 +190,55 @@
         }
 
         const MESES = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+        const MESES_ABR = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
 
         function getVzlaData() {
             const now = new Date();
+            const options = { timeZone: 'America/Caracas' };
             
-            // 🛡️ NÚCLEO BLINDADO: Anclado estrictamente a Caracas (VET)
-            const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Caracas', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now);
+            // Núcleo Horario Blindado
+            const parts = new Intl.DateTimeFormat('en-US', { ...options, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now);
             const y = parts.find(p => p.type === 'year').value;
             const m = parts.find(p => p.type === 'month').value;
             const d = parts.find(p => p.type === 'day').value;
             const idFecha = `${y}-${m}-${d}`;
             
-            const vzlaDate = new Date(now.toLocaleString("en-US", {timeZone: "America/Caracas"}));
+            const vzlaDate = new Date(now.toLocaleString("en-US", options));
             const diasNom = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
             
             let h = vzlaDate.getHours(); const am = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
             const min = vzlaDate.getMinutes().toString().padStart(2, '0');
             const diasEnMes = new Date(vzlaDate.getFullYear(), vzlaDate.getMonth() + 1, 0).getDate();
             
+            // NUEVO FORMATO DE FECHA: "29 MAR (DOMINGO)"
+            const labelFechaPrincipal = `${d} ${MESES_ABR[vzlaDate.getMonth()]} (${diasNom[vzlaDate.getDay()]})`;
+            
             return { 
                 id: idFecha, mesIdx: vzlaDate.getMonth(), anio: vzlaDate.getFullYear(), 
-                diaNom: diasNom[vzlaDate.getDay()], fecha: `${d}/${m}/${y}`, 
+                diaNom: diasNom[vzlaDate.getDay()], 
+                labelPrincipal: labelFechaPrincipal,
                 hora: `${h}:${min} ${am}`, diaNumero: vzlaDate.getDate(), totalDiasMes: diasEnMes
             };
         }
 
         const info = getVzlaData();
-        document.getElementById('txtDia').innerText = info.diaNom;
-        document.getElementById('txtDateTime').innerText = `${info.fecha} | ${info.hora}`;
+        document.getElementById('txtDia').innerText = info.labelPrincipal;
+        document.getElementById('txtDateTime').innerText = info.hora;
         document.body.setAttribute('data-theme', localStorage.getItem('jhonTheme') || 'dark');
 
-        // 🧹 PROTOCOLO DE SANEAMIENTO DE DATOS (Auto-limpieza de clones y corruptos)
+        // Saneamiento y Auto-curación
         let historialBruto = JSON.parse(localStorage.getItem('histJhon')) || [];
         if (historialBruto.length > 0) {
             let historialLimpio = [];
             let fechasVistas = new Set();
-            
             historialBruto = historialBruto.filter(h => h && h.f && h.f.includes('-') && h.f.length >= 8);
             historialBruto.sort((a, b) => new Date(b.f) - new Date(a.f));
-
             for (let h of historialBruto) {
-                if (!fechasVistas.has(h.f)) {
-                    fechasVistas.add(h.f);
-                    historialLimpio.push(h);
-                }
+                if (!fechasVistas.has(h.f)) { fechasVistas.add(h.f); historialLimpio.push(h); }
             }
             localStorage.setItem('histJhon', JSON.stringify(historialLimpio));
         }
 
-        // 🚑 PROTOCOLO DE AUTO-CURACIÓN (Detección de viaje en el tiempo)
         let savedFecha = localStorage.getItem('fechaJhon');
         if (savedFecha && savedFecha > info.id) {
             let hist = JSON.parse(localStorage.getItem('histJhon')) || [];
@@ -260,12 +261,10 @@
             let e = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
             let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalA = e + p;
-            
             if (ultimaFecha && ultimaFecha !== info.id) {
                 const ganadoAyer = Math.max(0, totalA - base);
                 const dObj = new Date(ultimaFecha + "T12:00:00");
                 historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), mes: dObj.getMonth(), anio: dObj.getFullYear() });
-                if(historial.length > 90) historial.pop(); 
                 localStorage.setItem('histJhon', JSON.stringify(historial));
                 base = totalA; localStorage.setItem('baseJhon', base);
                 ultimaFecha = info.id; localStorage.setItem('fechaJhon', info.id);
@@ -279,14 +278,11 @@
         async function fetchLTCPrice() {
             try {
                 const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT');
-                if(!res.ok) throw new Error("API Error");
                 const data = await res.json();
                 precioLTCEnVivo = parseFloat(data.price);
                 document.getElementById('liveLtcPrice').innerText = `($${precioLTCEnVivo.toFixed(2)})`;
                 calcularMetricas();
-            } catch (err) {
-                document.getElementById('liveLtcPrice').innerText = `(Error)`;
-            }
+            } catch (err) { document.getElementById('liveLtcPrice').innerText = `(Error)`; }
         }
         fetchLTCPrice();
         setInterval(fetchLTCPrice, 60000);
@@ -296,24 +292,21 @@
         function ejecutarRetiro() {
             let monto = parseFloat(document.getElementById('inputRetiro').value);
             let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
-            if (isNaN(monto) || monto <= 0) { alert("Transacción declinada: Monto inválido."); return; }
-            if (monto > earned) { alert("Transacción declinada: Fondos insuficientes en 'En Ganado'."); return; }
-
+            if (isNaN(monto) || monto <= 0) { alert("Monto inválido."); return; }
+            if (monto > earned) { alert("Fondos insuficientes."); return; }
             base -= monto; localStorage.setItem('baseJhon', base);
             let nuevoEarned = Math.max(0, earned - monto);
             localStorage.setItem('lastEarnedJhon', nuevoEarned);
-
             let retiradoHistorico = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
             localStorage.setItem('totalRetiradoJhon', retiradoHistorico + monto);
-
             document.getElementById('winSound').play().catch(e=>{});
-            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#F59E0B', '#10B981', '#FFFFFF'] });
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
             document.getElementById('inputRetiro').value = "";
             calcularMetricas();
         }
 
         function corregirRetiro() {
-            if (confirm("⚠️ ¿Autoriza la reversión completa del historial de retiros? Los fondos volverán al saldo base.")) {
+            if (confirm("⚠️ ¿Restaurar saldo base?")) {
                 let retirado = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
                 base += retirado; localStorage.setItem('baseJhon', base);
                 let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
@@ -326,130 +319,72 @@
         function calcularMetricas() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
             localStorage.setItem('metaJhon', goal);
-
             let e = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
             let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalActual = e + p;
-
             if (totalActual < base) { base = totalActual; localStorage.setItem('baseJhon', base); }
-
             const ganadoHoy = Math.max(0, totalActual - base);
             const hoyRedondeo = Math.round(ganadoHoy * 100) / 100;
-
             const ant = parseFloat(localStorage.getItem('antJhon')) || 0;
             if (hoyRedondeo > ant) { 
                 document.getElementById('cashSound').play().catch(e=>{}); 
-                const bigNumber = document.getElementById('gananciaHoy');
-                bigNumber.style.transform = "scale(1.1)";
-                setTimeout(() => { bigNumber.style.transform = "scale(1)"; }, 200);
+                document.getElementById('gananciaHoy').style.transform = "scale(1.1)";
+                setTimeout(() => { document.getElementById('gananciaHoy').style.transform = "scale(1)"; }, 200);
             }
             localStorage.setItem('antJhon', hoyRedondeo);
-
             document.getElementById('gananciaHoy').innerText = '$' + hoyRedondeo.toFixed(2);
             document.getElementById('valEarned').innerText = '$' + e.toFixed(4);
             document.getElementById('valPending').innerText = '$' + p.toFixed(4);
             document.getElementById('valTotalReal').innerText = '$' + totalActual.toFixed(4);
-            
-            let retiradoHistorico = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
-            document.getElementById('valRetirado').innerText = '$' + retiradoHistorico.toFixed(2);
-
+            document.getElementById('valRetirado').innerText = '$' + (parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0).toFixed(2);
             const pct = Math.min((ganadoHoy / goal) * 100, 100);
-            const fill = document.getElementById('fill');
-            fill.style.width = pct + '%';
-            
-            const msgNode = document.getElementById('message');
-            if(pct < 35) { fill.style.backgroundColor = "var(--accent-red)"; }
-            else if(pct < 99) { fill.style.backgroundColor = "var(--accent-yellow)"; }
-            else { fill.style.backgroundColor = "var(--accent-green)"; }
-
-            if(ganadoHoy >= goal) { msgNode.innerText = "¡OBJETIVO ALCANZADO! 🏆"; msgNode.style.color = "var(--accent-green)"; }
-            else { msgNode.innerText = `Faltan $${(goal - ganadoHoy).toFixed(2)}`; msgNode.style.color = "var(--text-muted)"; }
-
+            document.getElementById('fill').style.width = pct + '%';
+            if(pct < 35) document.getElementById('fill').style.backgroundColor = "var(--accent-red)";
+            else if(pct < 99) document.getElementById('fill').style.backgroundColor = "var(--accent-yellow)";
+            else document.getElementById('fill').style.backgroundColor = "var(--accent-green)";
+            document.getElementById('message').innerText = ganadoHoy >= goal ? "¡OBJETIVO ALCANZADO! 🏆" : `Faltan $${(goal - ganadoHoy).toFixed(2)}`;
             const statusNode = document.getElementById('withdrawStatusText');
-            if (e >= 5) {
-                statusNode.innerHTML = `<span class="dot dot-green"></span> Disponible`;
-                statusNode.style.color = 'var(--accent-green)';
-            } else {
-                statusNode.innerHTML = `<span class="dot dot-red"></span> Faltan $${(5 - e).toFixed(2)}`;
-                statusNode.style.color = 'var(--text-main)';
-            }
-
-            let fee = e * 0.20;
-            let neto = e - fee;
+            if (e >= 5) { statusNode.innerHTML = `<span class="dot dot-green"></span> Disponible`; statusNode.style.color = 'var(--accent-green)'; }
+            else { statusNode.innerHTML = `<span class="dot dot-red"></span> Faltan $${(5 - e).toFixed(2)}`; statusNode.style.color = 'var(--text-main)'; }
+            let fee = e * 0.20; let neto = e - fee;
             document.getElementById('calcFee').innerText = '-$' + fee.toFixed(2);
             document.getElementById('calcNeto').innerText = '$' + neto.toFixed(2);
-            
-            if (precioLTCEnVivo > 0 && e > 0) { document.getElementById('valCoinsLTC').innerText = (neto / precioLTCEnVivo).toFixed(5) + ' LTC 🪙'; } 
-            else { document.getElementById('valCoinsLTC').innerText = '0.00000 LTC 🪙'; }
-
+            if (precioLTCEnVivo > 0 && e > 0) document.getElementById('valCoinsLTC').innerText = (neto / precioLTCEnVivo).toFixed(5) + ' LTC 🪙';
+            else document.getElementById('valCoinsLTC').innerText = '0.00000 LTC 🪙';
             const sumMes = historial.filter(h => h.mes === info.mesIdx && h.anio === info.anio).reduce((a, h) => a + parseFloat(h.m), 0) + hoyRedondeo;
             document.getElementById('valMes').innerText = '$' + sumMes.toFixed(2);
             document.getElementById('valProyeccion').innerText = '$' + ((sumMes / info.diaNumero) * info.totalDiasMes).toFixed(2);
-
             renderizarGrafico(goal);
         }
 
         function renderizarGrafico(goal) {
             const ctx = document.getElementById('historialChart').getContext('2d');
             if (miGrafico) { miGrafico.destroy(); } 
-
             let datosMesActual = historial.filter(h => h.mes === info.mesIdx && h.anio === info.anio).reverse();
-            let labels = datosMesActual.map(h => { let p = h.f.split('-'); return `${p[2]}/${p[1]}`; });
-            let values = datosMesActual.map(h => parseFloat(h.m));
             
+            // Generamos etiquetas con el nuevo formato para el gráfico
+            let labels = datosMesActual.map(h => { 
+                let p = h.f.split('-'); 
+                let dObj = new Date(h.f + "T12:00:00");
+                const diasSemanaAbr = ["DOM", "LUN", "MAR", "MIE", "JUE", "VIE", "SAB"];
+                return `${p[2]} (${diasSemanaAbr[dObj.getDay()]})`; // Ejemplo: "28 (VIE)"
+            });
+            
+            let values = datosMesActual.map(h => parseFloat(h.m));
             const isLight = document.body.getAttribute('data-theme') === 'light';
-            const gridC = isLight ? '#E5E7EB' : '#2A3241';
-            const textC = isLight ? '#6B7280' : '#94A3B8';
-
             let gradientFill = ctx.createLinearGradient(0, 0, 0, 230);
             gradientFill.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
             gradientFill.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
-
             let pointColors = values.map(v => v >= goal ? '#10B981' : '#F59E0B');
 
             miGrafico = new Chart(ctx, {
                 type: 'line',
-                data: { 
-                    labels: labels, 
-                    datasets: [{ 
-                        label: 'Ganancia Diaria ($)', 
-                        data: values, 
-                        backgroundColor: gradientFill, 
-                        borderColor: '#3B82F6', 
-                        borderWidth: 3, 
-                        pointBackgroundColor: pointColors, 
-                        pointBorderColor: isLight ? '#FFFFFF' : '#151C2C', 
-                        pointBorderWidth: 2,
-                        pointRadius: 5, 
-                        pointHoverRadius: 8, 
-                        fill: true, 
-                        tension: 0.4 
-                    }] 
-                },
+                data: { labels: labels, datasets: [{ label: 'Ganancia Diaria ($)', data: values, backgroundColor: gradientFill, borderColor: '#3B82F6', borderWidth: 3, pointBackgroundColor: pointColors, pointBorderColor: isLight ? '#FFFFFF' : '#151C2C', pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 8, fill: true, tension: 0.4 }] },
                 options: {
                     interaction: { mode: 'index', intersect: false },
-                    animation: { duration: 600, easing: 'easeOutQuart' }, 
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false }, 
-                        tooltip: { 
-                            backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(21,28,44,0.95)', 
-                            titleColor: isLight ? '#111827' : '#F8FAFC', bodyColor: isLight ? '#111827' : '#F8FAFC', 
-                            borderColor: gridC, borderWidth: 1, titleFont: { size: 12, family: 'Poppins' }, 
-                            bodyFont: { size: 16, weight: 'bold', family: 'Poppins' }, displayColors: false, 
-                            padding: 10, cornerRadius: 8, callbacks: { label: function(context) { return '$' + context.parsed.y.toFixed(2); } } 
-                        } 
-                    },
-                    scales: { 
-                        y: { 
-                            beginAtZero: true, grid: { color: gridC, drawBorder: false }, 
-                            ticks: { color: textC, font: { family: 'Poppins', weight: '600' }, callback: function(v) { return '$' + v; } } 
-                        }, 
-                        x: { 
-                            grid: { display: false }, 
-                            ticks: { color: textC, font: { family: 'Poppins', weight: '600' }, maxRotation: 0, maxTicksLimit: 12 } 
-                        } 
-                    }
+                    animation: { duration: 600 }, responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(21,28,44,0.95)', titleColor: isLight ? '#111827' : '#F8FAFC', bodyColor: isLight ? '#111827' : '#F8FAFC', borderColor: isLight ? '#E5E7EB' : '#2A3241', borderWidth: 1, titleFont: { size: 12 }, bodyFont: { size: 16, weight: 'bold' }, padding: 10, cornerRadius: 8, callbacks: { label: function(context) { return '$' + context.parsed.y.toFixed(2); } } } },
+                    scales: { y: { beginAtZero: true, grid: { color: isLight ? '#E5E7EB' : '#2A3241', drawBorder: false }, ticks: { color: isLight ? '#6B7280' : '#94A3B8', font: { family: 'Poppins', weight: '600' }, callback: function(v) { return '$' + v; } } }, x: { grid: { display: false }, ticks: { color: isLight ? '#6B7280' : '#94A3B8', font: { family: 'Poppins', weight: '600' }, maxRotation: 0, maxTicksLimit: 12 } } }
                 }
             });
         }
@@ -465,10 +400,7 @@
             let wb = XLSX.utils.book_new();
             let totalG = 0; let dExito = 0;
             historial.forEach(h => { let m = parseFloat(h.m); totalG += m; if(m >= goal) dExito++; });
-            
-            let wsR = XLSX.utils.aoa_to_sheet([ ["REPORTE SPROUTGIGS"], [], ["MÉTRICA", "RESULTADO"], ["Total Días", historial.length], ["Días Meta Cumplida", dExito], ["Total Histórico ($)", totalG], ["Retirado Histórico ($)", parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0] ]);
-            XLSX.utils.book_append_sheet(wb, wsR, "Resumen Global");
-            
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([["REPORTE SPROUTGIGS"], [], ["MÉTRICA", "RESULTADO"], ["Total Días", historial.length], ["Días Meta Cumplida", dExito], ["Total Histórico ($)", totalG], ["Retirado Histórico ($)", parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0]]), "Resumen Global");
             let mesesGrp = {};
             historial.forEach(h => { let k = `${MESES[h.mes]} ${h.anio}`; if(!mesesGrp[k]) mesesGrp[k] = []; mesesGrp[k].push(h); });
             for(let k in mesesGrp) { let d = [...mesesGrp[k]].reverse(); let wsD = [["FECHA", "GANANCIA ($)", "META ($)", "¿LOGRADO?"]]; d.forEach(h => { let m = parseFloat(h.m); wsD.push([h.f, m, goal, m >= goal ? "✅ SÍ" : "❌ NO"]); }); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsD), k); }
