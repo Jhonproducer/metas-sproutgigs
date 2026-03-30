@@ -368,14 +368,11 @@
             renderizarGrafico(goal);
         }
 
-        // 📈 RENDERIZADO DE GRÁFICO (Chart.js) - ACTUALIZADO A SPLINE AREA CHART
         function renderizarGrafico(goal) {
             const ctx = document.getElementById('historialChart').getContext('2d');
             if (miGrafico) { miGrafico.destroy(); } 
 
-            // 1. FILTRADO ESTRICTO MENSUAL (Solo muestra días de este mes)
             let datosMesActual = historial.filter(h => h.mes === info.mesIdx && h.anio === info.anio).reverse();
-            
             let labels = datosMesActual.map(h => { let p = h.f.split('-'); return `${p[2]}/${p[1]}`; });
             let values = datosMesActual.map(h => parseFloat(h.m));
             
@@ -383,35 +380,38 @@
             const gridC = isLight ? '#E5E7EB' : '#2A3241';
             const textC = isLight ? '#6B7280' : '#94A3B8';
 
-            // 2. DISEÑO FINTECH: Degradado de fondo para el Área
             let gradientFill = ctx.createLinearGradient(0, 0, 0, 230);
-            gradientFill.addColorStop(0, 'rgba(59, 130, 246, 0.4)'); // Azul transparente arriba
-            gradientFill.addColorStop(1, 'rgba(59, 130, 246, 0.0)'); // Transparente abajo
+            gradientFill.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+            gradientFill.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
 
-            // 3. PUNTOS INTELIGENTES: Verde si logras la meta, Naranja si fallas
             let pointColors = values.map(v => v >= goal ? '#10B981' : '#F59E0B');
 
             miGrafico = new Chart(ctx, {
-                type: 'line', // Cambiado de 'bar' a 'line'
+                type: 'line',
                 data: { 
                     labels: labels, 
                     datasets: [{ 
                         label: 'Ganancia Diaria ($)', 
                         data: values, 
-                        backgroundColor: gradientFill, // Área debajo de la curva
-                        borderColor: '#3B82F6', // Línea azul principal
+                        backgroundColor: gradientFill, 
+                        borderColor: '#3B82F6', 
                         borderWidth: 3, 
-                        pointBackgroundColor: pointColors, // Color del punto dinámico
-                        pointBorderColor: isLight ? '#FFFFFF' : '#151C2C', // Borde del punto como el fondo
+                        pointBackgroundColor: pointColors, 
+                        pointBorderColor: isLight ? '#FFFFFF' : '#151C2C', 
                         pointBorderWidth: 2,
-                        pointRadius: 5, // Tamaño de los puntos
-                        pointHoverRadius: 7,
-                        fill: true, // Activa el modo Área
-                        tension: 0.4 // Hace que la línea sea CURVA y SUAVE
+                        pointRadius: 5, 
+                        pointHoverRadius: 8, // PUNTO MÁS GRANDE AL PASAR EL MOUSE
+                        fill: true, 
+                        tension: 0.4 
                     }] 
                 },
                 options: {
-                    animation: { duration: 600, easing: 'easeOutQuart' }, // Animación de entrada
+                    // 🧲 EL MODO IMÁN: ESTA ES LA MAGIA QUE PEDISTE
+                    interaction: {
+                        mode: 'index',
+                        intersect: false, // ¡Ya no tienes que tocar el punto exacto!
+                    },
+                    animation: { duration: 600, easing: 'easeOutQuart' }, 
                     responsive: true, maintainAspectRatio: false,
                     plugins: { 
                         legend: { display: false }, 
@@ -430,12 +430,7 @@
                         }, 
                         x: { 
                             grid: { display: false }, 
-                            ticks: { 
-                                color: textC, 
-                                font: { family: 'Poppins', weight: '600' },
-                                maxRotation: 0, // Prohíbe que el texto se incline
-                                maxTicksLimit: 12 // Evita que se amontonen las fechas si hay muchas
-                            } 
+                            ticks: { color: textC, font: { family: 'Poppins', weight: '600' }, maxRotation: 0, maxTicksLimit: 12 } 
                         } 
                     }
                 }
