@@ -217,18 +217,26 @@
         document.getElementById('txtDateTime').innerText = `${info.fecha} | ${info.hora}`;
         document.body.setAttribute('data-theme', localStorage.getItem('jhonTheme') || 'dark');
 
-        let savedFecha = localStorage.getItem('fechaJhon');
-        if (savedFecha && savedFecha > info.id) {
-            let hist = JSON.parse(localStorage.getItem('histJhon')) || [];
-            if (hist.length > 0 && hist[0].f === info.id) {
-                let entradaCorrupta = hist.shift(); 
-                localStorage.setItem('histJhon', JSON.stringify(hist));
-                let b = parseFloat(localStorage.getItem('baseJhon')) || 0;
-                b = Math.max(0, b - parseFloat(entradaCorrupta.m));
-                localStorage.setItem('baseJhon', b);
+        // 🧹 PROTOCOLO DE SANEAMIENTO DE DATOS (Auto-limpieza de clones y corruptos)
+        let historialBruto = JSON.parse(localStorage.getItem('histJhon')) || [];
+        if (historialBruto.length > 0) {
+            let historialLimpio = [];
+            let fechasVistas = new Set();
+            
+            // Filtra solo los que tienen formato de fecha real (ej. 2026-03-29) y desecha basuras como "0.06"
+            historialBruto = historialBruto.filter(h => h && h.f && h.f.includes('-') && h.f.length >= 8);
+            
+            // Ordena cronológicamente: lo más nuevo primero
+            historialBruto.sort((a, b) => new Date(b.f) - new Date(a.f));
+
+            // Elimina clones dejando solo la primera entrada de cada día
+            for (let h of historialBruto) {
+                if (!fechasVistas.has(h.f)) {
+                    fechasVistas.add(h.f);
+                    historialLimpio.push(h);
+                }
             }
-            localStorage.setItem('fechaJhon', info.id);
-            location.reload(); 
+            localStorage.setItem('histJhon', JSON.stringify(historialLimpio));
         }
 
         let base = parseFloat(localStorage.getItem('baseJhon')) || 0;
@@ -400,17 +408,13 @@
                         pointBorderColor: isLight ? '#FFFFFF' : '#151C2C', 
                         pointBorderWidth: 2,
                         pointRadius: 5, 
-                        pointHoverRadius: 8, // PUNTO MÁS GRANDE AL PASAR EL MOUSE
+                        pointHoverRadius: 8, 
                         fill: true, 
                         tension: 0.4 
                     }] 
                 },
                 options: {
-                    // 🧲 EL MODO IMÁN: ESTA ES LA MAGIA QUE PEDISTE
-                    interaction: {
-                        mode: 'index',
-                        intersect: false, // ¡Ya no tienes que tocar el punto exacto!
-                    },
+                    interaction: { mode: 'index', intersect: false },
                     animation: { duration: 600, easing: 'easeOutQuart' }, 
                     responsive: true, maintainAspectRatio: false,
                     plugins: { 
