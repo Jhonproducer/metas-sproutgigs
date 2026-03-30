@@ -6,132 +6,62 @@
     <title>Jhonproducer - Terminal Financiera</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
-        /* 🎨 SISTEMA DE DISEÑO BASE (Design System) */
         :root {
-            --bg-page: #0B1121;
-            --bg-card: #151C2C;
-            --bg-input: #1E293B;
-            --text-main: #F8FAFC;
-            --text-muted: #94A3B8;
-            --border-color: #2A3241;
-            --accent-blue: #3B82F6;
-            --accent-green: #10B981;
-            --accent-yellow: #F59E0B;
-            --accent-red: #EF4444;
+            --bg-page: #0B1121; --bg-card: #151C2C; --bg-input: #1E293B;
+            --text-main: #F8FAFC; --text-muted: #94A3B8; --border-color: #2A3241;
+            --accent-blue: #3B82F6; --accent-green: #10B981;
+            --accent-yellow: #F59E0B; --accent-red: #EF4444;
             --shadow-card: 0 8px 25px -8px rgba(0,0,0,0.6);
-            --radius-main: 16px;
-            --radius-sm: 8px;
+            --radius-main: 16px; --radius-sm: 8px;
         }
-        
         [data-theme="light"] {
-            --bg-page: #F3F4F6;
-            --bg-card: #FFFFFF;
-            --bg-input: #F9FAFB;
-            --text-main: #111827;
-            --text-muted: #6B7280;
-            --border-color: #E5E7EB;
+            --bg-page: #F3F4F6; --bg-card: #FFFFFF; --bg-input: #F9FAFB;
+            --text-main: #111827; --text-muted: #6B7280; --border-color: #E5E7EB;
             --shadow-card: 0 8px 20px -5px rgba(0,0,0,0.05);
         }
-
-        /* 📐 ESTRUCTURA MAESTRA */
         * { box-sizing: border-box; }
-        
         body { 
-            background: var(--bg-page); color: var(--text-main); 
-            font-family: 'Poppins', sans-serif; 
-            margin: 0; padding: 20px; 
-            display: flex; justify-content: center; align-items: flex-start;
-            min-height: 100vh; overflow-y: auto; overflow-x: hidden;
-            transition: background 0.3s ease;
+            background: var(--bg-page); color: var(--text-main); font-family: 'Poppins', sans-serif; 
+            margin: 0; padding: 20px; display: flex; justify-content: center; align-items: flex-start;
+            min-height: 100vh; overflow-y: auto; overflow-x: hidden; transition: background 0.3s ease;
         }
-
-        .dashboard-container {
-            width: 100%; max-width: 1100px;
-            display: flex; flex-direction: column; gap: 18px;
-        }
-
-        /* 🔝 CABECERA */
-        .header {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-card); padding: 16px 24px;
-            border-radius: var(--radius-main); border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-card);
-        }
-        .header h1 { margin: 0; font-size: 1.4rem; color: var(--accent-blue); font-weight: 800; letter-spacing: 0.5px; }
+        .dashboard-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 18px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 16px 24px; border-radius: var(--radius-main); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); }
+        .header h1 { margin: 0; font-size: 1.4rem; color: var(--accent-blue); font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
         .header p { margin: 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
         .controls { display: flex; gap: 12px; }
 
-        /* 💳 TARJETAS SUPERIORES (CSS Grid Estricto) */
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px;
-        }
-        .stat-card {
-            background: var(--bg-card); border: 1px solid var(--border-color);
-            border-radius: var(--radius-main); padding: 18px;
-            box-shadow: var(--shadow-card);
-            display: flex; flex-direction: column; justify-content: center;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-main); padding: 18px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: center; }
         .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .stat-value { font-size: 1.7rem; font-weight: 800; line-height: 1.2; }
 
-        /* 📊 BLOQUE CENTRAL */
-        .main-grid {
-            display: grid; grid-template-columns: 330px 1fr; gap: 18px;
-        }
-        .card-panel {
-            background: var(--bg-card); border: 1px solid var(--border-color);
-            border-radius: var(--radius-main); padding: 20px;
-            box-shadow: var(--shadow-card);
-            display: flex; flex-direction: column; gap: 15px; /* Flujo natural para evitar fragmentación */
-        }
+        .main-grid { display: grid; grid-template-columns: 330px 1fr; gap: 18px; }
+        .card-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-main); padding: 20px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 15px; }
         
-        /* SOLUCIÓN AL BUG CHROMIUM: Color sólido + Sombra */
-        .big-money { 
-            font-size: 4.5rem; font-weight: 800; line-height: 1.1; margin: 10px 0;
-            text-align: center;
-            color: var(--accent-yellow);
-            text-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        .big-money { font-size: 4.5rem; font-weight: 800; line-height: 1.1; margin: 10px 0; text-align: center; color: var(--accent-yellow); text-shadow: 0 4px 15px rgba(245, 158, 11, 0.25); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-        /* BARRA DE PROGRESO */
         .progress-wrapper { text-align: center; }
         .progress-msg { font-size: 1.1rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
         .progress-track { background: var(--bg-input); border-radius: 50px; height: 14px; width: 100%; overflow: hidden; border: 1px solid var(--border-color); }
         .progress-fill { height: 100%; width: 0%; transition: width 0.8s ease, background-color 0.4s ease; }
         
-        /* INPUT META */
-        .goal-row { 
-            display: flex; justify-content: space-between; align-items: center; 
-            background: var(--bg-input); padding: 10px 15px; 
-            border-radius: var(--radius-sm); border: 1px solid var(--border-color); 
-        }
+        .goal-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-input); padding: 10px 15px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); }
         .goal-row span { font-weight: 600; font-size: 0.95rem; color: var(--text-muted); }
-        .goal-input { 
-            background: transparent; border: none; color: var(--text-main); 
-            font-size: 1.2rem; font-weight: 700; width: 70px; text-align: right; outline: none; 
-            font-family: 'Poppins', sans-serif; border-bottom: 2px solid transparent; transition: border 0.2s;
-        }
+        .goal-input { background: transparent; border: none; color: var(--text-main); font-size: 1.2rem; font-weight: 700; width: 70px; text-align: right; outline: none; font-family: 'Poppins', sans-serif; border-bottom: 2px solid transparent; transition: border 0.2s; }
         .goal-input:focus { border-bottom: 2px solid var(--accent-blue); }
 
-        /* GRÁFICO */
         .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
         .chart-header span { font-weight: 700; font-size: 1.1rem; }
         .chart-container { position: relative; height: 230px; width: 100%; }
 
-        /* 🏦 TERMINAL DE FINANZAS (CSS Grid Estricto 5 Columnas) */
-        .finance-panel {
-            background: var(--bg-card); border: 1px solid var(--border-color);
-            border-radius: var(--radius-main); padding: 20px 24px;
-            box-shadow: var(--shadow-card);
-            display: grid; grid-template-columns: 1.2fr 1fr 1fr 1.5fr auto; gap: 20px; align-items: center;
-        }
+        .finance-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-main); padding: 20px 24px; box-shadow: var(--shadow-card); display: grid; grid-template-columns: 1.2fr 1fr 1fr 1.5fr auto; gap: 20px; align-items: center; }
         .f-col { display: flex; flex-direction: column; border-right: 1px solid var(--border-color); padding-right: 15px; }
         .f-col:last-child { border-right: none; padding-right: 0; }
         .f-title { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
@@ -139,21 +69,10 @@
         
         .action-group { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; border-right: none;}
         .action-inputs { display: flex; gap: 8px; }
-        .action-inputs input {
-            background: var(--bg-input); border: 1px solid var(--border-color);
-            color: var(--text-main); padding: 8px 12px; border-radius: var(--radius-sm);
-            font-size: 1rem; font-weight: 700; width: 100px; text-align: center; outline: none;
-            font-family: 'Poppins', sans-serif; transition: border 0.2s;
-        }
+        .action-inputs input { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 12px; border-radius: var(--radius-sm); font-size: 1rem; font-weight: 700; width: 100px; text-align: center; outline: none; font-family: 'Poppins', sans-serif; transition: border 0.2s; }
         .action-inputs input:focus { border-color: var(--accent-gold); }
 
-        /* BOTONES INTERFAZ */
-        .btn {
-            padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer;
-            text-transform: uppercase; font-size: 0.85rem; border: none; transition: all 0.2s ease;
-            font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 6px;
-            justify-content: center;
-        }
+        .btn { padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; border: none; transition: all 0.2s ease; font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 6px; justify-content: center; }
         .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
         .btn-outline:hover { background: var(--bg-input); color: var(--accent-blue); border-color: var(--accent-blue); }
         .btn-excel { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
@@ -161,18 +80,14 @@
         .btn-withdraw { background: linear-gradient(135deg, var(--accent-gold), #d97706); color: white; padding: 8px 20px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.25); }
         .btn-withdraw:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.4); }
 
-        /* UTILIDADES VISUALES */
         .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
         .dot-green { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); animation: pulse 2s infinite; }
         .dot-red { background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.8; } }
-
     </style>
 </head>
 <body data-theme="dark">
-
     <div class="dashboard-container">
-        
         <header class="header">
             <div>
                 <h1 id="txtDia">DÍA</h1>
@@ -212,12 +127,10 @@
                     <span class="stat-label" style="color: var(--accent-yellow);">TRABAJO DE HOY</span>
                     <div class="big-money" id="gananciaHoy">$0.00</div>
                 </div>
-                
                 <div class="progress-wrapper">
                     <div class="progress-msg" id="message">---</div>
                     <div class="progress-track"><div class="progress-fill" id="fill"></div></div>
                 </div>
-                
                 <div class="goal-row">
                     <span>META DIARIA: $</span>
                     <input type="number" id="goal" class="goal-input" value="1.00" step="0.10">
@@ -229,29 +142,23 @@
                     <span style="color: var(--text-main);">Mes Actual: <span id="valMes" style="color: var(--accent-green);">$0.00</span></span>
                     <span style="color: var(--text-muted);">Proyección: <span id="valProyeccion" style="color: var(--accent-blue);">$0.00 🚀</span></span>
                 </div>
-                <div class="chart-container">
-                    <canvas id="historialChart"></canvas>
-                </div>
+                <div class="chart-container"><canvas id="historialChart"></canvas></div>
             </div>
         </section>
 
         <section class="finance-panel">
-            
             <div class="f-col">
                 <span class="f-title">Status SproutGigs</span>
                 <span id="withdrawStatusText" class="f-val"><span class="dot dot-red"></span> Verificando...</span>
             </div>
-            
             <div class="f-col">
                 <span class="f-title">Comisión (20%)</span>
                 <span id="calcFee" class="f-val" style="color: var(--accent-red);">-$0.00</span>
             </div>
-
             <div class="f-col">
                 <span class="f-title">Neto a Recibir</span>
                 <span id="calcNeto" class="f-val" style="color: var(--accent-green);">$0.00</span>
             </div>
-            
             <div class="f-col">
                 <span class="f-title" style="display: flex; justify-content: space-between;">
                     <span>Equivalente Binance</span>
@@ -259,7 +166,6 @@
                 </span>
                 <span id="valCoinsLTC" class="f-val" style="color: var(--accent-gold);">0.00000 LTC 🪙</span>
             </div>
-
             <div class="f-col action-group">
                 <span onclick="corregirRetiro()" style="font-size: 0.65rem; color: var(--accent-red); cursor: pointer; text-decoration: underline; font-weight: 700;">Deshacer Error</span>
                 <div class="action-inputs">
@@ -267,16 +173,13 @@
                     <button class="btn btn-withdraw" onclick="ejecutarRetiro()">Retirar</button>
                 </div>
             </div>
-
         </section>
-
     </div>
 
     <audio id="cashSound" src="https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3" preload="auto"></audio>
     <audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
 
     <script>
-        // ⚙️ INICIALIZACIÓN E INFRAESTRUCTURA DE DATOS
         function toggleTheme() {
             const b = document.body;
             const t = b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -287,24 +190,46 @@
 
         const MESES = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
 
-        function getVzlaData() {
-            const ahora = new Date();
-            const vzla = new Date(ahora.getTime() + (ahora.getTimezoneOffset() * 60000) - (4 * 3600000));
-            const dias = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
-            let h = vzla.getHours(); const am = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
-            const m = vzla.getMinutes().toString().padStart(2, '0');
-            const diasEnMes = new Date(vzla.getFullYear(), vzla.getMonth() + 1, 0).getDate();
+        function getLondonData() {
+            const now = new Date();
+            const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now);
+            const y = parts.find(p => p.type === 'year').value;
+            const m = parts.find(p => p.type === 'month').value;
+            const d = parts.find(p => p.type === 'day').value;
+            const idFecha = `${y}-${m}-${d}`;
+            
+            const londonDate = new Date(now.toLocaleString("en-US", {timeZone: "Europe/London"}));
+            const diasNom = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
+            
+            let h = londonDate.getHours(); const am = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+            const min = londonDate.getMinutes().toString().padStart(2, '0');
+            const diasEnMes = new Date(londonDate.getFullYear(), londonDate.getMonth() + 1, 0).getDate();
+            
             return { 
-                id: vzla.toISOString().split('T')[0], mesIdx: vzla.getMonth(), anio: vzla.getFullYear(), 
-                diaNom: dias[vzla.getDay()], fecha: vzla.toLocaleDateString('es-VE'), hora: `${h}:${m} ${am}`,
-                diaNumero: vzla.getDate(), totalDiasMes: diasEnMes
+                id: idFecha, mesIdx: londonDate.getMonth(), anio: londonDate.getFullYear(), 
+                diaNom: diasNom[londonDate.getDay()], fecha: `${d}/${m}/${y}`, 
+                hora: `${h}:${min} ${am} (LONDRES)`, diaNumero: londonDate.getDate(), totalDiasMes: diasEnMes
             };
         }
 
-        const info = getVzlaData();
+        const info = getLondonData();
         document.getElementById('txtDia').innerText = info.diaNom;
         document.getElementById('txtDateTime').innerText = `${info.fecha} | ${info.hora}`;
         document.body.setAttribute('data-theme', localStorage.getItem('jhonTheme') || 'dark');
+
+        let savedFecha = localStorage.getItem('fechaJhon');
+        if (savedFecha && savedFecha > info.id) {
+            let hist = JSON.parse(localStorage.getItem('histJhon')) || [];
+            if (hist.length > 0 && hist[0].f === info.id) {
+                let entradaCorrupta = hist.shift(); 
+                localStorage.setItem('histJhon', JSON.stringify(hist));
+                let b = parseFloat(localStorage.getItem('baseJhon')) || 0;
+                b = Math.max(0, b - parseFloat(entradaCorrupta.m));
+                localStorage.setItem('baseJhon', b);
+            }
+            localStorage.setItem('fechaJhon', info.id);
+            location.reload(); 
+        }
 
         let base = parseFloat(localStorage.getItem('baseJhon')) || 0;
         let ultimaFecha = localStorage.getItem('fechaJhon');
@@ -317,8 +242,8 @@
             
             if (ultimaFecha && ultimaFecha !== info.id) {
                 const ganadoAyer = Math.max(0, totalA - base);
-                const d = new Date(ultimaFecha + "T12:00:00");
-                historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), mes: d.getMonth(), anio: d.getFullYear() });
+                const dObj = new Date(ultimaFecha + "T12:00:00");
+                historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), mes: dObj.getMonth(), anio: dObj.getFullYear() });
                 if(historial.length > 90) historial.pop(); 
                 localStorage.setItem('histJhon', JSON.stringify(historial));
                 base = totalA; localStorage.setItem('baseJhon', base);
@@ -329,7 +254,6 @@
         }
         auditarCierreDia();
 
-        // 📈 INTEGRACIÓN API BINANCE
         let precioLTCEnVivo = 0;
         async function fetchLTCPrice() {
             try {
@@ -341,7 +265,6 @@
                 calcularMetricas();
             } catch (err) {
                 document.getElementById('liveLtcPrice').innerText = `(Error)`;
-                console.error("Fallo de conexión API Binance");
             }
         }
         fetchLTCPrice();
@@ -349,15 +272,12 @@
 
         let miGrafico; 
 
-        // 🔒 MÓDULO TRANSACCIONAL (Retiros y Reversos)
         function ejecutarRetiro() {
             let monto = parseFloat(document.getElementById('inputRetiro').value);
             let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
-            
             if (isNaN(monto) || monto <= 0) { alert("Transacción declinada: Monto inválido."); return; }
             if (monto > earned) { alert("Transacción declinada: Fondos insuficientes en 'En Ganado'."); return; }
 
-            // Ajuste transaccional estricto
             base -= monto; localStorage.setItem('baseJhon', base);
             let nuevoEarned = Math.max(0, earned - monto);
             localStorage.setItem('lastEarnedJhon', nuevoEarned);
@@ -367,7 +287,6 @@
 
             document.getElementById('winSound').play().catch(e=>{});
             confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#F59E0B', '#10B981', '#FFFFFF'] });
-
             document.getElementById('inputRetiro').value = "";
             calcularMetricas();
         }
@@ -376,16 +295,13 @@
             if (confirm("⚠️ ¿Autoriza la reversión completa del historial de retiros? Los fondos volverán al saldo base.")) {
                 let retirado = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
                 base += retirado; localStorage.setItem('baseJhon', base);
-                
                 let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
                 localStorage.setItem('lastEarnedJhon', earned + retirado);
                 localStorage.setItem('totalRetiradoJhon', 0); 
-                
                 calcularMetricas();
             }
         }
 
-        // 🧠 MOTOR DE PROCESAMIENTO CENTRAL
         function calcularMetricas() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
             localStorage.setItem('metaJhon', goal);
@@ -394,13 +310,11 @@
             let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalActual = e + p;
 
-            // Escudo Anti-Fugas de Capital
             if (totalActual < base) { base = totalActual; localStorage.setItem('baseJhon', base); }
 
             const ganadoHoy = Math.max(0, totalActual - base);
             const hoyRedondeo = Math.round(ganadoHoy * 100) / 100;
 
-            // Detección de Inyección de Capital
             const ant = parseFloat(localStorage.getItem('antJhon')) || 0;
             if (hoyRedondeo > ant) { 
                 document.getElementById('cashSound').play().catch(e=>{}); 
@@ -410,7 +324,6 @@
             }
             localStorage.setItem('antJhon', hoyRedondeo);
 
-            // Renderizado de UI Principal
             document.getElementById('gananciaHoy').innerText = '$' + hoyRedondeo.toFixed(2);
             document.getElementById('valEarned').innerText = '$' + e.toFixed(4);
             document.getElementById('valPending').innerText = '$' + p.toFixed(4);
@@ -419,7 +332,6 @@
             let retiradoHistorico = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
             document.getElementById('valRetirado').innerText = '$' + retiradoHistorico.toFixed(2);
 
-            // Análisis de Progreso
             const pct = Math.min((ganadoHoy / goal) * 100, 100);
             const fill = document.getElementById('fill');
             fill.style.width = pct + '%';
@@ -432,7 +344,6 @@
             if(ganadoHoy >= goal) { msgNode.innerText = "¡OBJETIVO ALCANZADO! 🏆"; msgNode.style.color = "var(--accent-green)"; }
             else { msgNode.innerText = `Faltan $${(goal - ganadoHoy).toFixed(2)}`; msgNode.style.color = "var(--text-muted)"; }
 
-            // Cálculos Financieros Terminal Inferior
             const statusNode = document.getElementById('withdrawStatusText');
             if (e >= 5) {
                 statusNode.innerHTML = `<span class="dot dot-green"></span> Disponible`;
@@ -447,13 +358,9 @@
             document.getElementById('calcFee').innerText = '-$' + fee.toFixed(2);
             document.getElementById('calcNeto').innerText = '$' + neto.toFixed(2);
             
-            if (precioLTCEnVivo > 0 && e > 0) {
-                document.getElementById('valCoinsLTC').innerText = (neto / precioLTCEnVivo).toFixed(5) + ' LTC 🪙';
-            } else {
-                document.getElementById('valCoinsLTC').innerText = '0.00000 LTC 🪙';
-            }
+            if (precioLTCEnVivo > 0 && e > 0) { document.getElementById('valCoinsLTC').innerText = (neto / precioLTCEnVivo).toFixed(5) + ' LTC 🪙'; } 
+            else { document.getElementById('valCoinsLTC').innerText = '0.00000 LTC 🪙'; }
 
-            // Cálculos Históricos Mensuales
             const sumMes = historial.filter(h => h.mes === info.mesIdx && h.anio === info.anio).reduce((a, h) => a + parseFloat(h.m), 0) + hoyRedondeo;
             document.getElementById('valMes').innerText = '$' + sumMes.toFixed(2);
             document.getElementById('valProyeccion').innerText = '$' + ((sumMes / info.diaNumero) * info.totalDiasMes).toFixed(2);
@@ -461,42 +368,86 @@
             renderizarGrafico(goal);
         }
 
-        // 📊 RENDERIZADO DE GRÁFICO (Chart.js)
+        // 📈 RENDERIZADO DE GRÁFICO (Chart.js) - ACTUALIZADO A SPLINE AREA CHART
         function renderizarGrafico(goal) {
             const ctx = document.getElementById('historialChart').getContext('2d');
             if (miGrafico) { miGrafico.destroy(); } 
 
-            let datosGrafico = historial.slice(0, 30).reverse();
-            let labels = datosGrafico.map(h => { let p = h.f.split('-'); return `${p[2]}/${p[1]}`; });
-            let values = datosGrafico.map(h => parseFloat(h.m));
+            // 1. FILTRADO ESTRICTO MENSUAL (Solo muestra días de este mes)
+            let datosMesActual = historial.filter(h => h.mes === info.mesIdx && h.anio === info.anio).reverse();
+            
+            let labels = datosMesActual.map(h => { let p = h.f.split('-'); return `${p[2]}/${p[1]}`; });
+            let values = datosMesActual.map(h => parseFloat(h.m));
             
             const isLight = document.body.getAttribute('data-theme') === 'light';
             const gridC = isLight ? '#E5E7EB' : '#2A3241';
             const textC = isLight ? '#6B7280' : '#94A3B8';
 
-            let gradV = ctx.createLinearGradient(0, 0, 0, 230); gradV.addColorStop(0, '#10B981'); gradV.addColorStop(1, 'rgba(16,185,129,0.1)');
-            let gradY = ctx.createLinearGradient(0, 0, 0, 230); gradY.addColorStop(0, '#F59E0B'); gradY.addColorStop(1, 'rgba(245,158,11,0.1)');
-            let bgColors = values.map(v => v >= goal ? gradV : gradY);
+            // 2. DISEÑO FINTECH: Degradado de fondo para el Área
+            let gradientFill = ctx.createLinearGradient(0, 0, 0, 230);
+            gradientFill.addColorStop(0, 'rgba(59, 130, 246, 0.4)'); // Azul transparente arriba
+            gradientFill.addColorStop(1, 'rgba(59, 130, 246, 0.0)'); // Transparente abajo
+
+            // 3. PUNTOS INTELIGENTES: Verde si logras la meta, Naranja si fallas
+            let pointColors = values.map(v => v >= goal ? '#10B981' : '#F59E0B');
 
             miGrafico = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: labels, datasets: [{ data: values, backgroundColor: bgColors, borderRadius: 4, borderWidth: 0, hoverBackgroundColor: '#3B82F6' }] },
+                type: 'line', // Cambiado de 'bar' a 'line'
+                data: { 
+                    labels: labels, 
+                    datasets: [{ 
+                        label: 'Ganancia Diaria ($)', 
+                        data: values, 
+                        backgroundColor: gradientFill, // Área debajo de la curva
+                        borderColor: '#3B82F6', // Línea azul principal
+                        borderWidth: 3, 
+                        pointBackgroundColor: pointColors, // Color del punto dinámico
+                        pointBorderColor: isLight ? '#FFFFFF' : '#151C2C', // Borde del punto como el fondo
+                        pointBorderWidth: 2,
+                        pointRadius: 5, // Tamaño de los puntos
+                        pointHoverRadius: 7,
+                        fill: true, // Activa el modo Área
+                        tension: 0.4 // Hace que la línea sea CURVA y SUAVE
+                    }] 
+                },
                 options: {
-                    animation: { duration: 0 }, responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(21,28,44,0.95)', titleColor: isLight ? '#111827' : '#F8FAFC', bodyColor: isLight ? '#111827' : '#F8FAFC', borderColor: gridC, borderWidth: 1, titleFont: { size: 12, family: 'Poppins' }, bodyFont: { size: 16, weight: 'bold', family: 'Poppins' }, displayColors: false, padding: 10, cornerRadius: 8, callbacks: { label: function(context) { return '$' + context.parsed.y.toFixed(2); } } } },
-                    scales: { y: { beginAtZero: true, grid: { color: gridC, drawBorder: false }, ticks: { color: textC, font: { family: 'Poppins', weight: '600' }, callback: function(v) { return '$' + v; } } }, x: { grid: { display: false }, ticks: { color: textC, font: { family: 'Poppins', weight: '600' } } } }
+                    animation: { duration: 600, easing: 'easeOutQuart' }, // Animación de entrada
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false }, 
+                        tooltip: { 
+                            backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(21,28,44,0.95)', 
+                            titleColor: isLight ? '#111827' : '#F8FAFC', bodyColor: isLight ? '#111827' : '#F8FAFC', 
+                            borderColor: gridC, borderWidth: 1, titleFont: { size: 12, family: 'Poppins' }, 
+                            bodyFont: { size: 16, weight: 'bold', family: 'Poppins' }, displayColors: false, 
+                            padding: 10, cornerRadius: 8, callbacks: { label: function(context) { return '$' + context.parsed.y.toFixed(2); } } 
+                        } 
+                    },
+                    scales: { 
+                        y: { 
+                            beginAtZero: true, grid: { color: gridC, drawBorder: false }, 
+                            ticks: { color: textC, font: { family: 'Poppins', weight: '600' }, callback: function(v) { return '$' + v; } } 
+                        }, 
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { 
+                                color: textC, 
+                                font: { family: 'Poppins', weight: '600' },
+                                maxRotation: 0, // Prohíbe que el texto se incline
+                                maxTicksLimit: 12 // Evita que se amontonen las fechas si hay muchas
+                            } 
+                        } 
+                    }
                 }
             });
         }
 
-        // 📡 RADAR DE SINCRONIZACIÓN
         let ultimoSync = localStorage.getItem('syncTrigger');
         setInterval(() => {
             let syncActual = localStorage.getItem('syncTrigger');
             if (syncActual !== ultimoSync) { ultimoSync = syncActual; calcularMetricas(); }
         }, 1500);
         
-        // 💾 EXPORTACIÓN DE DATOS MÚLTIPLE (SheetJS)
         function exportarExcelPro() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
             let wb = XLSX.utils.book_new();
@@ -512,7 +463,6 @@
             XLSX.writeFile(wb, `SproutGigs_Master_${info.id}.xlsx`);
         }
 
-        // Listeners y Arranque Inicial
         document.getElementById('goal').addEventListener('input', calcularMetricas);
         document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
         calcularMetricas();
