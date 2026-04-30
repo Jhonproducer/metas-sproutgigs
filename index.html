@@ -37,7 +37,8 @@
         .header p { margin: 0; font-size: 1rem; color: var(--text-muted); font-weight: 600; }
         .controls { display: flex; gap: 12px; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+        /* 🔥 REDUCIDO A 3 COLUMNAS */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
         .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-main); padding: 18px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: center; }
         .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .stat-value { font-size: 1.7rem; font-weight: 800; line-height: 1.2; }
@@ -59,31 +60,13 @@
 
         .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
         .chart-header span { font-weight: 700; font-size: 1.1rem; }
-        .chart-container { position: relative; height: 230px; width: 100%; }
-
-        .finance-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-main); padding: 20px 24px; box-shadow: var(--shadow-card); display: grid; grid-template-columns: 1.2fr 1fr 1fr 1.5fr auto; gap: 20px; align-items: center; }
-        .f-col { display: flex; flex-direction: column; border-right: 1px solid var(--border-color); padding-right: 15px; }
-        .f-col:last-child { border-right: none; padding-right: 0; }
-        .f-title { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
-        .f-val { font-size: 1.3rem; font-weight: 800; }
-        
-        .action-group { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; border-right: none;}
-        .action-inputs { display: flex; gap: 8px; }
-        .action-inputs input { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 12px; border-radius: var(--radius-sm); font-size: 1rem; font-weight: 700; width: 100px; text-align: center; outline: none; font-family: 'Poppins', sans-serif; transition: border 0.2s; }
-        .action-inputs input:focus { border-color: var(--accent-gold); }
+        .chart-container { position: relative; height: 260px; width: 100%; } /* Gráfico un poco más alto ahora que hay más espacio */
 
         .btn { padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; border: none; transition: all 0.2s ease; font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 6px; justify-content: center; }
         .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
         .btn-outline:hover { background: var(--bg-input); color: var(--accent-blue); border-color: var(--accent-blue); }
         .btn-excel { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
         .btn-excel:hover { background: var(--accent-green); color: white; }
-        .btn-withdraw { background: linear-gradient(135deg, var(--accent-gold), #d97706); color: white; padding: 8px 20px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.25); }
-        .btn-withdraw:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.4); }
-
-        .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
-        .dot-green { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); animation: pulse 2s infinite; }
-        .dot-red { background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.8; } }
     </style>
 </head>
 <body data-theme="dark">
@@ -115,10 +98,6 @@
                 <span class="stat-label" style="color: var(--accent-green);">SALDO REAL TOTAL</span>
                 <span class="stat-value" id="valTotalReal" style="color: var(--accent-green);">$0.00</span>
             </div>
-            <div class="stat-card" style="border-bottom: 3px solid var(--accent-gold);">
-                <span class="stat-label" style="color: var(--accent-gold);">TOTAL RETIRADO 🏦</span>
-                <span class="stat-value" id="valRetirado" style="color: var(--accent-gold);">$0.00</span>
-            </div>
         </section>
 
         <section class="main-grid">
@@ -143,35 +122,6 @@
                     <span style="color: var(--text-muted);">Proyección: <span id="valProyeccion" style="color: var(--accent-blue);">$0.00 🚀</span></span>
                 </div>
                 <div class="chart-container"><canvas id="historialChart"></canvas></div>
-            </div>
-        </section>
-
-        <section class="finance-panel">
-            <div class="f-col">
-                <span class="f-title">Status SproutGigs</span>
-                <span id="withdrawStatusText" class="f-val"><span class="dot dot-red"></span> Verificando...</span>
-            </div>
-            <div class="f-col">
-                <span class="f-title">Comisión (20%)</span>
-                <span id="calcFee" class="f-val" style="color: var(--accent-red);">-$0.00</span>
-            </div>
-            <div class="f-col">
-                <span class="f-title">Neto a Recibir</span>
-                <span id="calcNeto" class="f-val" style="color: var(--accent-green);">$0.00</span>
-            </div>
-            <div class="f-col">
-                <span class="f-title" style="display: flex; justify-content: space-between;">
-                    <span>Equivalente Binance</span>
-                    <span id="liveLtcPrice" style="color: var(--accent-blue);">---</span>
-                </span>
-                <span id="valCoinsLTC" class="f-val" style="color: var(--accent-gold);">0.00000 LTC 🪙</span>
-            </div>
-            <div class="f-col action-group">
-                <span onclick="corregirRetiro()" style="font-size: 0.65rem; color: var(--accent-red); cursor: pointer; text-decoration: underline; font-weight: 700;">Deshacer Error</span>
-                <div class="action-inputs">
-                    <input type="number" id="inputRetiro" placeholder="Monto $" step="0.50">
-                    <button class="btn btn-withdraw" onclick="ejecutarRetiro()">Retirar</button>
-                </div>
             </div>
         </section>
     </div>
@@ -232,6 +182,20 @@
             localStorage.setItem('histJhon', JSON.stringify(historialLimpio));
         }
 
+        let savedFecha = localStorage.getItem('fechaJhon');
+        if (savedFecha && savedFecha > info.id) {
+            let hist = JSON.parse(localStorage.getItem('histJhon')) || [];
+            if (hist.length > 0 && hist[0].f === savedFecha) {
+                let entradaCorrupta = hist.shift(); 
+                localStorage.setItem('histJhon', JSON.stringify(hist));
+                let b = parseFloat(localStorage.getItem('baseJhon')) || 0;
+                b = Math.max(0, b - parseFloat(entradaCorrupta.m));
+                localStorage.setItem('baseJhon', b);
+            }
+            localStorage.setItem('fechaJhon', info.id);
+            location.reload(); 
+        }
+
         let base = parseFloat(localStorage.getItem('baseJhon')) || 0;
         let ultimaFecha = localStorage.getItem('fechaJhon');
         let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
@@ -242,71 +206,57 @@
             let totalA = e + p;
             
             if (ultimaFecha && ultimaFecha !== info.id) {
-                const ganadoAyer = Math.max(0, totalA - base);
-                const dObj = new Date(ultimaFecha + "T12:00:00");
-                historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), mes: dObj.getMonth(), anio: dObj.getFullYear() });
+                let fUltima = new Date(ultimaFecha + "T12:00:00");
+                let fHoy = new Date(info.id + "T12:00:00");
                 
-                // Mantenemos solo historial real en la base de datos
-                historial = historial.slice(0, 90); 
-                localStorage.setItem('histJhon', JSON.stringify(historial));
-                
-                base = totalA; localStorage.setItem('baseJhon', base);
-                ultimaFecha = info.id; localStorage.setItem('fechaJhon', info.id);
+                if (fUltima < fHoy) { 
+                    const ganadoAyer = Math.max(0, totalA - base);
+                    
+                    historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), mes: fUltima.getMonth(), anio: fUltima.getFullYear() });
+                    
+                    fUltima.setDate(fUltima.getDate() + 1);
+                    
+                    while(fUltima < fHoy) {
+                        let y = fUltima.getFullYear();
+                        let m_num = String(fUltima.getMonth() + 1).padStart(2, '0');
+                        let d_num = String(fUltima.getDate()).padStart(2, '0');
+                        
+                        historial.unshift({
+                            f: `${y}-${m_num}-${d_num}`,
+                            m: "0.00",
+                            mes: fUltima.getMonth(),
+                            anio: fUltima.getFullYear()
+                        });
+                        fUltima.setDate(fUltima.getDate() + 1);
+                    }
+                    
+                    historial = historial.slice(0, 90); 
+                    localStorage.setItem('histJhon', JSON.stringify(historial));
+                    
+                    base = totalA; localStorage.setItem('baseJhon', base);
+                    ultimaFecha = info.id; localStorage.setItem('fechaJhon', info.id);
+                }
             }
             if (base === 0 && totalA > 0) { base = totalA; localStorage.setItem('baseJhon', base); }
             if (!ultimaFecha) { localStorage.setItem('fechaJhon', info.id); }
         }
         auditarCierreDia();
 
-        let precioLTCEnVivo = 0;
-        async function fetchLTCPrice() {
-            try {
-                const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT');
-                const data = await res.json();
-                precioLTCEnVivo = parseFloat(data.price);
-                document.getElementById('liveLtcPrice').innerText = `($${precioLTCEnVivo.toFixed(2)})`;
-                calcularMetricas();
-            } catch (err) { document.getElementById('liveLtcPrice').innerText = `(Error)`; }
-        }
-        fetchLTCPrice();
-        setInterval(fetchLTCPrice, 60000);
-
         let miGrafico; 
-
-        function ejecutarRetiro() {
-            let monto = parseFloat(document.getElementById('inputRetiro').value);
-            let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
-            if (isNaN(monto) || monto <= 0) { alert("Monto inválido."); return; }
-            if (monto > earned) { alert("Fondos insuficientes."); return; }
-            base -= monto; localStorage.setItem('baseJhon', base);
-            let nuevoEarned = Math.max(0, earned - monto);
-            localStorage.setItem('lastEarnedJhon', nuevoEarned);
-            let retiradoHistorico = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
-            localStorage.setItem('totalRetiradoJhon', retiradoHistorico + monto);
-            document.getElementById('winSound').play().catch(e=>{});
-            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-            document.getElementById('inputRetiro').value = "";
-            calcularMetricas();
-        }
-
-        function corregirRetiro() {
-            if (confirm("⚠️ ¿Restaurar saldo base?")) {
-                let retirado = parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0;
-                base += retirado; localStorage.setItem('baseJhon', base);
-                let earned = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
-                localStorage.setItem('lastEarnedJhon', earned + retirado);
-                localStorage.setItem('totalRetiradoJhon', 0); 
-                calcularMetricas();
-            }
-        }
 
         function calcularMetricas() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
             localStorage.setItem('metaJhon', goal);
+            
             let e = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
             let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalActual = e + p;
-            if (totalActual < base) { base = totalActual; localStorage.setItem('baseJhon', base); }
+            
+            // 🔥 LA MAGIA DEL SISTEMA: AUTO-CALIBRACIÓN SI RETIRAS DINERO
+            if (totalActual < base) { 
+                base = totalActual; 
+                localStorage.setItem('baseJhon', base); 
+            }
             
             const ganadoHoy = Math.max(0, totalActual - base);
             const hoyRedondeo = Math.round(ganadoHoy * 100) / 100;
@@ -323,7 +273,6 @@
             document.getElementById('valEarned').innerText = '$' + e.toFixed(4);
             document.getElementById('valPending').innerText = '$' + p.toFixed(4);
             document.getElementById('valTotalReal').innerText = '$' + totalActual.toFixed(4);
-            document.getElementById('valRetirado').innerText = '$' + (parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0).toFixed(2);
             
             const pct = Math.min((ganadoHoy / goal) * 100, 100);
             document.getElementById('fill').style.width = pct + '%';
@@ -333,17 +282,6 @@
             
             document.getElementById('message').innerText = ganadoHoy >= goal ? "¡OBJETIVO ALCANZADO! 🏆" : `Faltan $${(goal - ganadoHoy).toFixed(2)}`;
             
-            const statusNode = document.getElementById('withdrawStatusText');
-            if (e >= 5) { statusNode.innerHTML = `<span class="dot dot-green"></span> Disponible`; statusNode.style.color = 'var(--accent-green)'; }
-            else { statusNode.innerHTML = `<span class="dot dot-red"></span> Faltan $${(5 - e).toFixed(2)}`; statusNode.style.color = 'var(--text-main)'; }
-            
-            let fee = e * 0.20; let neto = e - fee;
-            document.getElementById('calcFee').innerText = '-$' + fee.toFixed(2);
-            document.getElementById('calcNeto').innerText = '$' + neto.toFixed(2);
-            
-            if (precioLTCEnVivo > 0 && e > 0) document.getElementById('valCoinsLTC').innerText = (neto / precioLTCEnVivo).toFixed(5) + ' LTC 🪙';
-            else document.getElementById('valCoinsLTC').innerText = '0.00000 LTC 🪙';
-            
             // Re-calculamos suma del mes agregando los 0s de días faltantes
             let sumMes = hoyRedondeo;
             for(let i = 1; i < info.diaNumero; i++) {
@@ -351,7 +289,7 @@
                 let d_num = String(i).padStart(2, '0');
                 let fechaStr = `${info.anio}-${m_num}-${d_num}`;
                 let record = historial.find(h => h.f === fechaStr);
-                sumMes += record ? parseFloat(record.m) : 0; // Fuerza a sumar 0 si el día no existe
+                sumMes += record ? parseFloat(record.m) : 0;
             }
             
             document.getElementById('valMes').innerText = '$' + sumMes.toFixed(2);
@@ -360,7 +298,6 @@
             renderizarGrafico(goal, hoyRedondeo);
         }
 
-        // 🧠 MOTOR GRÁFICO ABSOLUTO (Rellena Vacíos Visuales con $0.00)
         function renderizarGrafico(goal, hoyRedondeo) {
             const ctx = document.getElementById('historialChart').getContext('2d');
             if (miGrafico) { miGrafico.destroy(); } 
@@ -369,7 +306,6 @@
             let values = [];
             let pointColors = [];
             
-            // Loop ESTRICTO desde el Día 1 hasta el Fin del Mes
             for(let i = 1; i <= info.totalDiasMes; i++) {
                 let m_num = String(info.mesIdx + 1).padStart(2, '0');
                 let d_num = String(i).padStart(2, '0');
@@ -380,17 +316,14 @@
                 labels.push(`${d_num} (${diasSemanaAbr[dObj.getDay()]})`);
                 
                 if (i < info.diaNumero) {
-                    // Días pasados: Si trabajaste, lee el monto. Si no, ¡Es 0.00 forzado!
                     let record = historial.find(h => h.f === fechaStr);
                     let val = record ? parseFloat(record.m) : 0.00;
                     values.push(val);
-                    pointColors.push(val >= goal ? '#10B981' : (val === 0 ? '#EF4444' : '#F59E0B')); // Puntos rojos si hiciste 0
+                    pointColors.push(val >= goal ? '#10B981' : (val === 0 ? '#EF4444' : '#F59E0B'));
                 } else if (i === info.diaNumero) {
-                    // Hoy
                     values.push(hoyRedondeo);
                     pointColors.push(hoyRedondeo >= goal ? '#10B981' : (hoyRedondeo === 0 ? '#EF4444' : '#F59E0B'));
                 } else {
-                    // Días del futuro (Vacíos para que no se dibujen)
                     values.push(null);
                     pointColors.push('transparent');
                 }
@@ -419,7 +352,6 @@
             if (syncActual !== ultimoSync) { ultimoSync = syncActual; calcularMetricas(); }
         }, 1500);
         
-        // 📊 EXPORTADOR EXCEL ABSOLUTO (Rellena Vacíos con $0.00 en las hojas de cálculo)
         function exportarExcelPro() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
             let wb = XLSX.utils.book_new();
@@ -443,7 +375,6 @@
             let totalG = 0; let dExito = 0; let totalDiasEval = 0;
             let sheetsData = {};
             
-            // Loop mes por mes, día por día de forma estricta
             for(let k in mesesGrp) { 
                 let wsD = [["FECHA", "GANANCIA ($)", "META ($)", "¿LOGRADO?"]]; 
                 let parts = k.split(" "); 
@@ -457,7 +388,6 @@
                     let d_str = String(i).padStart(2, '0');
                     let fStr = `${anio}-${m_str}-${d_str}`;
                     
-                    // Si el día no está en la memoria, le clava un $0.00
                     let m_val = mesesGrp[k][fStr] ? parseFloat(mesesGrp[k][fStr].m) : 0.00;
                     wsD.push([fStr, m_val, goal, m_val >= goal ? "✅ SÍ" : "❌ NO"]);
                     
@@ -473,8 +403,7 @@
                 ["MÉTRICA", "RESULTADO"], 
                 ["Total Días Evaluados", totalDiasEval], 
                 ["Días Meta Cumplida", dExito], 
-                ["Total Histórico ($)", totalG.toFixed(2)], 
-                ["Retirado Histórico ($)", (parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0).toFixed(2)] 
+                ["Total Histórico Trabajado ($)", totalG.toFixed(2)] 
             ]);
             XLSX.utils.book_append_sheet(wb, wsR, "Resumen Global");
             
