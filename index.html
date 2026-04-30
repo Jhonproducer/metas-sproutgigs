@@ -232,66 +232,26 @@
             localStorage.setItem('histJhon', JSON.stringify(historialLimpio));
         }
 
-        let savedFecha = localStorage.getItem('fechaJhon');
-        if (savedFecha && savedFecha > info.id) {
-            let hist = JSON.parse(localStorage.getItem('histJhon')) || [];
-            if (hist.length > 0 && hist[0].f === savedFecha) {
-                let entradaCorrupta = hist.shift(); 
-                localStorage.setItem('histJhon', JSON.stringify(hist));
-                let b = parseFloat(localStorage.getItem('baseJhon')) || 0;
-                b = Math.max(0, b - parseFloat(entradaCorrupta.m));
-                localStorage.setItem('baseJhon', b);
-            }
-            localStorage.setItem('fechaJhon', info.id);
-            location.reload(); 
-        }
-
         let base = parseFloat(localStorage.getItem('baseJhon')) || 0;
         let ultimaFecha = localStorage.getItem('fechaJhon');
         let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
 
-        // 🧠 NÚCLEO ACTUALIZADO: INYECTOR DE DÍAS VACÍOS ($0.00)
         function auditarCierreDia() {
             let e = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
             let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalA = e + p;
             
             if (ultimaFecha && ultimaFecha !== info.id) {
-                let fUltima = new Date(ultimaFecha + "T12:00:00");
-                let fHoy = new Date(info.id + "T12:00:00");
+                const ganadoAyer = Math.max(0, totalA - base);
+                const dObj = new Date(ultimaFecha + "T12:00:00");
+                historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), mes: dObj.getMonth(), anio: dObj.getFullYear() });
                 
-                // Aseguramos que el tiempo avanzó
-                if (fUltima < fHoy) { 
-                    const ganadoAyer = Math.max(0, totalA - base);
-                    
-                    // 1. Guardamos el dinero del último día activo
-                    historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), mes: fUltima.getMonth(), anio: fUltima.getFullYear() });
-                    
-                    // 2. Avanzamos un día para buscar vacíos
-                    fUltima.setDate(fUltima.getDate() + 1);
-                    
-                    // 3. Rellenamos con $0.00 todos los días en los que no abriste la página
-                    while(fUltima < fHoy) {
-                        let y = fUltima.getFullYear();
-                        let m_num = String(fUltima.getMonth() + 1).padStart(2, '0');
-                        let d_num = String(fUltima.getDate()).padStart(2, '0');
-                        
-                        historial.unshift({
-                            f: `${y}-${m_num}-${d_num}`,
-                            m: "0.00",
-                            mes: fUltima.getMonth(),
-                            anio: fUltima.getFullYear()
-                        });
-                        fUltima.setDate(fUltima.getDate() + 1);
-                    }
-                    
-                    // Guardamos historial limpio (máximo 90 días para no saturar memoria)
-                    historial = historial.slice(0, 90); 
-                    localStorage.setItem('histJhon', JSON.stringify(historial));
-                    
-                    base = totalA; localStorage.setItem('baseJhon', base);
-                    ultimaFecha = info.id; localStorage.setItem('fechaJhon', info.id);
-                }
+                // Mantenemos solo historial real en la base de datos
+                historial = historial.slice(0, 90); 
+                localStorage.setItem('histJhon', JSON.stringify(historial));
+                
+                base = totalA; localStorage.setItem('baseJhon', base);
+                ultimaFecha = info.id; localStorage.setItem('fechaJhon', info.id);
             }
             if (base === 0 && totalA > 0) { base = totalA; localStorage.setItem('baseJhon', base); }
             if (!ultimaFecha) { localStorage.setItem('fechaJhon', info.id); }
@@ -347,8 +307,10 @@
             let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalActual = e + p;
             if (totalActual < base) { base = totalActual; localStorage.setItem('baseJhon', base); }
+            
             const ganadoHoy = Math.max(0, totalActual - base);
             const hoyRedondeo = Math.round(ganadoHoy * 100) / 100;
+            
             const ant = parseFloat(localStorage.getItem('antJhon')) || 0;
             if (hoyRedondeo > ant) { 
                 document.getElementById('cashSound').play().catch(e=>{}); 
@@ -356,47 +318,88 @@
                 setTimeout(() => { document.getElementById('gananciaHoy').style.transform = "scale(1)"; }, 200);
             }
             localStorage.setItem('antJhon', hoyRedondeo);
+            
             document.getElementById('gananciaHoy').innerText = '$' + hoyRedondeo.toFixed(2);
             document.getElementById('valEarned').innerText = '$' + e.toFixed(4);
             document.getElementById('valPending').innerText = '$' + p.toFixed(4);
             document.getElementById('valTotalReal').innerText = '$' + totalActual.toFixed(4);
             document.getElementById('valRetirado').innerText = '$' + (parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0).toFixed(2);
+            
             const pct = Math.min((ganadoHoy / goal) * 100, 100);
             document.getElementById('fill').style.width = pct + '%';
             if(pct < 35) document.getElementById('fill').style.backgroundColor = "var(--accent-red)";
             else if(pct < 99) document.getElementById('fill').style.backgroundColor = "var(--accent-yellow)";
             else document.getElementById('fill').style.backgroundColor = "var(--accent-green)";
+            
             document.getElementById('message').innerText = ganadoHoy >= goal ? "¡OBJETIVO ALCANZADO! 🏆" : `Faltan $${(goal - ganadoHoy).toFixed(2)}`;
+            
             const statusNode = document.getElementById('withdrawStatusText');
             if (e >= 5) { statusNode.innerHTML = `<span class="dot dot-green"></span> Disponible`; statusNode.style.color = 'var(--accent-green)'; }
             else { statusNode.innerHTML = `<span class="dot dot-red"></span> Faltan $${(5 - e).toFixed(2)}`; statusNode.style.color = 'var(--text-main)'; }
+            
             let fee = e * 0.20; let neto = e - fee;
             document.getElementById('calcFee').innerText = '-$' + fee.toFixed(2);
             document.getElementById('calcNeto').innerText = '$' + neto.toFixed(2);
+            
             if (precioLTCEnVivo > 0 && e > 0) document.getElementById('valCoinsLTC').innerText = (neto / precioLTCEnVivo).toFixed(5) + ' LTC 🪙';
             else document.getElementById('valCoinsLTC').innerText = '0.00000 LTC 🪙';
-            const sumMes = historial.filter(h => h.mes === info.mesIdx && h.anio === info.anio).reduce((a, h) => a + parseFloat(h.m), 0) + hoyRedondeo;
+            
+            // Re-calculamos suma del mes agregando los 0s de días faltantes
+            let sumMes = hoyRedondeo;
+            for(let i = 1; i < info.diaNumero; i++) {
+                let m_num = String(info.mesIdx + 1).padStart(2, '0');
+                let d_num = String(i).padStart(2, '0');
+                let fechaStr = `${info.anio}-${m_num}-${d_num}`;
+                let record = historial.find(h => h.f === fechaStr);
+                sumMes += record ? parseFloat(record.m) : 0; // Fuerza a sumar 0 si el día no existe
+            }
+            
             document.getElementById('valMes').innerText = '$' + sumMes.toFixed(2);
             document.getElementById('valProyeccion').innerText = '$' + ((sumMes / info.diaNumero) * info.totalDiasMes).toFixed(2);
-            renderizarGrafico(goal);
+            
+            renderizarGrafico(goal, hoyRedondeo);
         }
 
-        function renderizarGrafico(goal) {
+        // 🧠 MOTOR GRÁFICO ABSOLUTO (Rellena Vacíos Visuales con $0.00)
+        function renderizarGrafico(goal, hoyRedondeo) {
             const ctx = document.getElementById('historialChart').getContext('2d');
             if (miGrafico) { miGrafico.destroy(); } 
-            let datosMesActual = historial.filter(h => h.mes === info.mesIdx && h.anio === info.anio).reverse();
-            let labels = datosMesActual.map(h => { 
-                let p = h.f.split('-'); 
-                let dObj = new Date(h.f + "T12:00:00");
+            
+            let labels = [];
+            let values = [];
+            let pointColors = [];
+            
+            // Loop ESTRICTO desde el Día 1 hasta el Fin del Mes
+            for(let i = 1; i <= info.totalDiasMes; i++) {
+                let m_num = String(info.mesIdx + 1).padStart(2, '0');
+                let d_num = String(i).padStart(2, '0');
+                let fechaStr = `${info.anio}-${m_num}-${d_num}`;
+                
+                let dObj = new Date(fechaStr + "T12:00:00");
                 const diasSemanaAbr = ["DOM", "LUN", "MAR", "MIE", "JUE", "VIE", "SAB"];
-                return `${p[2]} (${diasSemanaAbr[dObj.getDay()]})`; 
-            });
-            let values = datosMesActual.map(h => parseFloat(h.m));
+                labels.push(`${d_num} (${diasSemanaAbr[dObj.getDay()]})`);
+                
+                if (i < info.diaNumero) {
+                    // Días pasados: Si trabajaste, lee el monto. Si no, ¡Es 0.00 forzado!
+                    let record = historial.find(h => h.f === fechaStr);
+                    let val = record ? parseFloat(record.m) : 0.00;
+                    values.push(val);
+                    pointColors.push(val >= goal ? '#10B981' : (val === 0 ? '#EF4444' : '#F59E0B')); // Puntos rojos si hiciste 0
+                } else if (i === info.diaNumero) {
+                    // Hoy
+                    values.push(hoyRedondeo);
+                    pointColors.push(hoyRedondeo >= goal ? '#10B981' : (hoyRedondeo === 0 ? '#EF4444' : '#F59E0B'));
+                } else {
+                    // Días del futuro (Vacíos para que no se dibujen)
+                    values.push(null);
+                    pointColors.push('transparent');
+                }
+            }
+
             const isLight = document.body.getAttribute('data-theme') === 'light';
             let gradientFill = ctx.createLinearGradient(0, 0, 0, 230);
             gradientFill.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
             gradientFill.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
-            let pointColors = values.map(v => v >= goal ? '#10B981' : '#F59E0B');
 
             miGrafico = new Chart(ctx, {
                 type: 'line',
@@ -405,7 +408,7 @@
                     interaction: { mode: 'index', intersect: false },
                     animation: { duration: 600 }, responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false }, tooltip: { backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(21,28,44,0.95)', titleColor: isLight ? '#111827' : '#F8FAFC', bodyColor: isLight ? '#111827' : '#F8FAFC', borderColor: isLight ? '#E5E7EB' : '#2A3241', borderWidth: 1, titleFont: { size: 12 }, bodyFont: { size: 16, weight: 'bold' }, padding: 10, cornerRadius: 8, callbacks: { label: function(context) { return '$' + context.parsed.y.toFixed(2); } } } },
-                    scales: { y: { beginAtZero: true, grid: { color: isLight ? '#E5E7EB' : '#2A3241', drawBorder: false }, ticks: { color: isLight ? '#6B7280' : '#94A3B8', font: { family: 'Poppins', weight: '600' }, callback: function(v) { return '$' + v; } } }, x: { grid: { display: false }, ticks: { color: isLight ? '#6B7280' : '#94A3B8', font: { family: 'Poppins', weight: '600' }, maxRotation: 0, maxTicksLimit: 12 } } }
+                    scales: { y: { beginAtZero: true, grid: { color: isLight ? '#E5E7EB' : '#2A3241', drawBorder: false }, ticks: { color: isLight ? '#6B7280' : '#94A3B8', font: { family: 'Poppins', weight: '600' }, callback: function(v) { return '$' + v; } } }, x: { grid: { display: false }, ticks: { color: isLight ? '#6B7280' : '#94A3B8', font: { family: 'Poppins', weight: '600' }, maxRotation: 0, maxTicksLimit: 15 } } }
                 }
             });
         }
@@ -416,15 +419,66 @@
             if (syncActual !== ultimoSync) { ultimoSync = syncActual; calcularMetricas(); }
         }, 1500);
         
+        // 📊 EXPORTADOR EXCEL ABSOLUTO (Rellena Vacíos con $0.00 en las hojas de cálculo)
         function exportarExcelPro() {
             const goal = parseFloat(document.getElementById('goal').value) || 1.00;
             let wb = XLSX.utils.book_new();
-            let totalG = 0; let dExito = 0;
-            historial.forEach(h => { let m = parseFloat(h.m); totalG += m; if(m >= goal) dExito++; });
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([["REPORTE SPROUTGIGS"], [], ["MÉTRICA", "RESULTADO"], ["Total Días", historial.length], ["Días Meta Cumplida", dExito], ["Total Histórico ($)", totalG], ["Retirado Histórico ($)", parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0]]), "Resumen Global");
+            
+            let e = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
+            let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
+            let baseLocal = parseFloat(localStorage.getItem('baseJhon')) || 0;
+            let hoyRedondeo = Math.round(Math.max(0, (e + p) - baseLocal) * 100) / 100;
+            
             let mesesGrp = {};
-            historial.forEach(h => { let k = `${MESES[h.mes]} ${h.anio}`; if(!mesesGrp[k]) mesesGrp[k] = []; mesesGrp[k].push(h); });
-            for(let k in mesesGrp) { let d = [...mesesGrp[k]].reverse(); let wsD = [["FECHA", "GANANCIA ($)", "META ($)", "¿LOGRADO?"]]; d.forEach(h => { let m = parseFloat(h.m); wsD.push([h.f, m, goal, m >= goal ? "✅ SÍ" : "❌ NO"]); }); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsD), k); }
+            historial.forEach(h => { 
+                let k = `${MESES[h.mes]} ${h.anio}`; 
+                if(!mesesGrp[k]) mesesGrp[k] = {}; 
+                mesesGrp[k][h.f] = h; 
+            });
+            
+            let kHoy = `${MESES[info.mesIdx]} ${info.anio}`;
+            if (!mesesGrp[kHoy]) mesesGrp[kHoy] = {};
+            mesesGrp[kHoy][info.id] = { f: info.id, m: hoyRedondeo, mes: info.mesIdx, anio: info.anio };
+            
+            let totalG = 0; let dExito = 0; let totalDiasEval = 0;
+            let sheetsData = {};
+            
+            // Loop mes por mes, día por día de forma estricta
+            for(let k in mesesGrp) { 
+                let wsD = [["FECHA", "GANANCIA ($)", "META ($)", "¿LOGRADO?"]]; 
+                let parts = k.split(" "); 
+                let mesIndex = MESES.indexOf(parts[0]);
+                let anio = parseInt(parts[1]);
+                
+                let maxDay = (mesIndex === info.mesIdx && anio === info.anio) ? info.diaNumero : new Date(anio, mesIndex + 1, 0).getDate();
+                
+                for(let i = maxDay; i >= 1; i--) {
+                    let m_str = String(mesIndex + 1).padStart(2, '0');
+                    let d_str = String(i).padStart(2, '0');
+                    let fStr = `${anio}-${m_str}-${d_str}`;
+                    
+                    // Si el día no está en la memoria, le clava un $0.00
+                    let m_val = mesesGrp[k][fStr] ? parseFloat(mesesGrp[k][fStr].m) : 0.00;
+                    wsD.push([fStr, m_val, goal, m_val >= goal ? "✅ SÍ" : "❌ NO"]);
+                    
+                    totalG += m_val;
+                    if (m_val >= goal) dExito++;
+                    totalDiasEval++;
+                }
+                sheetsData[k] = wsD;
+            }
+            
+            let wsR = XLSX.utils.aoa_to_sheet([ 
+                ["REPORTE SPROUTGIGS"], [], 
+                ["MÉTRICA", "RESULTADO"], 
+                ["Total Días Evaluados", totalDiasEval], 
+                ["Días Meta Cumplida", dExito], 
+                ["Total Histórico ($)", totalG.toFixed(2)], 
+                ["Retirado Histórico ($)", (parseFloat(localStorage.getItem('totalRetiradoJhon')) || 0).toFixed(2)] 
+            ]);
+            XLSX.utils.book_append_sheet(wb, wsR, "Resumen Global");
+            
+            for(let k in sheetsData) { XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sheetsData[k]), k); }
             XLSX.writeFile(wb, `SproutGigs_Master_${info.id}.xlsx`);
         }
 
