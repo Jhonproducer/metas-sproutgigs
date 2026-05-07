@@ -37,7 +37,6 @@
         .header p { margin: 0; font-size: 1rem; color: var(--text-muted); font-weight: 600; }
         .controls { display: flex; gap: 12px; }
 
-        /* 🔥 REDUCIDO A 3 COLUMNAS */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
         .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-main); padding: 18px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: center; }
         .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
@@ -60,7 +59,7 @@
 
         .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
         .chart-header span { font-weight: 700; font-size: 1.1rem; }
-        .chart-container { position: relative; height: 260px; width: 100%; } /* Gráfico un poco más alto ahora que hay más espacio */
+        .chart-container { position: relative; height: 260px; width: 100%; }
 
         .btn { padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; border: none; transition: all 0.2s ease; font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 6px; justify-content: center; }
         .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
@@ -112,7 +111,7 @@
                 </div>
                 <div class="goal-row">
                     <span>META DIARIA: $</span>
-                    <input type="number" id="goal" class="goal-input" value="1.00" step="0.10">
+                    <input type="number" id="goal" class="goal-input" value="0.50" step="0.10">
                 </div>
             </div>
 
@@ -211,11 +210,9 @@
                 
                 if (fUltima < fHoy) { 
                     const ganadoAyer = Math.max(0, totalA - base);
-                    
                     historial.unshift({ f: ultimaFecha, m: ganadoAyer.toFixed(2), mes: fUltima.getMonth(), anio: fUltima.getFullYear() });
                     
                     fUltima.setDate(fUltima.getDate() + 1);
-                    
                     while(fUltima < fHoy) {
                         let y = fUltima.getFullYear();
                         let m_num = String(fUltima.getMonth() + 1).padStart(2, '0');
@@ -245,14 +242,14 @@
         let miGrafico; 
 
         function calcularMetricas() {
-            const goal = parseFloat(document.getElementById('goal').value) || 1.00;
+            const goal = parseFloat(document.getElementById('goal').value) || 0.50;
             localStorage.setItem('metaJhon', goal);
             
             let e = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
             let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalActual = e + p;
             
-            // 🔥 LA MAGIA DEL SISTEMA: AUTO-CALIBRACIÓN SI RETIRAS DINERO
+            // AUTO-CALIBRACIÓN DE RETIRO
             if (totalActual < base) { 
                 base = totalActual; 
                 localStorage.setItem('baseJhon', base); 
@@ -282,7 +279,6 @@
             
             document.getElementById('message').innerText = ganadoHoy >= goal ? "¡OBJETIVO ALCANZADO! 🏆" : `Faltan $${(goal - ganadoHoy).toFixed(2)}`;
             
-            // Re-calculamos suma del mes agregando los 0s de días faltantes
             let sumMes = hoyRedondeo;
             for(let i = 1; i < info.diaNumero; i++) {
                 let m_num = String(info.mesIdx + 1).padStart(2, '0');
@@ -298,6 +294,7 @@
             renderizarGrafico(goal, hoyRedondeo);
         }
 
+        // 🧠 MOTOR GRÁFICO CON BANDA DE META INTERACTIVA
         function renderizarGrafico(goal, hoyRedondeo) {
             const ctx = document.getElementById('historialChart').getContext('2d');
             if (miGrafico) { miGrafico.destroy(); } 
@@ -305,6 +302,7 @@
             let labels = [];
             let values = [];
             let pointColors = [];
+            let bandaObjetivo = []; // Arreglo para dibujar la línea de meta
             
             for(let i = 1; i <= info.totalDiasMes; i++) {
                 let m_num = String(info.mesIdx + 1).padStart(2, '0');
@@ -315,6 +313,8 @@
                 const diasSemanaAbr = ["DOM", "LUN", "MAR", "MIE", "JUE", "VIE", "SAB"];
                 labels.push(`${d_num} (${diasSemanaAbr[dObj.getDay()]})`);
                 
+                bandaObjetivo.push(goal); // Llenamos la banda con la meta actual ($0.50)
+
                 if (i < info.diaNumero) {
                     let record = historial.find(h => h.f === fechaStr);
                     let val = record ? parseFloat(record.m) : 0.00;
@@ -330,18 +330,66 @@
             }
 
             const isLight = document.body.getAttribute('data-theme') === 'light';
-            let gradientFill = ctx.createLinearGradient(0, 0, 0, 230);
+            let gradientFill = ctx.createLinearGradient(0, 0, 0, 260);
             gradientFill.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
             gradientFill.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
 
             miGrafico = new Chart(ctx, {
                 type: 'line',
-                data: { labels: labels, datasets: [{ label: 'Ganancia Diaria ($)', data: values, backgroundColor: gradientFill, borderColor: '#3B82F6', borderWidth: 3, pointBackgroundColor: pointColors, pointBorderColor: isLight ? '#FFFFFF' : '#151C2C', pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 8, fill: true, tension: 0.4 }] },
+                data: { 
+                    labels: labels, 
+                    datasets: [
+                        { 
+                            label: 'Ganancia ($)', 
+                            data: values, 
+                            backgroundColor: gradientFill, 
+                            borderColor: '#3B82F6', 
+                            borderWidth: 3, 
+                            pointBackgroundColor: pointColors, 
+                            pointBorderColor: isLight ? '#FFFFFF' : '#151C2C', 
+                            pointBorderWidth: 2, 
+                            pointRadius: 5, 
+                            pointHoverRadius: 8, 
+                            fill: true, 
+                            tension: 0.4 
+                        },
+                        // 🔥 NUEVA BANDA TOP (LÍNEA DE REFERENCIA)
+                        {
+                            label: 'Banda Meta',
+                            data: bandaObjetivo,
+                            borderColor: '#F59E0B', // Color Dorado
+                            borderWidth: 2,
+                            borderDash: [5, 5], // Línea Punteada elegante
+                            pointRadius: 0, // Sin puntos para que parezca una zona
+                            pointHoverRadius: 0,
+                            fill: false,
+                            tension: 0
+                        }
+                    ] 
+                },
                 options: {
                     interaction: { mode: 'index', intersect: false },
                     animation: { duration: 600 }, responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(21,28,44,0.95)', titleColor: isLight ? '#111827' : '#F8FAFC', bodyColor: isLight ? '#111827' : '#F8FAFC', borderColor: isLight ? '#E5E7EB' : '#2A3241', borderWidth: 1, titleFont: { size: 12 }, bodyFont: { size: 16, weight: 'bold' }, padding: 10, cornerRadius: 8, callbacks: { label: function(context) { return '$' + context.parsed.y.toFixed(2); } } } },
-                    scales: { y: { beginAtZero: true, grid: { color: isLight ? '#E5E7EB' : '#2A3241', drawBorder: false }, ticks: { color: isLight ? '#6B7280' : '#94A3B8', font: { family: 'Poppins', weight: '600' }, callback: function(v) { return '$' + v; } } }, x: { grid: { display: false }, ticks: { color: isLight ? '#6B7280' : '#94A3B8', font: { family: 'Poppins', weight: '600' }, maxRotation: 0, maxTicksLimit: 15 } } }
+                    plugins: { 
+                        legend: { display: false }, 
+                        tooltip: { 
+                            backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(21,28,44,0.95)', 
+                            titleColor: isLight ? '#111827' : '#F8FAFC', 
+                            bodyColor: isLight ? '#111827' : '#F8FAFC', 
+                            borderColor: isLight ? '#E5E7EB' : '#2A3241', 
+                            borderWidth: 1, titleFont: { size: 12 }, bodyFont: { size: 14, weight: 'bold' }, 
+                            padding: 10, cornerRadius: 8, 
+                            callbacks: { 
+                                label: function(context) { 
+                                    return context.dataset.label + ': $' + context.parsed.y.toFixed(2); 
+                                } 
+                            } 
+                        } 
+                    },
+                    scales: { 
+                        y: { beginAtZero: true, grid: { color: isLight ? '#E5E7EB' : '#2A3241', drawBorder: false }, ticks: { color: isLight ? '#6B7280' : '#94A3B8', font: { family: 'Poppins', weight: '600' }, callback: function(v) { return '$' + v; } } }, 
+                        x: { grid: { display: false }, ticks: { color: isLight ? '#6B7280' : '#94A3B8', font: { family: 'Poppins', weight: '600' }, maxRotation: 0, maxTicksLimit: 15 } } 
+                    }
                 }
             });
         }
@@ -353,7 +401,7 @@
         }, 1500);
         
         function exportarExcelPro() {
-            const goal = parseFloat(document.getElementById('goal').value) || 1.00;
+            const goal = parseFloat(document.getElementById('goal').value) || 0.50;
             let wb = XLSX.utils.book_new();
             
             let e = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
@@ -411,8 +459,9 @@
             XLSX.writeFile(wb, `SproutGigs_Master_${info.id}.xlsx`);
         }
 
+        // 🔥 OJO AL EVENTO: Si el usuario teclea, se recalcula todo el gráfico al instante
         document.getElementById('goal').addEventListener('input', calcularMetricas);
-        document.getElementById('goal').value = localStorage.getItem('metaJhon') || 1.00;
+        document.getElementById('goal').value = localStorage.getItem('metaJhon') || 0.50;
         calcularMetricas();
     </script>
 </body>
