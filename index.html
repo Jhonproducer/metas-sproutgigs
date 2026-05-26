@@ -71,17 +71,34 @@
         .btn-excel:hover { background: var(--accent-green); color: white; }
         .btn-manual { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.3); }
         .btn-manual:hover { background: var(--accent-blue); color: white; }
+        .btn-logs { background: rgba(245, 158, 11, 0.1); color: var(--accent-yellow); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .btn-logs:hover { background: var(--accent-yellow); color: white; }
 
-        /* MODAL STYLES */
+        /* 🔥 ESTILOS DEL MODAL DE ACTIVIDAD */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(4px); }
-        .modal-content { background: var(--bg-card); border: 1px solid var(--border-color); padding: 25px; border-radius: var(--radius-main); width: 100%; max-width: 320px; box-shadow: var(--shadow-card); }
-        .modal-title { margin: 0 0 15px 0; font-size: 1.2rem; font-weight: 800; color: var(--text-main); text-align: center; }
-        .modal-input-group { margin-bottom: 15px; }
-        .modal-input-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; }
-        .modal-input-group input { width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; border-radius: var(--radius-sm); font-family: 'Poppins', sans-serif; font-weight: 600; outline: none; }
-        .modal-input-group input:focus { border-color: var(--accent-blue); }
-        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
-        .modal-buttons .btn { flex: 1; }
+        .modal-content { background: var(--bg-card); border: 1px solid var(--border-color); padding: 25px; border-radius: var(--radius-main); width: 100%; max-width: 400px; box-shadow: var(--shadow-card); max-height: 85vh; display: flex; flex-direction: column; }
+        .modal-title { margin: 0 0 15px 0; font-size: 1.2rem; font-weight: 800; color: var(--text-main); text-align: center; display: flex; justify-content: space-between; align-items: center; }
+        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; transition: color 0.2s; }
+        .close-btn:hover { color: var(--accent-red); }
+        
+        .log-section-title { font-size: 0.85rem; color: var(--accent-blue); font-weight: 800; text-transform: uppercase; margin: 15px 0 10px 0; letter-spacing: 1px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
+        
+        .log-summary-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 10px; }
+        .log-summary-item { display: flex; justify-content: space-between; background: var(--bg-input); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-weight: 600; font-size: 0.9rem; }
+        
+        .log-timeline { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; }
+        .log-item { display: flex; justify-content: space-between; background: var(--bg-input); padding: 10px; border-radius: var(--radius-sm); font-size: 0.85rem; border-left: 3px solid var(--accent-blue); }
+        .log-item.fee { border-left-color: var(--accent-red); }
+        .log-time { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; width: 65px; }
+        .log-desc { flex-grow: 1; font-weight: 600; color: var(--text-main); }
+        .log-amount { font-weight: 800; }
+        .amount-green { color: var(--accent-green); }
+        .amount-red { color: var(--accent-red); }
+        
+        /* Custom Scrollbar for Logs */
+        .log-timeline::-webkit-scrollbar { width: 6px; }
+        .log-timeline::-webkit-scrollbar-track { background: transparent; }
+        .log-timeline::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
     </style>
 </head>
 <body data-theme="dark">
@@ -95,6 +112,10 @@
                 <div class="racha-badge" id="badgeRacha">🔥 Racha: 0</div>
             </div>
             <div class="controls">
+                <button class="btn btn-logs" onclick="openLogModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Actividad
+                </button>
                 <button class="btn btn-manual" onclick="openManualModal()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                     Ajuste
@@ -149,8 +170,8 @@
     </div>
 
     <div class="modal-overlay" id="manualModal">
-        <div class="modal-content">
-            <h3 class="modal-title">Ajuste Manual de Saldo</h3>
+        <div class="modal-content" style="max-width: 320px; max-height: unset;">
+            <h3 class="modal-title">Ajuste de Saldo</h3>
             <div class="modal-input-group">
                 <label>Saldo Earned ($)</label>
                 <input type="number" id="inputManualEarned" step="0.0001" placeholder="0.0000">
@@ -159,10 +180,27 @@
                 <label>Saldo Pending ($)</label>
                 <input type="number" id="inputManualPending" step="0.0001" placeholder="0.0000">
             </div>
-            <div class="modal-buttons">
-                <button class="btn btn-outline" onclick="closeManualModal()" style="color: var(--accent-red); border-color: var(--accent-red);">Cancelar</button>
-                <button class="btn btn-excel" onclick="saveManualModal()">Guardar</button>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-outline" onclick="closeManualModal()" style="color: var(--accent-red); border-color: var(--accent-red); flex: 1;">Cancelar</button>
+                <button class="btn btn-excel" onclick="saveManualModal()" style="flex: 1;">Guardar</button>
             </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="logModal">
+        <div class="modal-content">
+            <h3 class="modal-title">
+                Registro de Hoy
+                <button class="close-btn" onclick="closeLogModal()">×</button>
+            </h3>
+            
+            <div class="log-section-title">📊 Resumen por Tareas</div>
+            <div class="log-summary-grid" id="logSummaryContainer">
+                </div>
+
+            <div class="log-section-title" style="margin-top: 20px;">⏱️ Línea de Tiempo</div>
+            <div class="log-timeline" id="logTimelineContainer">
+                </div>
         </div>
     </div>
 
@@ -201,7 +239,8 @@
             return { 
                 id: idFecha, mesIdx: vzlaDate.getMonth(), anio: vzlaDate.getFullYear(), 
                 diaNom: diasNom[vzlaDate.getDay()], labelPrincipal: labelFechaPrincipal,
-                hora: `${h}:${min} ${am}`, diaNumero: vzlaDate.getDate(), totalDiasMes: diasEnMes
+                hora: `${h}:${min} ${am}`, diaNumero: vzlaDate.getDate(), totalDiasMes: diasEnMes,
+                rawDate: vzlaDate
             };
         }
 
@@ -210,15 +249,13 @@
         document.getElementById('txtDateTime').innerText = info.hora;
         document.body.setAttribute('data-theme', localStorage.getItem('jhonTheme') || 'dark');
 
+        // SANIDAD DE BASE DE DATOS
         let historialBruto = JSON.parse(localStorage.getItem('histJhon')) || [];
         if (historialBruto.length > 0) {
-            let historialLimpio = [];
-            let fechasVistas = new Set();
+            let historialLimpio = []; let fechasVistas = new Set();
             historialBruto = historialBruto.filter(h => h && h.f && h.f.includes('-') && h.f.length >= 8);
             historialBruto.sort((a, b) => new Date(b.f) - new Date(a.f));
-            for (let h of historialBruto) {
-                if (!fechasVistas.has(h.f)) { fechasVistas.add(h.f); historialLimpio.push(h); }
-            }
+            for (let h of historialBruto) { if (!fechasVistas.has(h.f)) { fechasVistas.add(h.f); historialLimpio.push(h); } }
             localStorage.setItem('histJhon', JSON.stringify(historialLimpio));
         }
 
@@ -240,6 +277,19 @@
         let ultimaFecha = localStorage.getItem('fechaJhon');
         let historial = JSON.parse(localStorage.getItem('histJhon')) || [];
 
+        // 🔥 MOTOR DE ACTIVIDAD (LOGS)
+        let actividadHoy = JSON.parse(localStorage.getItem('actividadJhon')) || [];
+        
+        function registrarActividad(tipo, monto) {
+            const timeInfo = getVzlaData();
+            actividadHoy.unshift({
+                hora: timeInfo.hora,
+                tipo: tipo, // 'tarea' o 'fee'
+                monto: parseFloat(monto)
+            });
+            localStorage.setItem('actividadJhon', JSON.stringify(actividadHoy));
+        }
+
         function auditarCierreDia() {
             let e = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
             let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
@@ -255,16 +305,8 @@
                     
                     fUltima.setDate(fUltima.getDate() + 1);
                     while(fUltima < fHoy) {
-                        let y = fUltima.getFullYear();
-                        let m_num = String(fUltima.getMonth() + 1).padStart(2, '0');
-                        let d_num = String(fUltima.getDate()).padStart(2, '0');
-                        
-                        historial.unshift({
-                            f: `${y}-${m_num}-${d_num}`,
-                            m: "0.00",
-                            mes: fUltima.getMonth(),
-                            anio: fUltima.getFullYear()
-                        });
+                        let y = fUltima.getFullYear(); let m_num = String(fUltima.getMonth() + 1).padStart(2, '0'); let d_num = String(fUltima.getDate()).padStart(2, '0');
+                        historial.unshift({ f: `${y}-${m_num}-${d_num}`, m: "0.00", mes: fUltima.getMonth(), anio: fUltima.getFullYear() });
                         fUltima.setDate(fUltima.getDate() + 1);
                     }
                     
@@ -273,6 +315,10 @@
                     
                     base = totalA; localStorage.setItem('baseJhon', base);
                     ultimaFecha = info.id; localStorage.setItem('fechaJhon', info.id);
+                    
+                    // 🧹 LIMPIEZA DIARIA: Borramos el registro del día anterior
+                    actividadHoy = [];
+                    localStorage.setItem('actividadJhon', JSON.stringify(actividadHoy));
                 }
             }
             if (base === 0 && totalA > 0) { base = totalA; localStorage.setItem('baseJhon', base); }
@@ -281,27 +327,21 @@
         auditarCierreDia();
 
         let miGrafico; 
+        
+        // Memoria para el Motor Detective
+        let memoriaEarned = parseFloat(localStorage.getItem('lastEarnedJhon')) || null;
+        let memoriaPending = parseFloat(localStorage.getItem('lastPendingJhon')) || null;
 
         function calcularRacha(goal, hoyRedondeo) {
             let racha = 0;
             if (hoyRedondeo >= goal) racha++;
-            
             let dCheck = new Date(info.id + "T12:00:00");
             dCheck.setDate(dCheck.getDate() - 1);
-            
             for(let i=0; i<30; i++) {
-                let y = dCheck.getFullYear();
-                let m = String(dCheck.getMonth() + 1).padStart(2, '0');
-                let d = String(dCheck.getDate()).padStart(2, '0');
-                let fStr = `${y}-${m}-${d}`;
-                
-                let record = historial.find(h => h.f === fStr);
-                if (record && parseFloat(record.m) >= goal) {
-                    racha++;
-                    dCheck.setDate(dCheck.getDate() - 1);
-                } else {
-                    break;
-                }
+                let y = dCheck.getFullYear(); let m = String(dCheck.getMonth() + 1).padStart(2, '0'); let d = String(dCheck.getDate()).padStart(2, '0');
+                let record = historial.find(h => h.f === `${y}-${m}-${d}`);
+                if (record && parseFloat(record.m) >= goal) { racha++; dCheck.setDate(dCheck.getDate() - 1); } 
+                else break;
             }
             document.getElementById('badgeRacha').innerText = `🔥 Racha: ${racha}`;
         }
@@ -314,7 +354,25 @@
             let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalActual = e + p;
             
-            if (totalActual < base) { 
+            // 🔥 MOTOR DETECTIVE (Calcula qué hiciste basado en los micro-cambios)
+            if (memoriaEarned !== null && memoriaPending !== null) {
+                // Redondeamos para evitar errores de coma flotante de JS
+                let deltaP = Math.round((p - memoriaPending) * 10000) / 10000;
+                let deltaE = Math.round((e - memoriaEarned) * 10000) / 10000;
+
+                if (deltaP > 0) {
+                    // Si el pendiente subió, ¡Es una tarea nueva!
+                    registrarActividad('tarea', deltaP);
+                } 
+                if (deltaE < 0 && Math.abs(deltaE) < 0.20 && deltaP >= 0) {
+                    // Si el ganado bajó un poquito y no es un retiro grande, congelaste un cupo
+                    registrarActividad('fee', Math.abs(deltaE));
+                }
+            }
+            memoriaEarned = e; memoriaPending = p;
+
+            if (totalActual < base && Math.abs(totalActual - base) > 0.50) { 
+                // Auto-calibración solo si el bajón es significativo (retiro real, no un fee)
                 base = totalActual; 
                 localStorage.setItem('baseJhon', base); 
             }
@@ -323,16 +381,15 @@
             const hoyRedondeo = Math.round(ganadoHoy * 100) / 100;
             
             const ant = parseFloat(localStorage.getItem('antJhon')) || 0;
-            
             if (hoyRedondeo > ant) { 
-                document.getElementById('cashSound').play().catch(e=>{}); 
+                document.getElementById('cashSound').play().catch(er=>{}); 
                 document.getElementById('gananciaHoy').style.transform = "scale(1.1)";
                 setTimeout(() => { document.getElementById('gananciaHoy').style.transform = "scale(1)"; }, 200);
             }
 
             const hitGoalAnt = parseFloat(localStorage.getItem('hitGoalJhon')) || 0;
             if (hoyRedondeo >= goal && hitGoalAnt < goal) {
-                document.getElementById('winSound').play().catch(e=>{});
+                document.getElementById('winSound').play().catch(er=>{});
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#10B981', '#3B82F6', '#F59E0B'] });
             }
             localStorage.setItem('hitGoalJhon', hoyRedondeo);
@@ -353,10 +410,8 @@
             
             let sumMes = hoyRedondeo;
             for(let i = 1; i < info.diaNumero; i++) {
-                let m_num = String(info.mesIdx + 1).padStart(2, '0');
-                let d_num = String(i).padStart(2, '0');
-                let fechaStr = `${info.anio}-${m_num}-${d_num}`;
-                let record = historial.find(h => h.f === fechaStr);
+                let m_num = String(info.mesIdx + 1).padStart(2, '0'); let d_num = String(i).padStart(2, '0');
+                let record = historial.find(h => h.f === `${info.anio}-${m_num}-${d_num}`);
                 sumMes += record ? parseFloat(record.m) : 0;
             }
             
@@ -365,84 +420,125 @@
             
             calcularRacha(goal, hoyRedondeo);
             renderizarGrafico(goal, hoyRedondeo, false);
+            
+            // Si el modal de Logs está abierto, lo actualiza en tiempo real
+            if (document.getElementById('logModal').style.display === 'flex') { renderizarLogs(); }
         }
 
         function renderizarGrafico(goal, hoyRedondeo, forzarDestruir = false) {
             const ctx = document.getElementById('historialChart').getContext('2d');
-            
             let labels = []; let values = []; let pointColors = []; let bandaObjetivo = [];
             
             for(let i = 1; i <= info.totalDiasMes; i++) {
-                let m_num = String(info.mesIdx + 1).padStart(2, '0');
-                let d_num = String(i).padStart(2, '0');
-                let fechaStr = `${info.anio}-${m_num}-${d_num}`;
-                
-                let dObj = new Date(fechaStr + "T12:00:00");
-                const diasSemanaAbr = ["DOM", "LUN", "MAR", "MIE", "JUE", "VIE", "SAB"];
-                labels.push(`${d_num} (${diasSemanaAbr[dObj.getDay()]})`);
-                
+                let m_num = String(info.mesIdx + 1).padStart(2, '0'); let d_num = String(i).padStart(2, '0');
+                let dObj = new Date(`${info.anio}-${m_num}-${d_num}T12:00:00`);
+                labels.push(`${d_num} (${["DOM", "LUN", "MAR", "MIE", "JUE", "VIE", "SAB"][dObj.getDay()]})`);
                 bandaObjetivo.push(goal); 
-
                 if (i < info.diaNumero) {
-                    let record = historial.find(h => h.f === fechaStr);
+                    let record = historial.find(h => h.f === `${info.anio}-${m_num}-${d_num}`);
                     let val = record ? parseFloat(record.m) : 0.00;
-                    values.push(val);
-                    pointColors.push(val >= goal ? '#10B981' : (val === 0 ? '#EF4444' : '#F59E0B'));
+                    values.push(val); pointColors.push(val >= goal ? '#10B981' : (val === 0 ? '#EF4444' : '#F59E0B'));
                 } else if (i === info.diaNumero) {
-                    values.push(hoyRedondeo);
-                    pointColors.push(hoyRedondeo >= goal ? '#10B981' : (hoyRedondeo === 0 ? '#EF4444' : '#F59E0B'));
+                    values.push(hoyRedondeo); pointColors.push(hoyRedondeo >= goal ? '#10B981' : (hoyRedondeo === 0 ? '#EF4444' : '#F59E0B'));
                 } else {
-                    values.push(null);
-                    pointColors.push('transparent');
+                    values.push(null); pointColors.push('transparent');
                 }
             }
 
             const isLight = document.body.getAttribute('data-theme') === 'light';
             
             if (miGrafico && !forzarDestruir) {
-                miGrafico.data.labels = labels;
-                miGrafico.data.datasets[0].data = values;
-                miGrafico.data.datasets[0].pointBackgroundColor = pointColors;
-                miGrafico.data.datasets[0].pointBorderColor = isLight ? '#FFFFFF' : '#151C2C';
-                miGrafico.data.datasets[1].data = bandaObjetivo;
-                miGrafico.options.scales.y.grid.color = isLight ? '#E5E7EB' : '#2A3241';
-                miGrafico.options.scales.y.ticks.color = isLight ? '#6B7280' : '#94A3B8';
+                miGrafico.data.labels = labels; miGrafico.data.datasets[0].data = values; miGrafico.data.datasets[0].pointBackgroundColor = pointColors;
+                miGrafico.data.datasets[0].pointBorderColor = isLight ? '#FFFFFF' : '#151C2C'; miGrafico.data.datasets[1].data = bandaObjetivo;
+                miGrafico.options.scales.y.grid.color = isLight ? '#E5E7EB' : '#2A3241'; miGrafico.options.scales.y.ticks.color = isLight ? '#6B7280' : '#94A3B8';
                 miGrafico.options.scales.x.ticks.color = isLight ? '#6B7280' : '#94A3B8';
                 miGrafico.options.plugins.tooltip.backgroundColor = isLight ? 'rgba(255,255,255,0.95)' : 'rgba(21,28,44,0.95)';
-                miGrafico.options.plugins.tooltip.titleColor = isLight ? '#111827' : '#F8FAFC';
-                miGrafico.options.plugins.tooltip.bodyColor = isLight ? '#111827' : '#F8FAFC';
+                miGrafico.options.plugins.tooltip.titleColor = isLight ? '#111827' : '#F8FAFC'; miGrafico.options.plugins.tooltip.bodyColor = isLight ? '#111827' : '#F8FAFC';
                 miGrafico.options.plugins.tooltip.borderColor = isLight ? '#E5E7EB' : '#2A3241';
-                miGrafico.update('none'); 
-                return;
+                miGrafico.update('none'); return;
             }
 
             if (miGrafico) miGrafico.destroy();
-
             let gradientFill = ctx.createLinearGradient(0, 0, 0, 260);
-            gradientFill.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
-            gradientFill.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+            gradientFill.addColorStop(0, 'rgba(59, 130, 246, 0.4)'); gradientFill.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
 
             miGrafico = new Chart(ctx, {
                 type: 'line',
-                data: { 
-                    labels: labels, 
-                    datasets: [
-                        { label: 'Ganancia ($)', data: values, backgroundColor: gradientFill, borderColor: '#3B82F6', borderWidth: 3, pointBackgroundColor: pointColors, pointBorderColor: isLight ? '#FFFFFF' : '#151C2C', pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 8, fill: true, tension: 0.4 },
-                        { label: 'Banda Meta', data: bandaObjetivo, borderColor: '#F59E0B', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, pointHoverRadius: 0, fill: false, tension: 0 }
-                    ] 
-                },
-                options: {
-                    interaction: { mode: 'index', intersect: false },
-                    animation: { duration: 600 }, responsive: true, maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false }, 
-                        tooltip: { backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(21,28,44,0.95)', titleColor: isLight ? '#111827' : '#F8FAFC', bodyColor: isLight ? '#111827' : '#F8FAFC', borderColor: isLight ? '#E5E7EB' : '#2A3241', borderWidth: 1, titleFont: { size: 12 }, bodyFont: { size: 14, weight: 'bold' }, padding: 10, cornerRadius: 8, callbacks: { label: function(context) { return context.dataset.label + ': $' + context.parsed.y.toFixed(2); } } } 
-                    },
-                    scales: { 
-                        y: { beginAtZero: true, grid: { color: isLight ? '#E5E7EB' : '#2A3241', drawBorder: false }, ticks: { color: isLight ? '#6B7280' : '#94A3B8', font: { family: 'Poppins', weight: '600' }, callback: function(v) { return '$' + v; } } }, 
-                        x: { grid: { display: false }, ticks: { color: isLight ? '#6B7280' : '#94A3B8', font: { family: 'Poppins', weight: '600' }, maxRotation: 0, maxTicksLimit: 15 } } 
-                    }
+                data: { labels: labels, datasets: [ { label: 'Ganancia ($)', data: values, backgroundColor: gradientFill, borderColor: '#3B82F6', borderWidth: 3, pointBackgroundColor: pointColors, pointBorderColor: isLight ? '#FFFFFF' : '#151C2C', pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 8, fill: true, tension: 0.4 }, { label: 'Banda Meta', data: bandaObjetivo, borderColor: '#F59E0B', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, pointHoverRadius: 0, fill: false, tension: 0 } ] },
+                options: { interaction: { mode: 'index', intersect: false }, animation: { duration: 600 }, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: isLight ? 'rgba(255,255,255,0.95)' : 'rgba(21,28,44,0.95)', titleColor: isLight ? '#111827' : '#F8FAFC', bodyColor: isLight ? '#111827' : '#F8FAFC', borderColor: isLight ? '#E5E7EB' : '#2A3241', borderWidth: 1, titleFont: { size: 12 }, bodyFont: { size: 14, weight: 'bold' }, padding: 10, cornerRadius: 8, callbacks: { label: function(c) { return c.dataset.label + ': $' + c.parsed.y.toFixed(2); } } } }, scales: { y: { beginAtZero: true, grid: { color: isLight ? '#E5E7EB' : '#2A3241', drawBorder: false }, ticks: { color: isLight ? '#6B7280' : '#94A3B8', font: { family: 'Poppins', weight: '600' }, callback: function(v) { return '$' + v; } } }, x: { grid: { display: false }, ticks: { color: isLight ? '#6B7280' : '#94A3B8', font: { family: 'Poppins', weight: '600' }, maxRotation: 0, maxTicksLimit: 15 } } } }
+            });
+        }
+
+        // 🔥 CONTROLADORES DEL MODAL DE ACTIVIDAD
+        function openLogModal() {
+            renderizarLogs();
+            document.getElementById('logModal').style.display = 'flex';
+        }
+
+        function closeLogModal() {
+            document.getElementById('logModal').style.display = 'none';
+        }
+
+        function renderizarLogs() {
+            let containerSummary = document.getElementById('logSummaryContainer');
+            let containerTimeline = document.getElementById('logTimelineContainer');
+            containerSummary.innerHTML = ""; containerTimeline.innerHTML = "";
+
+            if (actividadHoy.length === 0) {
+                containerTimeline.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:0.9rem; padding: 20px;">No hay tareas registradas hoy aún. ¡A trabajar! 🚀</div>`;
+                containerSummary.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:0.9rem;">Sin datos</div>`;
+                return;
+            }
+
+            // Agrupar tareas para el resumen
+            let conteoTareas = {};
+            let totalFees = 0;
+
+            actividadHoy.forEach(log => {
+                if (log.tipo === 'tarea') {
+                    let key = log.monto.toFixed(2);
+                    if (!conteoTareas[key]) conteoTareas[key] = { cantidad: 0, subtotal: 0 };
+                    conteoTareas[key].cantidad++;
+                    conteoTareas[key].subtotal += log.monto;
+                } else if (log.tipo === 'fee') {
+                    totalFees += log.monto;
                 }
+            });
+
+            // Dibujar Resumen
+            for (let precio in conteoTareas) {
+                let data = conteoTareas[precio];
+                containerSummary.innerHTML += `
+                    <div class="log-summary-item">
+                        <span style="color: var(--text-main);">🔹 ${data.cantidad} tareas de $${precio}</span>
+                        <span class="amount-green">+$${data.subtotal.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+            if (totalFees > 0) {
+                containerSummary.innerHTML += `
+                    <div class="log-summary-item" style="border-color: rgba(239, 68, 68, 0.3);">
+                        <span style="color: var(--accent-red);">🔴 Cupos Congelados (Fees)</span>
+                        <span class="amount-red">-$${totalFees.toFixed(4)}</span>
+                    </div>
+                `;
+            }
+
+            // Dibujar Timeline Exacto
+            actividadHoy.forEach(log => {
+                let esTarea = log.tipo === 'tarea';
+                let icon = esTarea ? '🟢 Tarea Completada' : '🔴 Cupo Congelado';
+                let classColor = esTarea ? 'amount-green' : 'amount-red';
+                let sign = esTarea ? '+' : '-';
+                let formatAmount = log.monto < 0.01 ? log.monto.toFixed(4) : log.monto.toFixed(2);
+                
+                containerTimeline.innerHTML += `
+                    <div class="log-item ${esTarea ? '' : 'fee'}">
+                        <span class="log-time">${log.hora}</span>
+                        <span class="log-desc">${icon}</span>
+                        <span class="log-amount ${classColor}">${sign}$${formatAmount}</span>
+                    </div>
+                `;
             });
         }
 
@@ -452,82 +548,41 @@
             document.getElementById('inputManualPending').value = localStorage.getItem('lastPendingJhon') || 0;
             document.getElementById('manualModal').style.display = 'flex';
         }
-
-        function closeManualModal() {
-            document.getElementById('manualModal').style.display = 'none';
-        }
-
+        function closeManualModal() { document.getElementById('manualModal').style.display = 'none'; }
         function saveManualModal() {
             let e = parseFloat(document.getElementById('inputManualEarned').value) || 0;
             let p = parseFloat(document.getElementById('inputManualPending').value) || 0;
-            localStorage.setItem('lastEarnedJhon', e);
-            localStorage.setItem('lastPendingJhon', p);
-            calcularMetricas();
-            closeManualModal();
+            localStorage.setItem('lastEarnedJhon', e); localStorage.setItem('lastPendingJhon', p);
+            calcularMetricas(); closeManualModal();
         }
 
-        // OPTIMIZACIÓN: Listener nativo en lugar de setInterval
         window.addEventListener('storage', (e) => {
-            if (e.key === 'syncTrigger' || e.key === 'lastEarnedJhon' || e.key === 'lastPendingJhon') {
-                calcularMetricas();
-            }
+            if (e.key === 'syncTrigger' || e.key === 'lastEarnedJhon' || e.key === 'lastPendingJhon') calcularMetricas();
         });
         
         function exportarExcelPro() {
-            const goal = parseFloat(document.getElementById('goal').value) || 0.50;
-            let wb = XLSX.utils.book_new();
-            
-            let e = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0;
-            let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
-            let baseLocal = parseFloat(localStorage.getItem('baseJhon')) || 0;
-            let hoyRedondeo = Math.round(Math.max(0, (e + p) - baseLocal) * 100) / 100;
-            
-            let mesesGrp = {};
-            historial.forEach(h => { 
-                let k = `${MESES[h.mes]} ${h.anio}`; 
-                if(!mesesGrp[k]) mesesGrp[k] = {}; 
-                mesesGrp[k][h.f] = h; 
-            });
-            
-            let kHoy = `${MESES[info.mesIdx]} ${info.anio}`;
-            if (!mesesGrp[kHoy]) mesesGrp[kHoy] = {};
+            const goal = parseFloat(document.getElementById('goal').value) || 0.50; let wb = XLSX.utils.book_new();
+            let e = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0; let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
+            let baseLocal = parseFloat(localStorage.getItem('baseJhon')) || 0; let hoyRedondeo = Math.round(Math.max(0, (e + p) - baseLocal) * 100) / 100;
+            let mesesGrp = {}; historial.forEach(h => { let k = `${MESES[h.mes]} ${h.anio}`; if(!mesesGrp[k]) mesesGrp[k] = {}; mesesGrp[k][h.f] = h; });
+            let kHoy = `${MESES[info.mesIdx]} ${info.anio}`; if (!mesesGrp[kHoy]) mesesGrp[kHoy] = {};
             mesesGrp[kHoy][info.id] = { f: info.id, m: hoyRedondeo, mes: info.mesIdx, anio: info.anio };
-            
-            let totalG = 0; let dExito = 0; let totalDiasEval = 0;
-            let sheetsData = {};
-            
+            let totalG = 0; let dExito = 0; let totalDiasEval = 0; let sheetsData = {};
             for(let k in mesesGrp) { 
                 let wsD = [["FECHA", "GANANCIA ($)", "META ($)", "¿LOGRADO?"]]; 
-                let parts = k.split(" "); 
-                let mesIndex = MESES.indexOf(parts[0]);
-                let anio = parseInt(parts[1]);
-                
+                let parts = k.split(" "); let mesIndex = MESES.indexOf(parts[0]); let anio = parseInt(parts[1]);
                 let maxDay = (mesIndex === info.mesIdx && anio === info.anio) ? info.diaNumero : new Date(anio, mesIndex + 1, 0).getDate();
-                
                 for(let i = maxDay; i >= 1; i--) {
-                    let m_str = String(mesIndex + 1).padStart(2, '0');
-                    let d_str = String(i).padStart(2, '0');
+                    let m_str = String(mesIndex + 1).padStart(2, '0'); let d_str = String(i).padStart(2, '0');
                     let fStr = `${anio}-${m_str}-${d_str}`;
-                    
                     let m_val = mesesGrp[k][fStr] ? parseFloat(mesesGrp[k][fStr].m) : 0.00;
                     wsD.push([fStr, m_val, goal, m_val >= goal ? "✅ SÍ" : "❌ NO"]);
-                    
-                    totalG += m_val;
-                    if (m_val >= goal) dExito++;
-                    totalDiasEval++;
+                    totalG += m_val; if (m_val >= goal) dExito++; totalDiasEval++;
                 }
                 sheetsData[k] = wsD;
             }
-            
-            let wsR = XLSX.utils.aoa_to_sheet([ 
-                ["REPORTE SPROUTGIGS"], [], 
-                ["MÉTRICA", "RESULTADO"], 
-                ["Total Días Evaluados", totalDiasEval], 
-                ["Días Meta Cumplida", dExito], 
-                ["Total Histórico Trabajado ($)", totalG.toFixed(2)] 
-            ]);
+            let wsR = XLSX.utils.aoa_to_sheet([ ["REPORTE SPROUTGIGS"], [], ["MÉTRICA", "RESULTADO"], ["Total Días Evaluados", totalDiasEval], ["Días Meta Cumplida", dExito], ["Total Histórico Trabajado ($)", totalG.toFixed(2)] ]);
             XLSX.utils.book_append_sheet(wb, wsR, "Resumen Global");
-            
             for(let k in sheetsData) { XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sheetsData[k]), k); }
             XLSX.writeFile(wb, `SproutGigs_Master_${info.id}.xlsx`);
         }
