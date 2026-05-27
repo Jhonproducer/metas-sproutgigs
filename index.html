@@ -16,6 +16,7 @@
             --text-main: #F8FAFC; --text-muted: #94A3B8; --border-color: #2A3241;
             --accent-blue: #3B82F6; --accent-green: #10B981;
             --accent-yellow: #F59E0B; --accent-red: #EF4444;
+            --accent-gold: #F59E0B;
             --shadow-card: 0 8px 25px -8px rgba(0,0,0,0.6);
             --radius-main: 16px; --radius-sm: 8px;
         }
@@ -74,7 +75,7 @@
         .btn-logs { background: rgba(245, 158, 11, 0.1); color: var(--accent-yellow); border: 1px solid rgba(245, 158, 11, 0.3); }
         .btn-logs:hover { background: var(--accent-yellow); color: white; }
 
-        /* 🔥 NUEVA UI DE ACTIVIDAD VIP */
+        /* MODAL VIP ACTIVITY */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(5px); }
         .modal-content { background: var(--bg-card); border: 1px solid var(--border-color); padding: 25px; border-radius: var(--radius-main); width: 100%; max-width: 480px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); max-height: 85vh; display: flex; flex-direction: column; }
         .modal-title { margin: 0 0 15px 0; font-size: 1.3rem; font-weight: 800; color: var(--text-main); text-align: center; display: flex; justify-content: space-between; align-items: center; }
@@ -83,7 +84,6 @@
         
         .log-section-title { font-size: 0.85rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin: 15px 0 10px 0; letter-spacing: 1px; }
         
-        /* Sistema de Smart Cards */
         .task-cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px; }
         .task-card { background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; display: flex; align-items: center; gap: 12px; transition: transform 0.2s; }
         .task-card:hover { transform: translateY(-2px); border-color: var(--accent-blue); }
@@ -96,10 +96,10 @@
         .fee-card span { color: var(--accent-red); font-weight: 700; font-size: 0.9rem; }
         .fee-card .fee-total { font-size: 1.2rem; font-weight: 800; }
 
-        /* Timeline simplificada */
         .log-timeline { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; }
         .log-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-input); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; border-left: 3px solid var(--border-color); }
         .log-item.retiro { border-left-color: var(--accent-gold); }
+        .log-item.fee { border-left-color: var(--accent-red); }
         .log-time { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; width: 70px; }
         .log-desc { flex-grow: 1; font-weight: 600; color: var(--text-main); }
         .log-amount { font-weight: 800; }
@@ -176,6 +176,7 @@
         </section>
     </div>
 
+    <!-- MODAL DE AJUSTE MANUAL -->
     <div class="modal-overlay" id="manualModal">
         <div class="modal-content" style="max-width: 320px;">
             <h3 class="modal-title">Ajuste de Saldo</h3>
@@ -194,6 +195,7 @@
         </div>
     </div>
 
+    <!-- MODAL DE ACTIVIDAD VIP -->
     <div class="modal-overlay" id="logModal">
         <div class="modal-content">
             <h3 class="modal-title">
@@ -202,15 +204,11 @@
             </h3>
             
             <div class="log-section-title">📊 Producción de Hoy</div>
-            <div class="task-cards-grid" id="taskCardsContainer">
-                </div>
-            
-            <div id="feeCardContainer">
-                </div>
+            <div class="task-cards-grid" id="taskCardsContainer"></div>
+            <div id="feeCardContainer"></div>
 
             <div class="log-section-title">⏱️ Historial Reciente</div>
-            <div class="log-timeline" id="logTimelineContainer">
-                </div>
+            <div class="log-timeline" id="logTimelineContainer"></div>
         </div>
     </div>
 
@@ -259,8 +257,7 @@
         function registrarActividad(tipo, monto) {
             const timeInfo = getVzlaData();
             actividadHoy.unshift({ hora: timeInfo.hora, tipo: tipo, monto: parseFloat(monto) });
-            // Guardar máximo las últimas 100 acciones del día para no saturar
-            actividadHoy = actividadHoy.slice(0, 100);
+            actividadHoy = actividadHoy.slice(0, 150);
             localStorage.setItem('actividadJhon', JSON.stringify(actividadHoy));
             if (document.getElementById('logModal').style.display === 'flex') { renderizarLogs(); }
         }
@@ -291,7 +288,6 @@
                     base = totalA; localStorage.setItem('baseJhon', base);
                     localStorage.setItem('fechaJhon', info.id);
                     
-                    // Limpieza Diaria de Actividad
                     actividadHoy = []; localStorage.setItem('actividadJhon', JSON.stringify(actividadHoy));
                 }
             }
@@ -325,30 +321,64 @@
             let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalActual = e + p;
             
-            // 🔥 MOTOR DETECTIVE DE ALTA VELOCIDAD Y MATEMÁTICA DE RETIROS
             if (memoriaEarned !== null && memoriaPending !== null) {
                 let deltaE = Math.round((e - memoriaEarned) * 10000) / 10000;
                 let deltaP = Math.round((p - memoriaPending) * 10000) / 10000;
 
-                if (deltaP > 0) { registrarActividad('tarea', deltaP); }
-                
+                // 🔥 ESCUDO ANTI-PESTAÑAS VIEJAS (Stale Data Shield)
+                // Si el pendiente baja a cero de golpe, pero no ganaste dinero real,
+                // significa que cambiaste a una pestaña vieja desactualizada.
+                let esPestanaVieja = (deltaP < 0 && deltaE === 0);
+
+                if (!esPestanaVieja) {
+                    if (deltaP > 0) { 
+                        // 🔥 ALGORITMO DESGLOSADOR INTELIGENTE
+                        let detectado = false;
+                        if (deltaP >= 0.06 && Math.abs((deltaP / 0.03) - Math.round(deltaP / 0.03)) < 0.001) {
+                            let cant = Math.round(deltaP / 0.03);
+                            for(let i=0; i<cant; i++) registrarActividad('tarea', 0.03);
+                            detectado = true;
+                        }
+                        else if (!detectado && deltaP >= 0.08 && Math.abs((deltaP / 0.04) - Math.round(deltaP / 0.04)) < 0.001) {
+                            let cant = Math.round(deltaP / 0.04);
+                            for(let i=0; i<cant; i++) registrarActividad('tarea', 0.04);
+                            detectado = true;
+                        }
+                        else if (!detectado && deltaP >= 0.10 && Math.abs((deltaP / 0.05) - Math.round(deltaP / 0.05)) < 0.001) {
+                            let cant = Math.round(deltaP / 0.05);
+                            for(let i=0; i<cant; i++) registrarActividad('tarea', 0.05);
+                            detectado = true;
+                        }
+                        else if (!detectado && deltaP >= 0.14 && Math.abs((deltaP / 0.07) - Math.round(deltaP / 0.07)) < 0.001) {
+                            let cant = Math.round(deltaP / 0.07);
+                            for(let i=0; i<cant; i++) registrarActividad('tarea', 0.07);
+                            detectado = true;
+                        }
+                        
+                        if (!detectado) { registrarActividad('tarea', deltaP); }
+                    }
+                    // SOLO guardamos la memoria si los datos son reales y frescos
+                    memoriaPending = p; 
+                }
+
                 if (deltaE < 0) {
                     let caida = Math.abs(deltaE);
                     if (caida >= 5.00) {
-                        // ¡ES UN RETIRO! Mantenemos tu "Trabajo de Hoy" intacto.
                         base = base - caida; 
                         localStorage.setItem('baseJhon', base);
                         registrarActividad('retiro', caida);
                     } else if (caida < 0.50) {
-                        // Congelaste un cupo (Fee)
                         registrarActividad('fee', caida);
                     }
                 }
+                memoriaEarned = e;
+            } else {
+                memoriaEarned = e; memoriaPending = p;
             }
-            memoriaEarned = e; memoriaPending = p;
 
-            // Salvaguarda general por si la base se descuadra
-            if (totalActual < base) { base = totalActual; localStorage.setItem('baseJhon', base); }
+            if (totalActual < base && Math.abs(totalActual - base) >= 5.00) { 
+                base = totalActual; localStorage.setItem('baseJhon', base); 
+            }
             
             const ganadoHoy = Math.max(0, totalActual - base);
             const hoyRedondeo = Math.round(ganadoHoy * 100) / 100;
@@ -424,7 +454,6 @@
             });
         }
 
-        // 🔥 FUNCIONES DE LA NUEVA UI DE ACTIVIDAD VIP
         function openLogModal() { renderizarLogs(); document.getElementById('logModal').style.display = 'flex'; }
         function closeLogModal() { document.getElementById('logModal').style.display = 'none'; }
 
@@ -444,14 +473,13 @@
 
             actividadHoy.forEach(log => {
                 if (log.tipo === 'tarea') {
-                    let key = log.monto.toFixed(3); // Precisión de 3 decimales para clasificar
+                    let key = log.monto.toFixed(3); 
                     if (!conteoTareas[key]) conteoTareas[key] = { cantidad: 0, subtotal: 0 };
                     conteoTareas[key].cantidad++;
                     conteoTareas[key].subtotal += log.monto;
                 } else if (log.tipo === 'fee') { totalFees += log.monto; }
             });
 
-            // Dibujar Smart Cards
             for (let precio in conteoTareas) {
                 let data = conteoTareas[precio];
                 containerCards.innerHTML += `
@@ -474,8 +502,7 @@
                 `;
             }
 
-            // Dibujar Timeline Elegante (Solo las últimas 15 acciones para que sea limpio)
-            let maxTimeline = actividadHoy.slice(0, 15);
+            let maxTimeline = actividadHoy.slice(0, 20); 
             maxTimeline.forEach(log => {
                 let esTarea = log.tipo === 'tarea';
                 let esRetiro = log.tipo === 'retiro';
@@ -496,7 +523,6 @@
             });
         }
 
-        // CONTROLADORES MODAL MANUAL
         function openManualModal() {
             document.getElementById('inputManualEarned').value = localStorage.getItem('lastEarnedJhon') || 0;
             document.getElementById('inputManualPending').value = localStorage.getItem('lastPendingJhon') || 0;
@@ -510,13 +536,11 @@
             calcularMetricas(); closeManualModal();
         }
 
-        // Receptor Cuántico de Tampermonkey
         window.addEventListener('storage', (e) => {
             if (e.key === 'syncTrigger' || e.key === 'lastEarnedJhon' || e.key === 'lastPendingJhon') calcularMetricas();
         });
         
         function exportarExcelPro() {
-            // Logica intacta del Excel...
             const goal = parseFloat(document.getElementById('goal').value) || 0.50; let wb = XLSX.utils.book_new();
             let e = parseFloat(localStorage.getItem('lastEarnedJhon')) || 0; let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let baseLocal = parseFloat(localStorage.getItem('baseJhon')) || 0; let hoyRedondeo = Math.round(Math.max(0, (e + p) - baseLocal) * 100) / 100;
