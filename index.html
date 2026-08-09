@@ -64,13 +64,6 @@
         .chart-header span { font-weight: 700; font-size: 1.1rem; }
         .chart-container { position: relative; height: 260px; width: 100%; }
 
-        .analytics-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-main); padding: 20px 24px; box-shadow: var(--shadow-card); display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: center; }
-        .a-col { display: flex; flex-direction: column; border-right: 1px solid var(--border-color); padding-right: 15px; }
-        .a-col:last-child { border-right: none; padding-right: 0; }
-        .a-title { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
-        .a-val { font-size: 1.5rem; font-weight: 800; }
-        .a-sub { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-top: 4px;}
-
         .btn { padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; border: none; transition: all 0.2s ease; font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 6px; justify-content: center; }
         .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
         .btn-outline:hover { background: var(--bg-input); color: var(--accent-blue); border-color: var(--accent-blue); }
@@ -78,8 +71,6 @@
         .btn-excel:hover { background: var(--accent-green); color: white; }
         .btn-manual { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.3); }
         .btn-manual:hover { background: var(--accent-blue); color: white; }
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); width: 100%; margin-top: 15px; }
-        .btn-danger:hover { background: var(--accent-red); color: white; }
 
         /* MODAL STYLES */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(4px); }
@@ -108,9 +99,9 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                     Ajuste
                 </button>
-                <button class="btn btn-excel" onclick="exportarExcelFactura()">
+                <button class="btn btn-excel" onclick="exportarExcelPro()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M8 13h8"></path><path d="M8 17h8"></path><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    Factura
+                    Excel
                 </button>
                 <button class="btn btn-outline" onclick="toggleTheme()">🌓 Tema</button>
             </div>
@@ -155,35 +146,11 @@
                 <div class="chart-container"><canvas id="historialChart"></canvas></div>
             </div>
         </section>
-
-        <section class="analytics-panel">
-            <div class="a-col">
-                <span class="a-title">🔥 Racha Invicta</span>
-                <span id="statRacha" class="a-val" style="color: var(--accent-yellow);">0 Días</span>
-                <span class="a-sub">Superando la meta</span>
-            </div>
-            <div class="a-col">
-                <span class="a-title">📈 Promedio Diario</span>
-                <span id="statPromedio" class="a-val" style="color: var(--accent-blue);">$0.00</span>
-                <span class="a-sub">Este mes</span>
-            </div>
-            <div class="a-col">
-                <span class="a-title">🏆 Mejor Día</span>
-                <span id="statMejorDia" class="a-val" style="color: var(--accent-green);">$0.00</span>
-                <span id="statMejorDiaFecha" class="a-sub">---</span>
-            </div>
-            <div class="a-col">
-                <span class="a-title">🎯 Cierre Estimado</span>
-                <span id="statEstimado" class="a-val" style="color: var(--text-main);">$0.00</span>
-                <span class="a-sub">Si mantienes el ritmo</span>
-            </div>
-        </section>
     </div>
 
-    <!-- MODAL MANUAL CON BOTÓN DE FORMATEO -->
     <div class="modal-overlay" id="manualModal">
         <div class="modal-content">
-            <h3 class="modal-title">Configuración</h3>
+            <h3 class="modal-title">Ajuste Manual de Saldo</h3>
             <div class="modal-input-group">
                 <label>Saldo Earned ($)</label>
                 <input type="number" id="inputManualEarned" step="0.0001" placeholder="0.0000">
@@ -193,11 +160,9 @@
                 <input type="number" id="inputManualPending" step="0.0001" placeholder="0.0000">
             </div>
             <div class="modal-buttons">
-                <button class="btn btn-outline" onclick="closeManualModal()">Cancelar</button>
+                <button class="btn btn-outline" onclick="closeManualModal()" style="color: var(--accent-red); border-color: var(--accent-red);">Cancelar</button>
                 <button class="btn btn-excel" onclick="saveManualModal()">Guardar</button>
             </div>
-            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0 10px 0;">
-            <button class="btn btn-danger" onclick="hardReset()">⚠️ Resetear Historial</button>
         </div>
     </div>
 
@@ -317,11 +282,28 @@
 
         let miGrafico; 
 
-        // 🔥 CONTABILIDAD DE DEDUCCIONES (Invisible para Factura)
-        function trackFinanzas(tipo, monto) {
-            let m = JSON.parse(localStorage.getItem(`jhon_${tipo}`)) || [];
-            m.push({ f: info.id, v: monto });
-            localStorage.setItem(`jhon_${tipo}`, JSON.stringify(m));
+        function calcularRacha(goal, hoyRedondeo) {
+            let racha = 0;
+            if (hoyRedondeo >= goal) racha++;
+            
+            let dCheck = new Date(info.id + "T12:00:00");
+            dCheck.setDate(dCheck.getDate() - 1);
+            
+            for(let i=0; i<30; i++) {
+                let y = dCheck.getFullYear();
+                let m = String(dCheck.getMonth() + 1).padStart(2, '0');
+                let d = String(dCheck.getDate()).padStart(2, '0');
+                let fStr = `${y}-${m}-${d}`;
+                
+                let record = historial.find(h => h.f === fStr);
+                if (record && parseFloat(record.m) >= goal) {
+                    racha++;
+                    dCheck.setDate(dCheck.getDate() - 1);
+                } else {
+                    break;
+                }
+            }
+            document.getElementById('badgeRacha').innerText = `🔥 Racha: ${racha}`;
         }
 
         function calcularMetricas() {
@@ -332,21 +314,9 @@
             let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalActual = e + p;
             
-            // 🔥 LÓGICA DE CONTABILIDAD ABSOLUTA (Sin adivinanzas)
             if (totalActual < base) { 
-                let caida = base - totalActual;
-                if (caida >= 4.00) {
-                    // Es un Retiro. Bajamos la base para proteger tu día.
-                    base = totalActual;
-                    localStorage.setItem('baseJhon', base);
-                    trackFinanzas('retiros', caida);
-                } else {
-                    // Es un fee o tarea rechazada. 
-                    // No tocamos la base. Dejamos que tu "gananciaHoy" baje matemáticamente.
-                    trackFinanzas('deducciones', caida);
-                    base = totalActual; // Actualizamos la base para no quedar en negativo
-                    localStorage.setItem('baseJhon', base);
-                }
+                base = totalActual; 
+                localStorage.setItem('baseJhon', base); 
             }
             
             const ganadoHoy = Math.max(0, totalActual - base);
@@ -355,14 +325,14 @@
             const ant = parseFloat(localStorage.getItem('antJhon')) || 0;
             
             if (hoyRedondeo > ant) { 
-                document.getElementById('cashSound').play().catch(er=>{}); 
+                document.getElementById('cashSound').play().catch(e=>{}); 
                 document.getElementById('gananciaHoy').style.transform = "scale(1.1)";
                 setTimeout(() => { document.getElementById('gananciaHoy').style.transform = "scale(1)"; }, 200);
             }
 
             const hitGoalAnt = parseFloat(localStorage.getItem('hitGoalJhon')) || 0;
             if (hoyRedondeo >= goal && hitGoalAnt < goal) {
-                document.getElementById('winSound').play().catch(er=>{});
+                document.getElementById('winSound').play().catch(e=>{});
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#10B981', '#3B82F6', '#F59E0B'] });
             }
             localStorage.setItem('hitGoalJhon', hoyRedondeo);
@@ -382,53 +352,18 @@
             document.getElementById('message').innerText = ganadoHoy >= goal ? "¡OBJETIVO ALCANZADO! 🏆" : `Faltan $${(goal - ganadoHoy).toFixed(2)}`;
             
             let sumMes = hoyRedondeo;
-            let maxMonto = hoyRedondeo;
-            let maxFecha = "Hoy";
-
             for(let i = 1; i < info.diaNumero; i++) {
                 let m_num = String(info.mesIdx + 1).padStart(2, '0');
                 let d_num = String(i).padStart(2, '0');
                 let fechaStr = `${info.anio}-${m_num}-${d_num}`;
                 let record = historial.find(h => h.f === fechaStr);
-                let val = record ? parseFloat(record.m) : 0;
-                
-                sumMes += val;
-
-                if (val > maxMonto) {
-                    maxMonto = val;
-                    maxFecha = `${d_num} ${MESES_ABR[info.mesIdx]}`;
-                }
-            }
-            
-            let promedio = sumMes / info.diaNumero;
-            document.getElementById('statPromedio').innerText = '$' + promedio.toFixed(2);
-            let estimado = promedio * info.totalDiasMes;
-            document.getElementById('statEstimado').innerText = '$' + estimado.toFixed(2);
-
-            if (maxMonto === 0) {
-                document.getElementById('statMejorDia').innerText = "$0.00";
-                document.getElementById('statMejorDiaFecha').innerText = "---";
-            } else {
-                document.getElementById('statMejorDia').innerText = '$' + maxMonto.toFixed(2);
-                document.getElementById('statMejorDiaFecha').innerText = maxFecha;
+                sumMes += record ? parseFloat(record.m) : 0;
             }
             
             document.getElementById('valMes').innerText = '$' + sumMes.toFixed(2);
-            document.getElementById('valProyeccion').innerText = '$' + estimado.toFixed(2);
+            document.getElementById('valProyeccion').innerText = '$' + ((sumMes / info.diaNumero) * info.totalDiasMes).toFixed(2);
             
-            // Racha
-            let racha = 0;
-            let dCheck = new Date(info.id + "T12:00:00");
-            if (hoyRedondeo >= goal) racha++;
-            dCheck.setDate(dCheck.getDate() - 1);
-            for(let i=0; i<30; i++) {
-                let y = dCheck.getFullYear(); let m = String(dCheck.getMonth() + 1).padStart(2, '0'); let d = String(dCheck.getDate()).padStart(2, '0');
-                let record = historial.find(h => h.f === `${y}-${m}-${d}`);
-                if (record && parseFloat(record.m) >= goal) { racha++; dCheck.setDate(dCheck.getDate() - 1); } 
-                else break;
-            }
-            document.getElementById('badgeRacha').innerText = `🔥 Racha: ${racha}`;
-
+            calcularRacha(goal, hoyRedondeo);
             renderizarGrafico(goal, hoyRedondeo, false);
         }
 
@@ -437,7 +372,7 @@
             
             let labels = []; let values = []; let pointColors = []; let bandaObjetivo = [];
             
-            // 🔥 ALGORITMO DE DERRAME CORRECTO (Hacia atrás, no hacia adelante)
+            // 1. EXTRAER DATOS CRUDOS
             let rawData = [];
             for(let i = 1; i <= info.diaNumero; i++) {
                 let m_num = String(info.mesIdx + 1).padStart(2, '0');
@@ -447,18 +382,19 @@
                     let record = historial.find(h => h.f === fechaStr);
                     rawData.push(record ? parseFloat(record.m) : 0.00);
                 } else {
-                    rawData.push(hoyRedondeo);
+                    rawData.push(hoyRedondeo); // El día de hoy
                 }
             }
 
+            // 2. ALGORITMO DE SUAVIZADO (Rellenar huecos hacia atrás, de viejo a nuevo)
             let smoothedData = [...rawData];
             
             for (let i = 0; i < smoothedData.length; i++) {
                 if (smoothedData[i] > goal) {
                     let surplus = smoothedData[i] - goal;
-                    smoothedData[i] = goal; // Bajamos el día a la meta para usar el excedente
-
-                    // Viajamos al pasado para rellenar huecos
+                    smoothedData[i] = goal; // Bajamos temporalmente a la meta
+                    
+                    // Viajamos al pasado para rellenar los huecos
                     for (let j = 0; j < i; j++) {
                         if (smoothedData[j] < goal && surplus > 0) {
                             let needed = goal - smoothedData[j];
@@ -467,14 +403,14 @@
                             surplus -= fill;
                         }
                     }
-
-                    // Si después de rellenar el pasado aún sobra dinero, se devuelve AL DÍA QUE LO GENERÓ
+                    // Si después de rellenar el pasado aún sobra, se queda en el día que lo generó
                     if (surplus > 0) {
                         smoothedData[i] += surplus;
                     }
                 }
             }
-            
+
+            // 3. GENERAR LABELS Y ARRAYS PARA CHART.JS
             for(let i = 1; i <= info.totalDiasMes; i++) {
                 let m_num = String(info.mesIdx + 1).padStart(2, '0');
                 let d_num = String(i).padStart(2, '0');
@@ -545,14 +481,16 @@
             });
         }
 
-        // CONTROLADORES MODAL MANUAL Y RESET
+        // CONTROLADORES MODAL MANUAL
         function openManualModal() {
             document.getElementById('inputManualEarned').value = localStorage.getItem('lastEarnedJhon') || 0;
             document.getElementById('inputManualPending').value = localStorage.getItem('lastPendingJhon') || 0;
             document.getElementById('manualModal').style.display = 'flex';
         }
 
-        function closeManualModal() { document.getElementById('manualModal').style.display = 'none'; }
+        function closeManualModal() {
+            document.getElementById('manualModal').style.display = 'none';
+        }
 
         function saveManualModal() {
             let e = parseFloat(document.getElementById('inputManualEarned').value) || 0;
@@ -563,32 +501,14 @@
             closeManualModal();
         }
 
-        function hardReset() {
-            if(confirm("¿Estás seguro? Esto borrará el historial de ganancias solo de este mes. Tu saldo real de SproutGigs se mantendrá intacto.")) {
-                localStorage.removeItem('histJhon');
-                localStorage.removeItem('jhon_deducciones');
-                localStorage.removeItem('jhon_retiros');
-                localStorage.setItem('baseJhon', parseFloat(localStorage.getItem('lastEarnedJhon') || 0) + parseFloat(localStorage.getItem('lastPendingJhon') || 0));
-                location.reload();
-            }
-        }
-
-        // 🔥 POLLING DE ALTA VELOCIDAD (100ms = 10 lecturas por segundo)
-        setInterval(() => {
-            let actualE = localStorage.getItem('lastEarnedJhon');
-            let actualP = localStorage.getItem('lastPendingJhon');
-            let trackerE = localStorage.getItem('memTrackerE_jhon');
-            let trackerP = localStorage.getItem('memTrackerP_jhon');
-
-            if (actualE !== trackerE || actualP !== trackerP) {
-                localStorage.setItem('memTrackerE_jhon', actualE);
-                localStorage.setItem('memTrackerP_jhon', actualP);
+        // OPTIMIZACIÓN: Listener nativo en lugar de setInterval
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'syncTrigger' || e.key === 'lastEarnedJhon' || e.key === 'lastPendingJhon') {
                 calcularMetricas();
             }
-        }, 100);
+        });
         
-        // 🔥 NUEVO REPORTE EXCEL (Estilo Factura)
-        function exportarExcelFactura() {
+        function exportarExcelPro() {
             const goal = parseFloat(document.getElementById('goal').value) || 0.50;
             let wb = XLSX.utils.book_new();
             
@@ -597,52 +517,54 @@
             let baseLocal = parseFloat(localStorage.getItem('baseJhon')) || 0;
             let hoyRedondeo = Math.round(Math.max(0, (e + p) - baseLocal) * 100) / 100;
             
-            let retiros = JSON.parse(localStorage.getItem('jhon_retiros')) || [];
-            let deducciones = JSON.parse(localStorage.getItem('jhon_deducciones')) || [];
-
-            let sumRetiros = retiros.reduce((acc, r) => acc + parseFloat(r.v), 0);
-            let sumDeducciones = deducciones.reduce((acc, r) => acc + parseFloat(r.v), 0);
-
+            let mesesGrp = {};
+            historial.forEach(h => { 
+                let k = `${MESES[h.mes]} ${h.anio}`; 
+                if(!mesesGrp[k]) mesesGrp[k] = {}; 
+                mesesGrp[k][h.f] = h; 
+            });
+            
             let kHoy = `${MESES[info.mesIdx]} ${info.anio}`;
-            let dExito = 0; let totalDiasEval = 0; let totalBruto = 0;
-            let wsD = [["FECHA", "GANANCIA CRUDA ($)", "META ($)", "¿LOGRADO?"]]; 
+            if (!mesesGrp[kHoy]) mesesGrp[kHoy] = {};
+            mesesGrp[kHoy][info.id] = { f: info.id, m: hoyRedondeo, mes: info.mesIdx, anio: info.anio };
             
-            let maxDay = info.diaNumero;
-            for(let i = maxDay; i >= 1; i--) {
-                let m_str = String(info.mesIdx + 1).padStart(2, '0'); let d_str = String(i).padStart(2, '0');
-                let fStr = `${info.anio}-${m_str}-${d_str}`;
-                let record = historial.find(h => h.f === fStr);
-                let m_val = (i === info.diaNumero) ? hoyRedondeo : (record ? parseFloat(record.m) : 0.00);
+            let totalG = 0; let dExito = 0; let totalDiasEval = 0;
+            let sheetsData = {};
+            
+            for(let k in mesesGrp) { 
+                let wsD = [["FECHA", "GANANCIA ($)", "META ($)", "¿LOGRADO?"]]; 
+                let parts = k.split(" "); 
+                let mesIndex = MESES.indexOf(parts[0]);
+                let anio = parseInt(parts[1]);
                 
-                wsD.push([fStr, m_val, goal, m_val >= goal ? "✅ SÍ" : "❌ NO"]);
-                totalBruto += m_val;
-                if (m_val >= goal) dExito++;
-                totalDiasEval++;
+                let maxDay = (mesIndex === info.mesIdx && anio === info.anio) ? info.diaNumero : new Date(anio, mesIndex + 1, 0).getDate();
+                
+                for(let i = maxDay; i >= 1; i--) {
+                    let m_str = String(mesIndex + 1).padStart(2, '0');
+                    let d_str = String(i).padStart(2, '0');
+                    let fStr = `${anio}-${m_str}-${d_str}`;
+                    
+                    let m_val = mesesGrp[k][fStr] ? parseFloat(mesesGrp[k][fStr].m) : 0.00;
+                    wsD.push([fStr, m_val, goal, m_val >= goal ? "✅ SÍ" : "❌ NO"]);
+                    
+                    totalG += m_val;
+                    if (m_val >= goal) dExito++;
+                    totalDiasEval++;
+                }
+                sheetsData[k] = wsD;
             }
-
-            let gananciaNeta = totalBruto - sumDeducciones;
-
-            // HOJA 1: FACTURA
-            let wsFactura = XLSX.utils.aoa_to_sheet([ 
-                ["ESTADO DE CUENTA - SPROUTGIGS"],
-                [`Generado el: ${info.labelPrincipal}`],
-                [],
-                ["RESUMEN FINANCIERO", ""],
-                ["Días Operados en el Mes:", totalDiasEval],
-                ["Días con Meta Superada:", dExito],
-                ["", ""],
-                ["Ganancia Bruta (Total):", `$${totalBruto.toFixed(2)}`],
-                ["Deducciones (Cupos/Malas):", `-$${sumDeducciones.toFixed(2)}`],
-                ["Retiros a Billetera:", `-$${sumRetiros.toFixed(2)}`],
-                ["=======================", "========="],
-                ["GANANCIA NETA REAL:", `$${gananciaNeta.toFixed(2)}`]
+            
+            let wsR = XLSX.utils.aoa_to_sheet([ 
+                ["REPORTE SPROUTGIGS"], [], 
+                ["MÉTRICA", "RESULTADO"], 
+                ["Total Días Evaluados", totalDiasEval], 
+                ["Días Meta Cumplida", dExito], 
+                ["Total Histórico Trabajado ($)", totalG.toFixed(2)] 
             ]);
-            XLSX.utils.book_append_sheet(wb, wsFactura, "Factura Resumen");
+            XLSX.utils.book_append_sheet(wb, wsR, "Resumen Global");
             
-            // HOJA 2: DESGLOSE DIARIO
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsD), "Desglose Diario");
-            
-            XLSX.writeFile(wb, `SproutGigs_Factura_${info.id}.xlsx`);
+            for(let k in sheetsData) { XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sheetsData[k]), k); }
+            XLSX.writeFile(wb, `SproutGigs_Master_${info.id}.xlsx`);
         }
 
         document.getElementById('goal').addEventListener('input', calcularMetricas);
