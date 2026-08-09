@@ -64,6 +64,13 @@
         .chart-header span { font-weight: 700; font-size: 1.1rem; }
         .chart-container { position: relative; height: 260px; width: 100%; }
 
+        .analytics-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-main); padding: 20px 24px; box-shadow: var(--shadow-card); display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: center; }
+        .a-col { display: flex; flex-direction: column; border-right: 1px solid var(--border-color); padding-right: 15px; }
+        .a-col:last-child { border-right: none; padding-right: 0; }
+        .a-title { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .a-val { font-size: 1.5rem; font-weight: 800; }
+        .a-sub { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-top: 4px;}
+
         .btn { padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; border: none; transition: all 0.2s ease; font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 6px; justify-content: center; }
         .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
         .btn-outline:hover { background: var(--bg-input); color: var(--accent-blue); border-color: var(--accent-blue); }
@@ -72,7 +79,6 @@
         .btn-manual { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.3); }
         .btn-manual:hover { background: var(--accent-blue); color: white; }
 
-        /* MODAL STYLES */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(4px); }
         .modal-content { background: var(--bg-card); border: 1px solid var(--border-color); padding: 25px; border-radius: var(--radius-main); width: 100%; max-width: 320px; box-shadow: var(--shadow-card); }
         .modal-title { margin: 0 0 15px 0; font-size: 1.2rem; font-weight: 800; color: var(--text-main); text-align: center; }
@@ -144,6 +150,29 @@
                     <span style="color: var(--text-muted);">Proyección: <span id="valProyeccion" style="color: var(--accent-blue);">$0.00 🚀</span></span>
                 </div>
                 <div class="chart-container"><canvas id="historialChart"></canvas></div>
+            </div>
+        </section>
+
+        <section class="analytics-panel">
+            <div class="a-col">
+                <span class="a-title">🔥 Racha Invicta</span>
+                <span id="statRacha" class="a-val" style="color: var(--accent-yellow);">0 Días</span>
+                <span class="a-sub">Superando la meta</span>
+            </div>
+            <div class="a-col">
+                <span class="a-title">📈 Promedio Diario</span>
+                <span id="statPromedio" class="a-val" style="color: var(--accent-blue);">$0.00</span>
+                <span class="a-sub">Este mes</span>
+            </div>
+            <div class="a-col">
+                <span class="a-title">🏆 Mejor Día</span>
+                <span id="statMejorDia" class="a-val" style="color: var(--accent-green);">$0.00</span>
+                <span id="statMejorDiaFecha" class="a-sub">---</span>
+            </div>
+            <div class="a-col">
+                <span class="a-title">🎯 Cierre Estimado</span>
+                <span id="statEstimado" class="a-val" style="color: var(--text-main);">$0.00</span>
+                <span class="a-sub">Si mantienes el ritmo</span>
             </div>
         </section>
     </div>
@@ -314,10 +343,18 @@
             let p = parseFloat(localStorage.getItem('lastPendingJhon')) || 0;
             let totalActual = e + p;
             
-            if (totalActual < base) { 
-                base = totalActual; 
-                localStorage.setItem('baseJhon', base); 
+            // 🔥 LÓGICA MATEMÁTICA PURA PARA RETIROS (Sin tocar si es tarifa o tarea rechazada)
+            let mem_e = parseFloat(localStorage.getItem('memE_jhon'));
+            if (isNaN(mem_e)) mem_e = e;
+
+            let deltaE = e - mem_e;
+            
+            // Si el Earned cae $4.00 o más, ES UN RETIRO a la billetera. Protegemos la base.
+            if (deltaE <= -4.00) {
+                base = base - Math.abs(deltaE);
+                localStorage.setItem('baseJhon', base);
             }
+            localStorage.setItem('memE_jhon', e);
             
             const ganadoHoy = Math.max(0, totalActual - base);
             const hoyRedondeo = Math.round(ganadoHoy * 100) / 100;
@@ -325,14 +362,14 @@
             const ant = parseFloat(localStorage.getItem('antJhon')) || 0;
             
             if (hoyRedondeo > ant) { 
-                document.getElementById('cashSound').play().catch(e=>{}); 
+                document.getElementById('cashSound').play().catch(er=>{}); 
                 document.getElementById('gananciaHoy').style.transform = "scale(1.1)";
                 setTimeout(() => { document.getElementById('gananciaHoy').style.transform = "scale(1)"; }, 200);
             }
 
             const hitGoalAnt = parseFloat(localStorage.getItem('hitGoalJhon')) || 0;
             if (hoyRedondeo >= goal && hitGoalAnt < goal) {
-                document.getElementById('winSound').play().catch(e=>{});
+                document.getElementById('winSound').play().catch(er=>{});
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#10B981', '#3B82F6', '#F59E0B'] });
             }
             localStorage.setItem('hitGoalJhon', hoyRedondeo);
@@ -352,16 +389,39 @@
             document.getElementById('message').innerText = ganadoHoy >= goal ? "¡OBJETIVO ALCANZADO! 🏆" : `Faltan $${(goal - ganadoHoy).toFixed(2)}`;
             
             let sumMes = hoyRedondeo;
+            let maxMonto = hoyRedondeo;
+            let maxFecha = "Hoy";
+
             for(let i = 1; i < info.diaNumero; i++) {
                 let m_num = String(info.mesIdx + 1).padStart(2, '0');
                 let d_num = String(i).padStart(2, '0');
                 let fechaStr = `${info.anio}-${m_num}-${d_num}`;
                 let record = historial.find(h => h.f === fechaStr);
-                sumMes += record ? parseFloat(record.m) : 0;
+                let val = record ? parseFloat(record.m) : 0;
+                
+                sumMes += val;
+
+                if (val > maxMonto) {
+                    maxMonto = val;
+                    maxFecha = `${d_num} ${MESES_ABR[info.mesIdx]}`;
+                }
+            }
+            
+            let promedio = sumMes / info.diaNumero;
+            document.getElementById('statPromedio').innerText = '$' + promedio.toFixed(2);
+            let estimado = promedio * info.totalDiasMes;
+            document.getElementById('statEstimado').innerText = '$' + estimado.toFixed(2);
+
+            if (maxMonto === 0) {
+                document.getElementById('statMejorDia').innerText = "$0.00";
+                document.getElementById('statMejorDiaFecha').innerText = "---";
+            } else {
+                document.getElementById('statMejorDia').innerText = '$' + maxMonto.toFixed(2);
+                document.getElementById('statMejorDiaFecha').innerText = maxFecha;
             }
             
             document.getElementById('valMes').innerText = '$' + sumMes.toFixed(2);
-            document.getElementById('valProyeccion').innerText = '$' + ((sumMes / info.diaNumero) * info.totalDiasMes).toFixed(2);
+            document.getElementById('valProyeccion').innerText = '$' + estimado.toFixed(2);
             
             calcularRacha(goal, hoyRedondeo);
             renderizarGrafico(goal, hoyRedondeo, false);
@@ -371,6 +431,41 @@
             const ctx = document.getElementById('historialChart').getContext('2d');
             
             let labels = []; let values = []; let pointColors = []; let bandaObjetivo = [];
+            
+            // 🔥 MOTOR DE DERRAME LÍQUIDO (Suavizado Visual de Gráfica)
+            let rawData = [];
+            for(let i = 1; i <= info.diaNumero; i++) {
+                let m_num = String(info.mesIdx + 1).padStart(2, '0');
+                let d_num = String(i).padStart(2, '0');
+                let fechaStr = `${info.anio}-${m_num}-${d_num}`;
+                if (i < info.diaNumero) {
+                    let record = historial.find(h => h.f === fechaStr);
+                    rawData.push(record ? parseFloat(record.m) : 0.00);
+                } else {
+                    rawData.push(hoyRedondeo);
+                }
+            }
+
+            let smoothedData = [...rawData];
+            let surplus = 0;
+            
+            for(let i = 0; i < smoothedData.length; i++) {
+                if(smoothedData[i] > goal) {
+                    surplus += (smoothedData[i] - goal);
+                    smoothedData[i] = goal;
+                }
+            }
+            for(let i = 0; i < smoothedData.length; i++) {
+                if(smoothedData[i] < goal && surplus > 0) {
+                    let needed = goal - smoothedData[i];
+                    let fill = Math.min(surplus, needed);
+                    smoothedData[i] += fill;
+                    surplus -= fill;
+                }
+            }
+            if(surplus > 0) {
+                smoothedData[smoothedData.length - 1] += surplus;
+            }
             
             for(let i = 1; i <= info.totalDiasMes; i++) {
                 let m_num = String(info.mesIdx + 1).padStart(2, '0');
@@ -383,14 +478,10 @@
                 
                 bandaObjetivo.push(goal); 
 
-                if (i < info.diaNumero) {
-                    let record = historial.find(h => h.f === fechaStr);
-                    let val = record ? parseFloat(record.m) : 0.00;
+                if (i <= info.diaNumero) {
+                    let val = smoothedData[i-1];
                     values.push(val);
                     pointColors.push(val >= goal ? '#10B981' : (val === 0 ? '#EF4444' : '#F59E0B'));
-                } else if (i === info.diaNumero) {
-                    values.push(hoyRedondeo);
-                    pointColors.push(hoyRedondeo >= goal ? '#10B981' : (hoyRedondeo === 0 ? '#EF4444' : '#F59E0B'));
                 } else {
                     values.push(null);
                     pointColors.push('transparent');
@@ -427,7 +518,7 @@
                 data: { 
                     labels: labels, 
                     datasets: [
-                        { label: 'Ganancia ($)', data: values, backgroundColor: gradientFill, borderColor: '#3B82F6', borderWidth: 3, pointBackgroundColor: pointColors, pointBorderColor: isLight ? '#FFFFFF' : '#151C2C', pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 8, fill: true, tension: 0.4 },
+                        { label: 'Ganancia (Suavizada)', data: values, backgroundColor: gradientFill, borderColor: '#3B82F6', borderWidth: 3, pointBackgroundColor: pointColors, pointBorderColor: isLight ? '#FFFFFF' : '#151C2C', pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 8, fill: true, tension: 0.4 },
                         { label: 'Banda Meta', data: bandaObjetivo, borderColor: '#F59E0B', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, pointHoverRadius: 0, fill: false, tension: 0 }
                     ] 
                 },
@@ -446,16 +537,13 @@
             });
         }
 
-        // CONTROLADORES MODAL MANUAL
         function openManualModal() {
             document.getElementById('inputManualEarned').value = localStorage.getItem('lastEarnedJhon') || 0;
             document.getElementById('inputManualPending').value = localStorage.getItem('lastPendingJhon') || 0;
             document.getElementById('manualModal').style.display = 'flex';
         }
 
-        function closeManualModal() {
-            document.getElementById('manualModal').style.display = 'none';
-        }
+        function closeManualModal() { document.getElementById('manualModal').style.display = 'none'; }
 
         function saveManualModal() {
             let e = parseFloat(document.getElementById('inputManualEarned').value) || 0;
@@ -466,12 +554,19 @@
             closeManualModal();
         }
 
-        // OPTIMIZACIÓN: Listener nativo en lugar de setInterval
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'syncTrigger' || e.key === 'lastEarnedJhon' || e.key === 'lastPendingJhon') {
+        // 🔥 POLLING EN TIEMPO REAL (Rápido y silencioso)
+        setInterval(() => {
+            let actualE = localStorage.getItem('lastEarnedJhon');
+            let actualP = localStorage.getItem('lastPendingJhon');
+            let trackerE = localStorage.getItem('memTrackerE_jhon');
+            let trackerP = localStorage.getItem('memTrackerP_jhon');
+
+            if (actualE !== trackerE || actualP !== trackerP) {
+                localStorage.setItem('memTrackerE_jhon', actualE);
+                localStorage.setItem('memTrackerP_jhon', actualP);
                 calcularMetricas();
             }
-        });
+        }, 250);
         
         function exportarExcelPro() {
             const goal = parseFloat(document.getElementById('goal').value) || 0.50;
@@ -497,7 +592,7 @@
             let sheetsData = {};
             
             for(let k in mesesGrp) { 
-                let wsD = [["FECHA", "GANANCIA ($)", "META ($)", "¿LOGRADO?"]]; 
+                let wsD = [["FECHA", "GANANCIA REAL ($)", "META ($)", "¿LOGRADO?"]]; 
                 let parts = k.split(" "); 
                 let mesIndex = MESES.indexOf(parts[0]);
                 let anio = parseInt(parts[1]);
@@ -523,7 +618,7 @@
                 ["REPORTE SPROUTGIGS"], [], 
                 ["MÉTRICA", "RESULTADO"], 
                 ["Total Días Evaluados", totalDiasEval], 
-                ["Días Meta Cumplida", dExito], 
+                ["Días Meta Cumplida (Crudos)", dExito], 
                 ["Total Histórico Trabajado ($)", totalG.toFixed(2)] 
             ]);
             XLSX.utils.book_append_sheet(wb, wsR, "Resumen Global");
