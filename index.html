@@ -372,45 +372,6 @@
             
             let labels = []; let values = []; let pointColors = []; let bandaObjetivo = [];
             
-            // 1. EXTRAER DATOS CRUDOS
-            let rawData = [];
-            for(let i = 1; i <= info.diaNumero; i++) {
-                let m_num = String(info.mesIdx + 1).padStart(2, '0');
-                let d_num = String(i).padStart(2, '0');
-                let fechaStr = `${info.anio}-${m_num}-${d_num}`;
-                if (i < info.diaNumero) {
-                    let record = historial.find(h => h.f === fechaStr);
-                    rawData.push(record ? parseFloat(record.m) : 0.00);
-                } else {
-                    rawData.push(hoyRedondeo); // El día de hoy
-                }
-            }
-
-            // 2. ALGORITMO DE SUAVIZADO (Rellenar huecos hacia atrás, de viejo a nuevo)
-            let smoothedData = [...rawData];
-            
-            for (let i = 0; i < smoothedData.length; i++) {
-                if (smoothedData[i] > goal) {
-                    let surplus = smoothedData[i] - goal;
-                    smoothedData[i] = goal; // Bajamos temporalmente a la meta
-                    
-                    // Viajamos al pasado para rellenar los huecos
-                    for (let j = 0; j < i; j++) {
-                        if (smoothedData[j] < goal && surplus > 0) {
-                            let needed = goal - smoothedData[j];
-                            let fill = Math.min(surplus, needed);
-                            smoothedData[j] += fill;
-                            surplus -= fill;
-                        }
-                    }
-                    // Si después de rellenar el pasado aún sobra, se queda en el día que lo generó
-                    if (surplus > 0) {
-                        smoothedData[i] += surplus;
-                    }
-                }
-            }
-
-            // 3. GENERAR LABELS Y ARRAYS PARA CHART.JS
             for(let i = 1; i <= info.totalDiasMes; i++) {
                 let m_num = String(info.mesIdx + 1).padStart(2, '0');
                 let d_num = String(i).padStart(2, '0');
@@ -422,10 +383,14 @@
                 
                 bandaObjetivo.push(goal); 
 
-                if (i <= info.diaNumero) {
-                    let val = smoothedData[i-1];
+                if (i < info.diaNumero) {
+                    let record = historial.find(h => h.f === fechaStr);
+                    let val = record ? parseFloat(record.m) : 0.00;
                     values.push(val);
                     pointColors.push(val >= goal ? '#10B981' : (val === 0 ? '#EF4444' : '#F59E0B'));
+                } else if (i === info.diaNumero) {
+                    values.push(hoyRedondeo);
+                    pointColors.push(hoyRedondeo >= goal ? '#10B981' : (hoyRedondeo === 0 ? '#EF4444' : '#F59E0B'));
                 } else {
                     values.push(null);
                     pointColors.push('transparent');
