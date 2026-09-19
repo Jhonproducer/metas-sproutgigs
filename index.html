@@ -44,9 +44,9 @@
         .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-main); padding: 18px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: center; }
         .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .stat-value { font-size: 1.7rem; font-weight: 800; line-height: 1.2; }
+        .stat-note { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; margin-top: 7px; line-height: 1.4; }
 
         .main-grid { display: grid; grid-template-columns: 330px 1fr; gap: 18px; }
-        .bottom-grid { display: grid; grid-template-columns: 330px 1fr; gap: 18px; }
         .card-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-main); padding: 20px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 15px; }
 
         .big-money { font-size: 4.5rem; font-weight: 800; line-height: 1.1; margin: 10px 0; text-align: center; color: var(--accent-yellow); text-shadow: 0 4px 15px rgba(245, 158, 11, 0.25); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -74,37 +74,18 @@
         .btn-manual { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.3); }
         .btn-manual:hover { background: var(--accent-blue); color: white; }
         .btn-mini { padding: 5px 10px; font-size: 0.72rem; }
-        .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(4px); padding: 16px; }
         .modal-content { background: var(--bg-card); border: 1px solid var(--border-color); padding: 25px; border-radius: var(--radius-main); width: 100%; max-width: 320px; box-shadow: var(--shadow-card); max-height: 92vh; overflow-y: auto; }
         .modal-title { margin: 0 0 15px 0; font-size: 1.2rem; font-weight: 800; color: var(--text-main); text-align: center; }
         .modal-input-group { margin-bottom: 15px; }
         .modal-input-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; }
-        .modal-input-group input, .modal-input-group textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; border-radius: var(--radius-sm); font-family: 'Poppins', sans-serif; font-weight: 600; outline: none; }
-        .modal-input-group input:focus, .modal-input-group textarea:focus { border-color: var(--accent-blue); }
+        .modal-input-group input { width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; border-radius: var(--radius-sm); font-family: 'Poppins', sans-serif; font-weight: 600; outline: none; }
+        .modal-input-group input:focus { border-color: var(--accent-blue); }
         .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
         .modal-buttons .btn { flex: 1; }
         .modal-hint { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; line-height: 1.5; margin: 0 0 14px 0; }
 
-        /* --- Retiros --- */
-        .retiro-amount { font-size: 2.4rem; font-weight: 800; line-height: 1.1; text-align: center; color: var(--accent-green); margin: 4px 0 2px 0; }
-        .retiro-sub { text-align: center; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
-        .retiro-list { display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto; }
-        .retiro-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 0.85rem; font-weight: 600; }
-        .retiro-item .fecha { color: var(--text-muted); }
-        .retiro-item .monto { color: var(--accent-green); font-weight: 800; }
-        .retiro-item button { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.95rem; line-height: 1; padding: 2px 4px; }
-        .retiro-item button:hover { color: var(--accent-red); }
-        .empty-note { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-align: center; padding: 10px 0; }
-
-        /* --- Mapa de días --- */
-        .heat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15px, 1fr)); gap: 4px; }
-        .heat-cell { aspect-ratio: 1 / 1; border-radius: 3px; background: var(--bg-input); border: 1px solid var(--border-color); }
-        .heat-legend { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-muted); font-weight: 600; flex-wrap: wrap; }
-        .heat-dot { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
-
-        /* --- Respaldo --- */
         .backup-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-main); padding: 12px 20px; box-shadow: var(--shadow-card); flex-wrap: wrap; }
         .backup-status { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
         .status-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; }
@@ -116,7 +97,7 @@
             body { padding: 12px; }
             .dashboard-container { gap: 14px; }
             .stats-grid { grid-template-columns: 1fr; gap: 12px; }
-            .main-grid, .bottom-grid { grid-template-columns: 1fr; gap: 14px; }
+            .main-grid { grid-template-columns: 1fr; gap: 14px; }
             .header { padding: 14px 16px; }
             .header h1 { font-size: 1.3rem; }
             .controls { width: 100%; }
@@ -157,14 +138,17 @@
             <div class="stat-card" style="border-bottom: 3px solid var(--accent-blue);">
                 <span class="stat-label">EN GANADO (Retirable)</span>
                 <span class="stat-value" id="valEarned" style="color: var(--text-main);">$0.00</span>
+                <span class="stat-note" id="notaCobro">—</span>
             </div>
             <div class="stat-card">
                 <span class="stat-label">PENDIENTE</span>
                 <span class="stat-value" id="valPending" style="color: var(--text-muted);">$0.00</span>
+                <span class="stat-note" id="notaPendiente">—</span>
             </div>
             <div class="stat-card" style="border-bottom: 3px solid var(--accent-green); background: rgba(16, 185, 129, 0.03);">
                 <span class="stat-label" style="color: var(--accent-green);">SALDO REAL TOTAL</span>
                 <span class="stat-value" id="valTotalReal" style="color: var(--accent-green);">$0.00</span>
+                <span class="stat-note" id="notaRetiros">Sin retiros detectados</span>
             </div>
         </section>
 
@@ -196,43 +180,6 @@
             </div>
         </section>
 
-        <section class="bottom-grid">
-            <div class="card-panel">
-                <span class="stat-label" style="color: var(--accent-green);">RETIRO</span>
-                <div>
-                    <div class="retiro-amount" id="valDisponible">$0.00</div>
-                    <div class="retiro-sub">disponible ahora en Ganado</div>
-                </div>
-                <div class="progress-wrapper">
-                    <div class="progress-msg" id="msgCobro" style="font-size: 0.95rem;">---</div>
-                    <div class="progress-track"><div class="progress-fill" id="fillCobro"></div></div>
-                </div>
-                <div class="goal-row">
-                    <span>MÍNIMO DE COBRO: $</span>
-                    <input type="number" id="minCobro" class="goal-input" value="5" step="1" min="0.01">
-                </div>
-                <button class="btn btn-excel" id="btnRetiro" onclick="openRetiroModal()">Registrar retiro</button>
-                <div>
-                    <div class="stat-label">Historial de retiros — total <span id="valRetiradoTotal" style="color: var(--accent-green);">$0.00</span></div>
-                    <div class="retiro-list" id="listaRetiros"></div>
-                </div>
-            </div>
-
-            <div class="card-panel">
-                <div class="chart-header">
-                    <span style="color: var(--text-main);">Últimos 90 días</span>
-                    <div class="heat-legend">
-                        <span class="heat-dot" style="background: var(--bg-input); border:1px solid var(--border-color);"></span> sin registro
-                        <span class="heat-dot" style="background: var(--accent-red);"></span> en cero
-                        <span class="heat-dot" style="background: var(--accent-yellow);"></span> parcial
-                        <span class="heat-dot" style="background: var(--accent-green);"></span> meta cumplida
-                    </div>
-                </div>
-                <div class="heat-grid" id="heatGrid"></div>
-                <div class="retiro-sub" id="heatResumen">—</div>
-            </div>
-        </section>
-
         <section class="backup-bar">
             <div class="backup-status">
                 <span class="status-dot" id="backupDot"></span>
@@ -250,7 +197,7 @@
     <div class="modal-overlay" id="manualModal" data-modal>
         <div class="modal-content">
             <h3 class="modal-title">Ajuste Manual de Saldo</h3>
-            <p class="modal-hint">Copia aquí los saldos tal como los muestra SproutGigs. No restes los retiros: eso se registra abajo.</p>
+            <p class="modal-hint">Solo para cuando el lector automático no esté corriendo. Copia los saldos tal como los muestra SproutGigs.</p>
             <div class="modal-input-group">
                 <label>Saldo Earned ($)</label>
                 <input type="number" id="inputManualEarned" step="0.0001" placeholder="0.0000">
@@ -266,29 +213,6 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="retiroModal" data-modal>
-        <div class="modal-content">
-            <h3 class="modal-title">Registrar retiro</h3>
-            <p class="modal-hint">Al guardar, el saldo Ganado baja por el monto retirado. Tu ganancia del día y tu histórico no se tocan.</p>
-            <div class="modal-input-group">
-                <label>Monto retirado ($)</label>
-                <input type="number" id="inputRetiroMonto" step="0.0001" placeholder="0.0000">
-            </div>
-            <div class="modal-input-group">
-                <label>Fecha del retiro</label>
-                <input type="date" id="inputRetiroFecha">
-            </div>
-            <div class="modal-input-group">
-                <label>Nota (método, referencia)</label>
-                <input type="text" id="inputRetiroNota" placeholder="Ej: Payeer / Binance">
-            </div>
-            <div class="modal-buttons">
-                <button class="btn btn-outline" onclick="closeRetiroModal()" style="color: var(--accent-red); border-color: var(--accent-red);">Cancelar</button>
-                <button class="btn btn-excel" onclick="saveRetiroModal()">Guardar retiro</button>
-            </div>
-        </div>
-    </div>
-
     <div class="toast" id="toast"></div>
 
     <audio id="cashSound" src="https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3" preload="auto"></audio>
@@ -297,12 +221,22 @@
 <script>
 /* =========================================================
    TERMINAL FINANCIERA — SproutGigs
-   Claves de localStorage (compatibles con la versión anterior):
-     lastEarnedJhon, lastPendingJhon, baseJhon, fechaJhon,
-     histJhon, metaJhon, jhonTheme, antJhon
-   Claves nuevas:
-     retirosJhon, minCobroJhon, suavizadoJhon, celebradoJhon, snapJhon
+   El tablero es un espejo: solo refleja los saldos que le
+   llegan de SproutGigs. Los retiros no se escriben a mano,
+   se deducen de la caída del saldo.
+
+   Claves existentes: lastEarnedJhon, lastPendingJhon, baseJhon,
+   fechaJhon, histJhon, metaJhon, jhonTheme, antJhon
+   Claves nuevas: retirosJhon, prevEJhon, prevPJhon,
+   suavizadoJhon, celebradoJhon, snapJhon
    ========================================================= */
+
+/* Mínimo de cobro de la plataforma. Cualquier caída del saldo
+   igual o mayor a esto se interpreta como retiro; por debajo,
+   como corrección de una tarea rechazada. Cambia solo este número
+   si SproutGigs mueve su mínimo. */
+const MIN_COBRO = 5;
+const EPS = 0.0001;
 
 const $ = id => document.getElementById(id);
 const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
@@ -318,7 +252,7 @@ const MESES = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO"
 const MESES_ABR = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
 const DIAS_NOM = ["DOMINGO","LUNES","MARTES","MIÉRCOLES","JUEVES","VIERNES","SÁBADO"];
 const DIAS_ABR = ["DOM","LUN","MAR","MIE","JUE","VIE","SAB"];
-const MAX_HISTORIAL = 400; // ~13 meses de días guardados
+const MAX_HISTORIAL = 400;
 
 /* ---------- fecha (zona horaria de Venezuela) ---------- */
 function fechaStr(d) {
@@ -333,22 +267,19 @@ function getVzlaData() {
     const y = parts.find(p => p.type === 'year').value;
     const m = parts.find(p => p.type === 'month').value;
     const d = parts.find(p => p.type === 'day').value;
-    const idFecha = `${y}-${m}-${d}`;
 
     const vzlaDate = new Date(now.toLocaleString("en-US", options));
     let h = vzlaDate.getHours(); const am = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
     const min = vzlaDate.getMinutes().toString().padStart(2, '0');
-    const diasEnMes = new Date(vzlaDate.getFullYear(), vzlaDate.getMonth() + 1, 0).getDate();
 
     return {
-        id: idFecha,
+        id: `${y}-${m}-${d}`,
         mesIdx: vzlaDate.getMonth(),
         anio: vzlaDate.getFullYear(),
-        diaNom: DIAS_NOM[vzlaDate.getDay()],
         labelPrincipal: `${d} ${MESES_ABR[vzlaDate.getMonth()]} (${DIAS_NOM[vzlaDate.getDay()]})`,
         hora: `${h}:${min} ${am}`,
         diaNumero: vzlaDate.getDate(),
-        totalDiasMes: diasEnMes
+        totalDiasMes: new Date(vzlaDate.getFullYear(), vzlaDate.getMonth() + 1, 0).getDate()
     };
 }
 
@@ -379,43 +310,43 @@ let suavizado = LS.get('suavizadoJhon', '0') === '1';
 function saldoE() { return num(LS.get('lastEarnedJhon', 0)); }
 function saldoP() { return num(LS.get('lastPendingJhon', 0)); }
 function retiradoTotal() { return retiros.reduce((a, r) => a + num(r.m), 0); }
+
 /* Bruto acumulado de por vida: lo retirado sigue contando como trabajado.
-   Así un retiro nunca borra la ganancia del día. */
+   Retirar no cambia este número, así que nunca borra la ganancia del día. */
 function bruto() { return saldoE() + saldoP() + retiradoTotal(); }
 function getMeta() { return num($('goal').value) || 0.50; }
-function getMinCobro() { return num($('minCobro').value) || 5; }
 
-/* ---------- saneado del historial ---------- */
+/* ---------- saneado ---------- */
+function guardarHistorial() { LS.set('histJhon', JSON.stringify(historial)); }
+function guardarRetiros() { LS.set('retirosJhon', JSON.stringify(retiros)); }
+
 function sanearHistorial() {
     const vistas = new Set();
     historial = historial
         .filter(h => h && typeof h.f === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(h.f))
         .sort((a, b) => b.f.localeCompare(a.f))
         .filter(h => { if (vistas.has(h.f)) return false; vistas.add(h.f); return true; })
-        .map(h => {
-            const d = parseFecha(h.f);
-            return { f: h.f, m: num(h.m).toFixed(2), mes: d.getMonth(), anio: d.getFullYear() };
-        })
+        .map(h => { const d = parseFecha(h.f); return { f: h.f, m: num(h.m).toFixed(2), mes: d.getMonth(), anio: d.getFullYear() }; })
         .slice(0, MAX_HISTORIAL);
-    LS.set('histJhon', JSON.stringify(historial));
+    guardarHistorial();
 }
 sanearHistorial();
 
 function sanearRetiros() {
     retiros = retiros
         .filter(r => r && typeof r.f === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(r.f) && num(r.m) > 0)
-        .map(r => ({ f: r.f, m: num(r.m), nota: (r.nota || '').toString().slice(0, 80), ts: r.ts || Date.parse(r.f + 'T12:00:00') }))
-        .sort((a, b) => b.f.localeCompare(a.f) || b.ts - a.ts);
-    LS.set('retirosJhon', JSON.stringify(retiros));
+        .map(r => ({ f: r.f, m: num(r.m), hora: r.hora || '', ts: r.ts || Date.parse(r.f + 'T12:00:00') }))
+        .sort((a, b) => b.ts - a.ts);
+    guardarRetiros();
 }
 sanearRetiros();
 
-/* ---------- corrección si el reloj del equipo estuvo adelantado ---------- */
+/* ---------- corrección si el reloj estuvo adelantado ---------- */
 (function corregirFechaFutura() {
     if (ultimaFecha && ultimaFecha > info.id) {
         if (historial.length > 0 && historial[0].f === ultimaFecha) {
             const corrupta = historial.shift();
-            LS.set('histJhon', JSON.stringify(historial));
+            guardarHistorial();
             base = Math.max(0, base - num(corrupta.m));
             LS.set('baseJhon', base);
         }
@@ -423,6 +354,48 @@ sanearRetiros();
         LS.set('fechaJhon', info.id);
     }
 })();
+
+/* =========================================================
+   DETECCIÓN AUTOMÁTICA DE RETIROS
+   Compara el saldo actual contra la última lectura conocida.
+   - Total cae MIN_COBRO o más  -> retiro, por el monto exacto
+   - Total sube y coincide con un retiro guardado -> el retiro
+     fue cancelado en SproutGigs, se borra y el saldo vuelve
+   - Pendiente que pasa a Ganado no mueve el total, se ignora
+   - Caídas menores a MIN_COBRO son tareas rechazadas
+   ========================================================= */
+function detectarMovimientos() {
+    const e = saldoE(), p = saldoP();
+    const prevEraw = LS.get('prevEJhon'), prevPraw = LS.get('prevPJhon');
+
+    if (prevEraw === null || prevPraw === null) {
+        LS.set('prevEJhon', e); LS.set('prevPJhon', p);
+        return;
+    }
+
+    const totalAnt = num(prevEraw) + num(prevPraw);
+    const total = e + p;
+    const delta = Math.round((total - totalAnt) * 10000) / 10000;
+
+    if (delta <= -MIN_COBRO) {
+        const monto = -delta;
+        const vz = getVzlaData();
+        retiros.unshift({ f: vz.id, m: monto, hora: vz.hora, ts: Date.now() });
+        sanearRetiros();
+        toast(`Retiro detectado: ${d2(monto)} · ${vz.id}`);
+    } else if (delta >= MIN_COBRO) {
+        const idx = retiros.findIndex(r => Math.abs(num(r.m) - delta) < EPS);
+        if (idx !== -1) {
+            const r = retiros[idx];
+            retiros.splice(idx, 1);
+            guardarRetiros();
+            toast(`Retiro cancelado en SproutGigs: ${d2(r.m)} de vuelta`);
+        }
+    }
+
+    LS.set('prevEJhon', e);
+    LS.set('prevPJhon', p);
+}
 
 /* ---------- cierre de día ---------- */
 function auditarCierreDia() {
@@ -444,7 +417,7 @@ function auditarCierreDia() {
             }
 
             historial = historial.slice(0, MAX_HISTORIAL);
-            LS.set('histJhon', JSON.stringify(historial));
+            guardarHistorial();
 
             base = br; LS.set('baseJhon', base);
             ultimaFecha = info.id; LS.set('fechaJhon', info.id);
@@ -455,9 +428,11 @@ function auditarCierreDia() {
     if (base === 0 && br > 0) { base = br; LS.set('baseJhon', base); }
     if (!ultimaFecha) { ultimaFecha = info.id; LS.set('fechaJhon', info.id); }
 }
+
+detectarMovimientos();
 auditarCierreDia();
 
-/* ---------- consultas al historial ---------- */
+/* ---------- consultas ---------- */
 function montoDeFecha(fStr) {
     const r = historial.find(h => h.f === fStr);
     return r ? num(r.m) : null;
@@ -465,19 +440,18 @@ function montoDeFecha(fStr) {
 
 function calcularRacha(goal, hoyRedondeo) {
     let racha = 0;
-    if (hoyRedondeo >= goal && goal > 0) racha++;
+    if (goal > 0 && hoyRedondeo >= goal) racha++;
     const cursor = parseFecha(info.id);
     cursor.setDate(cursor.getDate() - 1);
-    for (let i = 0; i < 400; i++) {
+    for (let i = 0; i < MAX_HISTORIAL; i++) {
         const v = montoDeFecha(fechaStr(cursor));
-        if (v !== null && v >= goal && goal > 0) { racha++; cursor.setDate(cursor.getDate() - 1); }
+        if (v !== null && goal > 0 && v >= goal) { racha++; cursor.setDate(cursor.getDate() - 1); }
         else break;
     }
     $('badgeRacha').innerText = `🔥 Racha: ${racha}`;
-    return racha;
 }
 
-/* Promedio real de los últimos N días con registro (excluye hoy). */
+/* Promedio de los últimos días con registro, sin contar hoy. */
 function ritmoDiario(dias = 7) {
     const cursor = parseFecha(info.id);
     cursor.setDate(cursor.getDate() - 1);
@@ -491,13 +465,12 @@ function ritmoDiario(dias = 7) {
 }
 
 /* =========================================================
-   RENDER PRINCIPAL
-   origen: 'datos' | 'meta' | 'tema' | 'init'
+   RENDER
+   origen: 'datos' | 'meta' | 'tema' | 'grafico' | 'init'
    ========================================================= */
 function render(origen = 'datos') {
     const goal = getMeta();
     LS.set('metaJhon', goal);
-    LS.set('minCobroJhon', getMinCobro());
 
     const e = saldoE(), p = saldoP();
     const total = e + p;
@@ -508,14 +481,13 @@ function render(origen = 'datos') {
     const ganadoHoy = Math.max(0, br - base);
     const hoy2 = Math.round(ganadoHoy * 100) / 100;
 
-    /* feedback sonoro solo cuando entra plata de verdad */
     const ant = num(LS.get('antJhon', 0));
     if (origen === 'datos' && hoy2 > ant) {
         const s = $('cashSound'); s.currentTime = 0; s.play().catch(() => {});
         $('gananciaHoy').style.transform = "scale(1.1)";
         setTimeout(() => { $('gananciaHoy').style.transform = "scale(1)"; }, 200);
     }
-    if (origen === 'datos' && hoy2 >= goal && goal > 0 && LS.get('celebradoJhon') !== info.id) {
+    if (origen === 'datos' && goal > 0 && hoy2 >= goal && LS.get('celebradoJhon') !== info.id) {
         LS.set('celebradoJhon', info.id);
         const s = $('winSound'); s.currentTime = 0; s.play().catch(() => {});
         if (!window.matchMedia || !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -529,12 +501,44 @@ function render(origen = 'datos') {
     $('valPending').innerText = d4(p);
     $('valTotalReal').innerText = d4(total);
 
+    /* notas bajo cada tarjeta */
+    if (e >= MIN_COBRO) {
+        $('notaCobro').innerText = `Listo para cobrar · mínimo ${d2(MIN_COBRO)}`;
+        $('notaCobro').style.color = 'var(--accent-green)';
+    } else {
+        $('notaCobro').innerText = `Faltan ${d2(MIN_COBRO - e)} para el mínimo`;
+        $('notaCobro').style.color = 'var(--text-muted)';
+    }
+
+    if (total >= MIN_COBRO && e < MIN_COBRO) {
+        $('notaPendiente').innerText = `El mínimo ya está reunido, esperando aprobación`;
+    } else {
+        const falta = MIN_COBRO - total;
+        const ritmo = ritmoDiario(7);
+        if (falta > 0 && ritmo > EPS) {
+            const dias = Math.ceil(falta / ritmo);
+            const f = parseFecha(info.id); f.setDate(f.getDate() + dias);
+            $('notaPendiente').innerText = `A tu ritmo, ${d2(MIN_COBRO)} el ${f.getDate()} ${MESES_ABR[f.getMonth()]}`;
+        } else if (falta > 0) {
+            $('notaPendiente').innerText = `Faltan ${d2(falta)} para el mínimo`;
+        } else {
+            $('notaPendiente').innerText = `Por aprobar`;
+        }
+    }
+
+    if (retiros.length === 0) {
+        $('notaRetiros').innerText = 'Sin retiros detectados';
+    } else {
+        const u = retiros[0];
+        const d = parseFecha(u.f);
+        $('notaRetiros').innerText = `Retirado ${d2(retiradoTotal())} en ${retiros.length} · último ${d2(u.m)} el ${d.getDate()} ${MESES_ABR[d.getMonth()]}`;
+    }
+
     const pct = goal > 0 ? Math.min((ganadoHoy / goal) * 100, 100) : 0;
     $('fill').style.width = pct + '%';
     $('fill').style.backgroundColor = pct >= 100 ? 'var(--accent-green)' : (pct < 35 ? 'var(--accent-blue)' : 'var(--accent-yellow)');
-    $('message').innerText = ganadoHoy >= goal && goal > 0 ? "¡OBJETIVO ALCANZADO! 🏆" : `Faltan ${d2(goal - ganadoHoy)}`;
+    $('message').innerText = (goal > 0 && ganadoHoy >= goal) ? "¡OBJETIVO ALCANZADO! 🏆" : `Faltan ${d2(goal - ganadoHoy)}`;
 
-    /* mes y proyección */
     let sumMes = hoy2;
     for (let i = 1; i < info.diaNumero; i++) {
         const fStr = `${info.anio}-${String(info.mesIdx + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
@@ -542,149 +546,13 @@ function render(origen = 'datos') {
     }
     $('valMes').innerText = d2(sumMes);
 
-    /* la proyección no castiga el día en curso: usa el promedio de días cerrados */
     const diasCerrados = info.diaNumero - 1;
     const promCerrados = diasCerrados > 0 ? (sumMes - hoy2) / diasCerrados : hoy2;
-    const diasRestantes = info.totalDiasMes - info.diaNumero;
-    const proyeccion = sumMes + (promCerrados * diasRestantes);
-    $('valProyeccion').innerText = d2(proyeccion) + ' 🚀';
+    $('valProyeccion').innerText = d2(sumMes + promCerrados * (info.totalDiasMes - info.diaNumero)) + ' 🚀';
 
     calcularRacha(goal, hoy2);
-    renderRetiros(e, total);
-    renderHeatmap(goal, hoy2);
     renderizarGrafico(goal, hoy2, origen === 'tema');
-
     programarRespaldo();
-}
-
-/* =========================================================
-   RETIROS
-   ========================================================= */
-function renderRetiros(e, total) {
-    const minimo = getMinCobro();
-    $('valDisponible').innerText = d2(e);
-
-    const pct = minimo > 0 ? Math.min((total / minimo) * 100, 100) : 0;
-    $('fillCobro').style.width = pct + '%';
-    $('fillCobro').style.backgroundColor = e >= minimo ? 'var(--accent-green)' : (total >= minimo ? 'var(--accent-yellow)' : 'var(--accent-blue)');
-
-    if (e >= minimo) {
-        $('msgCobro').innerText = `Ya puedes cobrar ${d2(e)} 🏦`;
-    } else if (total >= minimo) {
-        $('msgCobro').innerText = `Reunido, esperando que ${d2(total - e)} pase a Ganado`;
-    } else {
-        const falta = minimo - total;
-        const ritmo = ritmoDiario(7);
-        if (ritmo > 0.0001) {
-            const dias = Math.ceil(falta / ritmo);
-            const fecha = parseFecha(info.id);
-            fecha.setDate(fecha.getDate() + dias);
-            $('msgCobro').innerText = `Faltan ${d2(falta)} · ~${dias} día${dias === 1 ? '' : 's'} (${fecha.getDate()} ${MESES_ABR[fecha.getMonth()]})`;
-        } else {
-            $('msgCobro').innerText = `Faltan ${d2(falta)} para el mínimo`;
-        }
-    }
-
-    $('btnRetiro').disabled = e <= 0;
-    $('valRetiradoTotal').innerText = d2(retiradoTotal());
-
-    const lista = $('listaRetiros');
-    lista.innerHTML = '';
-    if (retiros.length === 0) {
-        lista.innerHTML = '<div class="empty-note">Aún no has registrado retiros.</div>';
-        return;
-    }
-    retiros.forEach((r, idx) => {
-        const d = parseFecha(r.f);
-        const row = document.createElement('div');
-        row.className = 'retiro-item';
-        const izq = document.createElement('span');
-        izq.className = 'fecha';
-        izq.textContent = `${String(d.getDate()).padStart(2, '0')} ${MESES_ABR[d.getMonth()]} ${d.getFullYear()}${r.nota ? ' · ' + r.nota : ''}`;
-        const der = document.createElement('span');
-        der.style.display = 'flex'; der.style.alignItems = 'center'; der.style.gap = '8px';
-        const monto = document.createElement('span');
-        monto.className = 'monto'; monto.textContent = d2(r.m);
-        const del = document.createElement('button');
-        del.type = 'button'; del.title = 'Borrar este retiro'; del.textContent = '✕';
-        del.onclick = () => borrarRetiro(idx);
-        der.appendChild(monto); der.appendChild(del);
-        row.appendChild(izq); row.appendChild(der);
-        lista.appendChild(row);
-    });
-}
-
-function openRetiroModal() {
-    $('inputRetiroMonto').value = saldoE().toFixed(4);
-    $('inputRetiroFecha').value = info.id;
-    $('inputRetiroNota').value = '';
-    abrirModal('retiroModal');
-    setTimeout(() => $('inputRetiroMonto').focus(), 50);
-}
-function closeRetiroModal() { cerrarModal('retiroModal'); }
-
-function saveRetiroModal() {
-    const monto = num($('inputRetiroMonto').value);
-    const fecha = $('inputRetiroFecha').value || info.id;
-    const nota = $('inputRetiroNota').value.trim();
-    if (monto <= 0) { toast('El monto del retiro debe ser mayor que cero'); return; }
-    const e = saldoE();
-    if (monto > e + 0.0001) { toast(`Solo tienes ${d2(e)} en Ganado`); return; }
-
-    retiros.unshift({ f: fecha, m: monto, nota, ts: Date.now() });
-    sanearRetiros();
-
-    /* El saldo Ganado baja; el bruto no cambia porque el retiro entra en retiradoTotal. */
-    LS.set('lastEarnedJhon', Math.max(0, e - monto));
-
-    cerrarModal('retiroModal');
-    render('retiro');
-    toast(`Retiro de ${d2(monto)} registrado`);
-}
-
-function borrarRetiro(idx) {
-    const r = retiros[idx];
-    if (!r) return;
-    if (!confirm(`¿Borrar el retiro de ${d2(r.m)} del ${r.f}? El monto vuelve a tu saldo Ganado.`)) return;
-    LS.set('lastEarnedJhon', saldoE() + num(r.m));
-    retiros.splice(idx, 1);
-    sanearRetiros();
-    render('retiro');
-    toast('Retiro eliminado');
-}
-
-/* =========================================================
-   MAPA DE 90 DÍAS
-   ========================================================= */
-function renderHeatmap(goal, hoy2) {
-    const grid = $('heatGrid');
-    grid.innerHTML = '';
-    const inicio = parseFecha(info.id);
-    inicio.setDate(inicio.getDate() - 89);
-    let cumplidos = 0, conRegistro = 0, sumado = 0;
-
-    for (let i = 0; i < 90; i++) {
-        const f = fechaStr(inicio);
-        const esHoy = f === info.id;
-        const v = esHoy ? hoy2 : montoDeFecha(f);
-        const cell = document.createElement('div');
-        cell.className = 'heat-cell';
-        if (v === null) {
-            cell.title = `${f} · sin registro`;
-        } else {
-            conRegistro++; sumado += v;
-            if (goal > 0 && v >= goal) { cell.style.background = 'var(--accent-green)'; cell.style.borderColor = 'var(--accent-green)'; cumplidos++; }
-            else if (v > 0) { cell.style.background = 'var(--accent-yellow)'; cell.style.borderColor = 'var(--accent-yellow)'; }
-            else { cell.style.background = 'var(--accent-red)'; cell.style.borderColor = 'var(--accent-red)'; }
-            cell.title = `${f} · ${d2(v)}${esHoy ? ' (hoy)' : ''}`;
-        }
-        if (esHoy) cell.style.outline = '2px solid var(--accent-blue)';
-        grid.appendChild(cell);
-        inicio.setDate(inicio.getDate() + 1);
-    }
-
-    const pctExito = conRegistro > 0 ? Math.round((cumplidos / conRegistro) * 100) : 0;
-    $('heatResumen').innerText = `${cumplidos} de ${conRegistro} días con meta cumplida (${pctExito}%) · ${d2(sumado)} acumulado`;
 }
 
 /* =========================================================
@@ -705,7 +573,7 @@ function datosDelMes(hoy2) {
     return raw;
 }
 
-/* Reparto del excedente entre días flojos. Solo se usa si el usuario lo activa. */
+/* Reparte el excedente entre los días flojos. Solo si lo activas. */
 function nivelar(raw, goal) {
     const out = [...raw];
     let excedente = 0;
@@ -713,10 +581,7 @@ function nivelar(raw, goal) {
         if (out[i] > goal) { excedente += out[i] - goal; out[i] = goal; }
     }
     for (let i = 0; i < out.length && excedente > 0; i++) {
-        if (out[i] < goal) {
-            const fill = Math.min(excedente, goal - out[i]);
-            out[i] += fill; excedente -= fill;
-        }
+        if (out[i] < goal) { const fill = Math.min(excedente, goal - out[i]); out[i] += fill; excedente -= fill; }
     }
     if (excedente > 0) out[out.length - 1] += excedente;
     return out;
@@ -729,8 +594,8 @@ function renderizarGrafico(goal, hoy2, forzarDestruir = false) {
 
     $('btnSuavizado').innerText = suavizado ? 'Nivelado' : 'Real';
     $('btnSuavizado').title = suavizado
-        ? 'Mostrando el excedente repartido entre los días flojos. Toca para ver los datos reales.'
-        : 'Mostrando lo que ganaste cada día. Toca para ver la versión nivelada.';
+        ? 'Excedente repartido entre los días flojos. Toca para ver los datos reales.'
+        : 'Lo que ganaste cada día. Toca para ver la versión nivelada.';
 
     const labels = [], values = [], pointColors = [], bandaObjetivo = [];
     for (let i = 1; i <= info.totalDiasMes; i++) {
@@ -807,23 +672,18 @@ function renderizarGrafico(goal, hoy2, forzarDestruir = false) {
 }
 
 /* =========================================================
-   MODALES
+   MODAL / TOAST
    ========================================================= */
-function abrirModal(id) { $(id).style.display = 'flex'; }
-function cerrarModal(id) { $(id).style.display = 'none'; }
-
 function openManualModal() {
     $('inputManualEarned').value = LS.get('lastEarnedJhon', 0);
     $('inputManualPending').value = LS.get('lastPendingJhon', 0);
-    abrirModal('manualModal');
+    $('manualModal').style.display = 'flex';
     setTimeout(() => $('inputManualEarned').focus(), 50);
 }
-function closeManualModal() { cerrarModal('manualModal'); }
+function closeManualModal() { $('manualModal').style.display = 'none'; }
 function saveManualModal() {
-    LS.set('lastEarnedJhon', num($('inputManualEarned').value));
-    LS.set('lastPendingJhon', num($('inputManualPending').value));
-    cerrarModal('manualModal');
-    render('datos');
+    aplicarSaldos(num($('inputManualEarned').value), num($('inputManualPending').value));
+    closeManualModal();
 }
 
 document.addEventListener('keydown', ev => {
@@ -833,29 +693,56 @@ document.querySelectorAll('[data-modal]').forEach(m => {
     m.addEventListener('click', ev => { if (ev.target === m) m.style.display = 'none'; });
 });
 
-/* =========================================================
-   TOAST
-   ========================================================= */
 let toastTimer = null;
 function toast(msg) {
     const t = $('toast');
+    if (!t) return;
     t.textContent = msg;
     t.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
 }
 
 /* =========================================================
-   RESPALDO: exportar / importar / carpeta automática
+   ENTRADA DE DATOS
+   Punto único por donde deben entrar los saldos, venga del
+   modal, de otra pestaña o del userscript de Tampermonkey.
+   Desde el userscript:  window.SGSync.push(12.3456, 0.8900)
+   ========================================================= */
+function aplicarSaldos(e, p) {
+    LS.set('lastEarnedJhon', num(e));
+    LS.set('lastPendingJhon', num(p));
+    detectarMovimientos();
+    auditarCierreDia();
+    render('datos');
+}
+window.SGSync = {
+    push: (earned, pending) => aplicarSaldos(earned, pending),
+    estado: () => ({ earned: saldoE(), pending: saldoP(), retiros, historial })
+};
+
+/* sincronización entre pestañas del mismo origen */
+window.addEventListener('storage', ev => {
+    if (['syncTrigger', 'lastEarnedJhon', 'lastPendingJhon', 'retirosJhon', 'histJhon'].includes(ev.key)) {
+        retiros = LS.json('retirosJhon', retiros);
+        historial = LS.json('histJhon', historial);
+        detectarMovimientos();
+        auditarCierreDia();
+        render('datos');
+    }
+});
+
+/* =========================================================
+   RESPALDO
    ========================================================= */
 function exportarEstado() {
     return {
         app: 'metas-sproutgigs',
-        version: 2,
+        version: 3,
         generado: new Date().toISOString(),
         fechaVzla: info.id,
         meta: getMeta(),
-        minCobro: getMinCobro(),
+        minCobro: MIN_COBRO,
         saldos: { earned: saldoE(), pending: saldoP() },
         base,
         ultimaFecha: LS.get('fechaJhon'),
@@ -881,26 +768,27 @@ function importarArchivo(ev) {
         try {
             const obj = JSON.parse(reader.result);
             if (!obj || obj.app !== 'metas-sproutgigs') { toast('Ese archivo no es un respaldo de este sistema'); return; }
-            if (!confirm('Se van a combinar los datos del respaldo con los actuales. Los días que ya existan aquí se conservan. ¿Continuar?')) return;
+            if (!confirm('Se combinan los datos del respaldo con los actuales. Los días que ya existan aquí se conservan. ¿Continuar?')) return;
 
             const porFecha = new Map(historial.map(h => [h.f, h]));
             (obj.historial || []).forEach(h => { if (h && h.f && !porFecha.has(h.f)) porFecha.set(h.f, h); });
             historial = [...porFecha.values()];
             sanearHistorial();
 
-            const porTs = new Map(retiros.map(r => [r.f + '|' + r.m, r]));
-            (obj.retiros || []).forEach(r => { const k = r.f + '|' + num(r.m); if (!porTs.has(k)) porTs.set(k, r); });
-            retiros = [...porTs.values()];
+            const claves = new Map(retiros.map(r => [r.f + '|' + num(r.m).toFixed(4), r]));
+            (obj.retiros || []).forEach(r => { const k = r.f + '|' + num(r.m).toFixed(4); if (!claves.has(k)) claves.set(k, r); });
+            retiros = [...claves.values()];
             sanearRetiros();
 
             if (obj.saldos) {
                 LS.set('lastEarnedJhon', num(obj.saldos.earned));
                 LS.set('lastPendingJhon', num(obj.saldos.pending));
+                LS.set('prevEJhon', num(obj.saldos.earned));
+                LS.set('prevPJhon', num(obj.saldos.pending));
             }
             if (Number.isFinite(obj.base)) { base = num(obj.base); LS.set('baseJhon', base); }
-            if (obj.ultimaFecha) { LS.set('fechaJhon', obj.ultimaFecha); }
-            if (obj.meta) { $('goal').value = num(obj.meta); }
-            if (obj.minCobro) { $('minCobro').value = num(obj.minCobro); }
+            if (obj.ultimaFecha) LS.set('fechaJhon', obj.ultimaFecha);
+            if (obj.meta) $('goal').value = num(obj.meta);
 
             toast('Respaldo restaurado. Recargando…');
             setTimeout(() => location.reload(), 1200);
@@ -913,7 +801,6 @@ function importarArchivo(ev) {
     reader.readAsText(file);
 }
 
-/* --- carpeta local (File System Access API) --- */
 const soportaCarpeta = typeof window.showDirectoryPicker === 'function';
 let dirHandle = null;
 let respaldoTimer = null;
@@ -952,7 +839,7 @@ function estadoRespaldo(color, texto) {
 
 async function elegirCarpetaRespaldo() {
     if (!soportaCarpeta) {
-        toast('Tu navegador no permite escribir en carpetas. Usa Chrome o Edge de escritorio, o el botón de descargar.');
+        toast('Este navegador no permite escribir en carpetas. Usa Chrome o Edge de escritorio.');
         return;
     }
     try {
@@ -990,14 +877,11 @@ async function escribirRespaldo(silencioso = false) {
     try {
         const data = JSON.stringify(exportarEstado(), null, 2);
         await escribirArchivo('metas-sproutgigs-backup.json', data);
-
-        /* una copia fechada por día, para tener versiones en Mega */
         if (LS.get('snapJhon') !== info.id) {
             await escribirArchivo(`historial-${info.id}.json`, data);
             LS.set('snapJhon', info.id);
         }
-        const hora = getVzlaData().hora;
-        estadoRespaldo('var(--accent-green)', `Respaldado en tu carpeta · ${hora}`);
+        estadoRespaldo('var(--accent-green)', `Respaldado en tu carpeta · ${getVzlaData().hora}`);
     } catch (e) {
         estadoRespaldo('var(--accent-red)', 'Error al escribir el respaldo');
         if (!silencioso) toast('No se pudo escribir en la carpeta');
@@ -1039,7 +923,6 @@ window.addEventListener('beforeunload', () => { if (dirHandle) escribirRespaldo(
 function exportarExcelPro() {
     const goal = getMeta();
     const wb = XLSX.utils.book_new();
-
     const e = saldoE(), p = saldoP();
     const hoy2 = Math.round(Math.max(0, bruto() - base) * 100) / 100;
 
@@ -1085,13 +968,13 @@ function exportarExcelPro() {
         ["Total retirado ($)", Number(retiradoTotal().toFixed(2))],
         ["Saldo Ganado ($)", Number(e.toFixed(4))],
         ["Saldo Pendiente ($)", Number(p.toFixed(4))],
-        ["Mínimo de cobro ($)", getMinCobro()]
+        ["Mínimo de cobro ($)", MIN_COBRO]
     ]);
     XLSX.utils.book_append_sheet(wb, wsR, "Resumen Global");
 
-    const wsRet = [["FECHA", "MONTO ($)", "NOTA"]];
-    retiros.forEach(r => wsRet.push([r.f, num(r.m), r.nota || ""]));
-    if (retiros.length === 0) wsRet.push(["—", 0, "Sin retiros registrados"]);
+    const wsRet = [["FECHA", "HORA", "MONTO ($)"]];
+    retiros.forEach(r => wsRet.push([r.f, r.hora || "", num(r.m)]));
+    if (retiros.length === 0) wsRet.push(["—", "", 0]);
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsRet), "Retiros");
 
     for (const k in sheetsData) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sheetsData[k]), k.slice(0, 31));
@@ -1103,24 +986,9 @@ function exportarExcelPro() {
    ========================================================= */
 let debounceMeta = null;
 $('goal').value = LS.get('metaJhon', 0.50);
-$('minCobro').value = LS.get('minCobroJhon', 5);
-
 $('goal').addEventListener('input', () => {
     clearTimeout(debounceMeta);
     debounceMeta = setTimeout(() => render('meta'), 300);
-});
-$('minCobro').addEventListener('input', () => {
-    clearTimeout(debounceMeta);
-    debounceMeta = setTimeout(() => render('meta'), 300);
-});
-
-/* sincronización entre pestañas o con un script externo que escriba los saldos */
-window.addEventListener('storage', ev => {
-    if (['syncTrigger', 'lastEarnedJhon', 'lastPendingJhon', 'retirosJhon', 'histJhon'].includes(ev.key)) {
-        retiros = LS.json('retirosJhon', retiros);
-        historial = LS.json('histJhon', historial);
-        render('datos');
-    }
 });
 
 render('init');
