@@ -288,6 +288,8 @@ $('txtDia').innerText = info.labelPrincipal;
 $('txtDateTime').innerText = info.hora;
 setInterval(() => { $('txtDateTime').innerText = getVzlaData().hora; }, 30000);
 
+window.addEventListener('error', ev => { try { toast('Error: ' + ev.message); } catch (_) {} });
+
 /* ---------- tema ---------- */
 const temaGuardado = LS.get('jhonTheme');
 document.body.setAttribute('data-theme', temaGuardado || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
@@ -306,6 +308,7 @@ let base      = num(LS.get('baseJhon', 0));
 let ultimaFecha = LS.get('fechaJhon');
 let miGrafico = null;
 let suavizado = LS.get('suavizadoJhon', '0') === '1';
+let toastTimer = null; /* declarado arriba a propósito: toast() se usa durante el arranque */
 
 function saldoE() { return num(LS.get('lastEarnedJhon', 0)); }
 function saldoP() { return num(LS.get('lastPendingJhon', 0)); }
@@ -377,24 +380,28 @@ function detectarMovimientos() {
     const total = e + p;
     const delta = Math.round((total - totalAnt) * 10000) / 10000;
 
+    /* La lectura nueva se guarda PRIMERO. Así, pase lo que pase después,
+       el mismo movimiento nunca se puede registrar dos veces. */
+    LS.set('prevEJhon', e);
+    LS.set('prevPJhon', p);
+
+    let aviso = '';
     if (delta <= -MIN_COBRO) {
         const monto = -delta;
         const vz = getVzlaData();
         retiros.unshift({ f: vz.id, m: monto, hora: vz.hora, ts: Date.now() });
         sanearRetiros();
-        toast(`Retiro detectado: ${d2(monto)} · ${vz.id}`);
+        aviso = `Retiro detectado: ${d2(monto)} · ${vz.id}`;
     } else if (delta >= MIN_COBRO) {
         const idx = retiros.findIndex(r => Math.abs(num(r.m) - delta) < EPS);
         if (idx !== -1) {
             const r = retiros[idx];
             retiros.splice(idx, 1);
             guardarRetiros();
-            toast(`Retiro cancelado en SproutGigs: ${d2(r.m)} de vuelta`);
+            aviso = `Retiro cancelado en SproutGigs: ${d2(r.m)} de vuelta`;
         }
     }
-
-    LS.set('prevEJhon', e);
-    LS.set('prevPJhon', p);
+    if (aviso) toast(aviso);
 }
 
 /* ---------- cierre de día ---------- */
@@ -693,7 +700,6 @@ document.querySelectorAll('[data-modal]').forEach(m => {
     m.addEventListener('click', ev => { if (ev.target === m) m.style.display = 'none'; });
 });
 
-let toastTimer = null;
 function toast(msg) {
     const t = $('toast');
     if (!t) return;
