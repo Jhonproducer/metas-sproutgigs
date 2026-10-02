@@ -393,10 +393,16 @@ function detectarMovimientos() {
         sanearRetiros();
         aviso = `Retiro detectado: ${d2(monto)} · ${vz.id}`;
     } else if (delta >= MIN_COBRO) {
-        const idx = retiros.findIndex(r => Math.abs(num(r.m) - delta) < EPS);
-        if (idx !== -1) {
-            const r = retiros[idx];
-            retiros.splice(idx, 1);
+        /* Cancelación: el total sube y encaja con un retiro guardado. Se tolera un
+           resto pequeño (trabajo hecho entre dos lecturas) y se elige el mejor encaje. */
+        let mejor = -1, mejorResto = Infinity;
+        retiros.forEach((r, i) => {
+            const resto = delta - num(r.m);
+            if (resto >= -EPS && resto < MIN_COBRO && resto < mejorResto) { mejor = i; mejorResto = resto; }
+        });
+        if (mejor !== -1) {
+            const r = retiros[mejor];
+            retiros.splice(mejor, 1);
             guardarRetiros();
             aviso = `Retiro cancelado en SproutGigs: ${d2(r.m)} de vuelta`;
         }
@@ -436,6 +442,23 @@ function auditarCierreDia() {
     if (!ultimaFecha) { ultimaFecha = info.id; LS.set('fechaJhon', info.id); }
 }
 
+/* Reparación puntual: abrir el tablero con ?reparar=13.45 deja el registro de
+   retiros con UN solo retiro de ese monto (hoy), sincroniza la última lectura y
+   limpia la URL. No toca el histórico ni la base del día. */
+function repararDesdeURL() {
+    let monto = 0;
+    try { monto = num(new URLSearchParams(location.search).get('reparar')); } catch (e) { return; }
+    if (monto <= 0) return;
+    retiros = [{ f: info.id, m: monto, hora: '', ts: Date.now() }];
+    guardarRetiros();
+    LS.set('prevEJhon', saldoE());
+    LS.set('prevPJhon', saldoP());
+    localStorage.removeItem('celebradoJhon');
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+    toast(`Retiros reparados: queda 1 retiro de ${d2(monto)}`);
+}
+
+repararDesdeURL();
 detectarMovimientos();
 auditarCierreDia();
 
